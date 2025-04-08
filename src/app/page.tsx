@@ -55,7 +55,7 @@ export default function HomePage() {
   return (
     <motion.main 
       ref={containerRef}
-      className="relative min-h-[200vh] w-full bg-white overflow-hidden px-4"
+      className="relative min-h-[200vh] w-full bg-white overflow-hidden"
       initial="hidden"
       animate="visible"
       variants={fadeIn}
@@ -458,6 +458,155 @@ export default function HomePage() {
             })}
           </div>
         </motion.div>
+      </div>
+
+      {/* New Section with Cards */}
+      <div className="w-full bg-[#fff5f7] min-h-screen flex items-center justify-center py-20 pt-40">
+        <div className="w-full max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Animations Card */}
+            <motion.div 
+              className="bg-[#ffffff] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="p-8">
+                <div className="relative h-64 w-full">
+                  <Image
+                    src="/mac.png"
+                    alt="Animations"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-2xl font-bold mb-3">Animations</h3>
+                  <p className="text-gray-600 mb-6">
+                    Animations made with After Effects, Premiere Pro, Photoshop, FIGMA and Blender
+                  </p>
+                  <Link 
+                    href="/projects"
+                    className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
+                  >
+                    See
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Photography Card */}
+            <motion.div 
+              className="bg-[#ffffff] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="p-8">
+                <div className="relative h-64 w-full">
+                  <Image
+                    src="/fx3.png"
+                    alt="Photography"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-2xl font-bold mb-3">Photography</h3>
+                  <p className="text-gray-600 mb-6">
+                    Photos and cinematic video projects i made
+                  </p>
+                  <Link 
+                    href="/projects"
+                    className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
+                  >
+                    See
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <div className="w-full bg-[#520066]">
+        <div className="py-4">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col">
+              {/* Main Footer Content */}
+              <div className="flex items-center justify-between mb-4">
+                {/* Left Side: Logo and Email */}
+                <div className="flex items-center space-x-6">
+                  <Link href="/" className="w-12 h-12 relative">
+                    <Image
+                      src="/Sentimental_Icon_white.png"
+                      alt="Miizu Logo"
+                      fill
+                      className="object-contain"
+                    />
+                  </Link>
+                  <a 
+                    href="mailto:hey@miizumelon.de"
+                    className="text-white text-base hover:text-[#fc87f0] transition-colors duration-300"
+                  >
+                    hey@miizumelon.de
+                  </a>
+                </div>
+
+                {/* Right Side: Social Links */}
+                <div className="flex space-x-6">
+                  <a 
+                    href="https://x.com/heymiizu" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-white text-base hover:text-[#fc87f0] transition-colors duration-300"
+                  >
+                    Twitter
+                  </a>
+                  <a 
+                    href="https://www.instagram.com/miizumelon/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-white text-base hover:text-[#fc87f0] transition-colors duration-300"
+                  >
+                    Instagram
+                  </a>
+                  <a 
+                    href="https://www.youtube.com/@Miizumelon" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-white text-base hover:text-[#fc87f0] transition-colors duration-300"
+                  >
+                    YouTube
+                  </a>
+                </div>
+              </div>
+
+              {/* Made with Heart - Centered at Bottom */}
+              <div className="flex justify-center border-t border-white/10 pt-3">
+                <div className="text-white text-xs flex items-center space-x-1 opacity-70">
+                  <span>Made with</span>
+                  <motion.span
+                    className="text-[#fc87f0]"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    ❤️
+                  </motion.span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </motion.main>
   );
