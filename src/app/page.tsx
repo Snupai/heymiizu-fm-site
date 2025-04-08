@@ -33,7 +33,6 @@ export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [nextPage, setNextPage] = useState("");
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
@@ -47,7 +46,7 @@ export default function HomePage() {
     setIsTransitioning(false);
   }, [pathname]);
 
-  const handleLinkClick = (e: React.MouseEvent, href: string) => {
+  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
     // Disable transition animation for navigation
     // No need to set isTransitioning or nextPage
   };
@@ -91,7 +90,7 @@ export default function HomePage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                {nextPage}
+                Loading...
               </motion.h1>
             </motion.div>
           </motion.div>
@@ -415,8 +414,8 @@ export default function HomePage() {
                 }
               };
 
-              const fileName = bubble.src.split('/').pop() || '';
-              const pattern = patterns[fileName] || { y: [0, -1, 0], x: [-1, 1, -1], duration: 14 };
+              const fileName = bubble.src.split('/').pop() ?? '';
+              const pattern = patterns[fileName] ?? { y: [0, -1, 0], x: [-1, 1, -1], duration: 14 };
 
               return (
                 <motion.div

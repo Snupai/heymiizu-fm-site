@@ -67,7 +67,7 @@ export default function ProjectsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Here are some of the projects I've worked on. Each one represents a unique challenge and learning experience.
+          Here are some of the projects I&apos;ve worked on. Each one represents a unique challenge and learning experience.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl z-50">

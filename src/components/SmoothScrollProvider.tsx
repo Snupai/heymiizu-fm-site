@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { Events, scrollSpy } from 'react-scroll';
-import { scrollConfig } from '../utils/scrollConfig';
 
 interface SmoothScrollProviderProps {
   children: React.ReactNode;

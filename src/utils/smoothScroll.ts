@@ -6,7 +6,7 @@
  */
 export const smoothScroll = (
   target: HTMLElement | number,
-  duration: number = 1500,
+  duration = 1500,
   easing?: (t: number) => number
 ): void => {
   // If target is a number, treat it as a position
@@ -27,10 +27,10 @@ export const smoothScroll = (
   };
   
   // Use provided easing function or default
-  const easeFunction = easing || defaultEasing;
+  const easeFunction = easing ?? defaultEasing;
   
   function animation(currentTime: number) {
-    if (startTime === null) startTime = currentTime;
+    startTime ??= currentTime;
     const timeElapsed = currentTime - startTime;
     const progress = Math.min(timeElapsed / duration, 1);
     
