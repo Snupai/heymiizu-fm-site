@@ -1,9 +1,13 @@
 "use client";
 
-import { Inter } from "next/font/google";
+import { Public_Sans } from "next/font/google";
 import "../styles/globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const publicSans = Public_Sans({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-public-sans"
+});
 
 export default function RootLayout({
   children,
@@ -12,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${publicSans.variable} font-sans`}>
         {children}
       </body>
     </html>
