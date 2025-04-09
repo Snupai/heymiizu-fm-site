@@ -10,7 +10,7 @@ const publicSans = Public_Sans({
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    metadataBase: new URL('https://miizumelon.de'),
+    metadataBase: new URL('https://heymiizu-fm-site-git-main-snupai.vercel.app'),
     title: 'Hey Miizu!',
     description: "Hey Miizu, i was wondering if you could show me some of your projects you've been making recently.",
     icons: {
