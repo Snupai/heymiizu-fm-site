@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../../components/Logo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 // Animation variants for staggered fade-in
@@ -71,48 +71,13 @@ const pageVariants = {
   visible: { opacity: 1 }
 };
 
-export default function ProjectsPage() {
+// Create a separate component for the main content
+function ProjectsContent() {
   const [activeCategory, setActiveCategory] = useState("Everything");
-  const [time, setTime] = useState(0);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Scroll to top on page load
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Update active category based on URL parameter
-  useEffect(() => {
-    const categoryParam = searchParams.get('category');
-    if (categoryParam) {
-      // Convert URL parameter to category name format
-      let categoryName = "Everything";
-      
-      if (categoryParam === "after-effects") {
-        categoryName = "Animations";
-      } else if (categoryParam === "photography") {
-        categoryName = "Photography";
-      } else if (categoryParam === "vfx") {
-        categoryName = "VFX";
-      }
-      
-      setActiveCategory(categoryName);
-    }
-  }, [searchParams]);
-
-  // Update time for continuous animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(prev => prev + 1);
-      messageBubbles.forEach(bubble => {
-        bubble.pattern = createRandomPattern();
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
+  
+  // Define categories
   const categories = [
     { name: "Everything", icon: "•" },
     { 
@@ -143,6 +108,40 @@ export default function ProjectsPage() {
       )
     },
   ];
+  
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Update active category based on URL parameter
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      // Convert URL parameter to category name format
+      let categoryName = "Everything";
+      
+      if (categoryParam === "after-effects") {
+        categoryName = "Animations";
+      } else if (categoryParam === "photography") {
+        categoryName = "Photography";
+      } else if (categoryParam === "vfx") {
+        categoryName = "VFX";
+      }
+      
+      setActiveCategory(categoryName);
+    }
+  }, [searchParams]);
+
+  // Update time for continuous animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      messageBubbles.forEach(bubble => {
+        bubble.pattern = createRandomPattern();
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle link click for navigation
   const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
@@ -770,5 +769,18 @@ export default function ProjectsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+// Main component with Suspense boundary
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-2xl font-bold">Loading projects...</div>
+      </div>
+    }>
+      <ProjectsContent />
+    </Suspense>
   );
 } 
