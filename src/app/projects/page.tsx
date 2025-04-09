@@ -27,13 +27,6 @@ interface MessageBubble {
   };
 }
 
-interface AnimationPattern {
-  y: number;
-  x: number;
-  rotate: number;
-  duration: number;
-}
-
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
   const baseAmplitude = 0.8;
