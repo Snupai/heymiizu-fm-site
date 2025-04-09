@@ -321,7 +321,7 @@ export default function HomePage() {
       <div className="sticky top-0 min-h-screen">
         {/* Background Mac */}
         <motion.div
-          className="absolute inset-0 opacity-90 flex items-center justify-center"
+          className="absolute inset-0 opacity-90 flex items-center z-100 justify-center"
           style={{
             y: macY,
             scale: macScale,
@@ -347,14 +347,14 @@ export default function HomePage() {
           transition={{ duration: 0.6, delay: 0.5 }}
         >
           <motion.h1 
-            className="text-8xl font-bold mb-4 text-center z-50 relative"
+            className="text-8xl font-bold mb-4 text-center z-150 relative"
             variants={fadeInUp}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
             Hey, Im Miizu
           </motion.h1>
           <motion.p 
-            className="text-xl mb-8 text-center z-50 relative"
+            className="text-xl mb-8 text-center z-150 relative"
             variants={fadeInUp}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
@@ -366,7 +366,7 @@ export default function HomePage() {
           >
             <Link 
               href="/projects"
-              className="bg-[#0095FF] text-white px-8 py-3 rounded-full text-lg hover:bg-[#0077CC] transition-colors z-50 relative"
+              className="bg-[#0095FF] text-white px-8 py-3 rounded-full text-lg hover:bg-[#0077CC] transition-colors z-150 relative"
             >
               Projects
             </Link>
@@ -460,7 +460,7 @@ export default function HomePage() {
       </div>
 
       {/* New Section with Cards */}
-      <div className="w-full bg-[#fff5f7] min-h-screen flex items-center justify-center py-20 pt-60">
+      <div className="w-full bg-[#fff5f7] min-h-screen flex items-center justify-center py-20 pt-80">
         <div className="w-full max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Animations Card */}
@@ -486,7 +486,7 @@ export default function HomePage() {
                     Animations made with After Effects, Premiere Pro, Photoshop, FIGMA and Blender
                   </p>
                   <Link 
-                    href="/projects"
+                    href="/projects?category=after-effects"
                     className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
                   >
                     See
@@ -518,7 +518,7 @@ export default function HomePage() {
                     Photos and cinematic video projects i made
                   </p>
                   <Link 
-                    href="/projects"
+                    href="/projects?category=photography"
                     className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
                   >
                     See
@@ -527,6 +527,22 @@ export default function HomePage() {
               </div>
             </motion.div>
           </div>
+          
+          {/* See Everything Button */}
+          <motion.div 
+            className="flex justify-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Link 
+              href="/projects?category=everything"
+              className="bg-[#0095FF] text-white px-10 py-4 rounded-full text-lg font-medium hover:bg-[#0077CC] transition-colors shadow-lg hover:shadow-xl"
+            >
+              Projects
+            </Link>
+          </motion.div>
         </div>
       </div>
 

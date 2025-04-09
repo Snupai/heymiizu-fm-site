@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logo from "../../components/Logo";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 // Animation variants for staggered fade-in
 const fadeInUp = {
@@ -75,12 +75,32 @@ export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState("Everything");
   const [time, setTime] = useState(0);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Update active category based on URL parameter
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      // Convert URL parameter to category name format
+      let categoryName = "Everything";
+      
+      if (categoryParam === "after-effects") {
+        categoryName = "Animations";
+      } else if (categoryParam === "photography") {
+        categoryName = "Photography";
+      } else if (categoryParam === "vfx") {
+        categoryName = "VFX";
+      }
+      
+      setActiveCategory(categoryName);
+    }
+  }, [searchParams]);
 
   // Update time for continuous animation
   useEffect(() => {
@@ -130,12 +150,35 @@ export default function ProjectsPage() {
     // No need to set isTransitioning or nextPage
   };
 
+  // Handle category change
+  const handleCategoryChange = (categoryName: string) => {
+    setActiveCategory(categoryName);
+    
+    // Update URL with category parameter
+    let categoryParam = "everything";
+    
+    if (categoryName === "Animations") {
+      categoryParam = "after-effects";
+    } else if (categoryName === "Photography") {
+      categoryParam = "photography";
+    } else if (categoryName === "VFX") {
+      categoryParam = "vfx";
+    }
+    
+    // Use window.history to update URL without page reload
+    const url = new URL(window.location.href);
+    url.searchParams.set('category', categoryParam);
+    window.history.pushState({}, '', url.toString());
+  };
+
   return (
     <main className="relative min-h-screen w-full bg-white overflow-hidden">
       {/* Logo */}
       <motion.div 
         className="fixed top-8 left-[20%] z-30"
         variants={fadeInUp}
+        initial="hidden"
+        animate="visible"
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <Logo />
@@ -482,7 +525,7 @@ export default function ProjectsPage() {
           {categories.map((category) => (
             <button
               key={category.name}
-              onClick={() => setActiveCategory(category.name)}
+              onClick={() => handleCategoryChange(category.name)}
               className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
                 activeCategory === category.name
                 ? "bg-black text-white"
