@@ -389,6 +389,14 @@ export default function ContactPage() {
                   >
                     ❤️
                   </motion.span>
+                  <span>by</span>
+                    <a 
+                      href="https://snupai.me" 
+                      target="_blank" 
+                      className="hover:text-white transition-colors duration-300"
+                    >
+                      Snupai
+                    </a>
                 </div>
               </div>
             </div>
