@@ -329,7 +329,7 @@ export default function HomePage() {
           variants={fadeIn}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="relative w-[69%] aspect-[16/10] translate-y-[45vh]">
+          <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh]">
             <Image
               src="/mac.png"
               alt="Mac Display"
@@ -342,27 +342,27 @@ export default function HomePage() {
 
         {/* Main Content */}
         <motion.div 
-          className="relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto pt-32"
+          className="relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto pt-54"
           variants={fadeInUp}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
           <motion.h1 
             className="text-8xl font-bold mb-4 text-center z-50 relative"
             variants={fadeInUp}
-            transition={{ duration: 0.5, delay: 0.6 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
           >
             Hey, Im Miizu
           </motion.h1>
           <motion.p 
             className="text-xl mb-8 text-center z-50 relative"
             variants={fadeInUp}
-            transition={{ duration: 0.5, delay: 0.7 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
           >
             Wanna see something cool?
           </motion.p>
           <motion.div
             variants={fadeInUp}
-            transition={{ duration: 0.5, delay: 0.8 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
           >
             <Link 
               href="/projects"
@@ -444,7 +444,7 @@ export default function HomePage() {
                     transformOrigin: "center",
                   }}
                 >
-                  <div className="w-[1000px] h-[400px] relative">
+                  <div className="w-[1000px] h-[440px] relative">
                     <Image
                       src={bubble.src}
                       alt="Message Bubble"
@@ -460,7 +460,7 @@ export default function HomePage() {
       </div>
 
       {/* New Section with Cards */}
-      <div className="w-full bg-[#fff5f7] min-h-screen flex items-center justify-center py-20 pt-40">
+      <div className="w-full bg-[#fff5f7] min-h-screen flex items-center justify-center py-20 pt-60">
         <div className="w-full max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Animations Card */}
