@@ -132,7 +132,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-medium">Email</h3>
-                  <p className="text-gray-600">hello@miizu.dev</p>
+                  <p className="text-gray-600">hey@miizumelon.de</p>
                 </div>
               </div>
               <div className="flex items-start">
