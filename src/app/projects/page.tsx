@@ -27,6 +27,16 @@ interface MessageBubble {
   };
 }
 
+type Media = {
+  src: string;
+};
+
+type Project = {
+  title: string;
+  description: string;
+  media?: Media;
+};
+
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
   const baseAmplitude = 0.8;
@@ -561,8 +571,20 @@ function ProjectsContent() {
                 </div>
               ),
               projects: [
-                { title: "Animation Project 1", description: "A placeholder animation project showcasing various techniques." },
-                { title: "Animation Project 2", description: "A placeholder animation project showcasing various techniques." }
+                { 
+                  title: "Animation Project 1", 
+                  description: "A placeholder animation project showcasing various techniques.",
+                  media: undefined
+                  /*media: {
+                    src: 'https://cdn.discordapp.com/attachments/1295130916326477844/1362148553593721003/Bildschirmfoto_2025-04-16_um_21.31.54.
+                    png?ex=68015732&is=680005b2&hm=7ab0f904c204bc68018ade1bbbcd1f987221d05423e39d2184373d02fa9fcd94&'
+                  }*/
+                },
+                { 
+                  title: "Animation Project 2", 
+                  description: "A placeholder animation project showcasing various techniques.",
+                  media: undefined
+                }
               ]
             },
             {
@@ -570,8 +592,16 @@ function ProjectsContent() {
               description: "Visual effects and motion graphics created for various projects",
               icon: "✨",
               projects: [
-                { title: "VFX Project 1", description: "A placeholder VFX project with stunning visual effects." },
-                { title: "VFX Project 2", description: "A placeholder VFX project with stunning visual effects." }
+                { 
+                  title: "VFX Project 1", 
+                  description: "A placeholder VFX project with stunning visual effects.",
+                  media: undefined
+                },
+                { 
+                  title: "VFX Project 2", 
+                  description: "A placeholder VFX project with stunning visual effects.",
+                  media: undefined
+                }
               ]
             },
             {
@@ -588,8 +618,16 @@ function ProjectsContent() {
                 </div>
               ),
               projects: [
-                { title: "Photography Project 1", description: "A placeholder photography project capturing beautiful moments." },
-                { title: "Photography Project 2", description: "A placeholder photography project capturing beautiful moments." }
+                { 
+                  title: "Photography Project 1", 
+                  description: "A placeholder photography project capturing beautiful moments.",
+                  media: undefined
+                },
+                { 
+                  title: "Photography Project 2", 
+                  description: "A placeholder photography project capturing beautiful moments.",
+                  media: undefined
+                }
               ]
             },
             {
@@ -597,8 +635,16 @@ function ProjectsContent() {
               description: "Custom projects created for clients",
               icon: "💼",
               projects: [
-                { title: "Commission Project 1", description: "A custom project created for a client." },
-                { title: "Commission Project 2", description: "A custom project created for a client." }
+                { 
+                  title: "Commission Project 1", 
+                  description: "A custom project created for a client.",
+                  media: undefined
+                },
+                { 
+                  title: "Commission Project 2", 
+                  description: "A custom project created for a client.",
+                  media: undefined
+                }
               ]
             }
           ]
@@ -629,7 +675,7 @@ function ProjectsContent() {
                   className="grid grid-cols-1 md:grid-cols-2 gap-8"
                   layout
                 >
-                  {category.projects.map((project, index) => (
+                  {category.projects.map((project: Project, index) => (
                     <motion.div 
                       key={project.title}
                       layout
@@ -646,12 +692,14 @@ function ProjectsContent() {
                       }}
                       className="bg-white rounded-xl shadow-lg overflow-hidden"
                     >
-                      <div className="relative h-64">
+                      <div className="relative w-full" style={{ paddingTop: '56.25%' }}> {/* 16:9 aspect ratio */}
                         <Image
-                          src="/dd8ushtKAafNiPreGQQfuOm10U.jpg"
+                          src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
                           alt={project.title}
                           fill
-                          className="object-cover"
+                          className="object-contain bg-[#f3caed]"
+                          unoptimized={false}
+                          priority={true}
                         />
                       </div>
                       <div className="p-6 relative">
