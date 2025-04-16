@@ -675,7 +675,8 @@ function ProjectsContent() {
                   className="grid grid-cols-1 md:grid-cols-2 gap-8"
                   layout
                 >
-                  {category.projects.map((project: Project, index) => (
+                {/*{category.projects.map((project: Project, index) => (*/}
+                  {[...category.projects].reverse().map((project: Project, index) => (
                     <motion.div 
                       key={project.title}
                       layout
