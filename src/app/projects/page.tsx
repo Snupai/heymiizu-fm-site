@@ -100,6 +100,10 @@ function ProjectsContent() {
         </div>
       )
     },
+    { 
+      name: "Commissions", 
+      icon: "💼"
+    },
   ];
   
   // Scroll to top on page load
@@ -120,6 +124,8 @@ function ProjectsContent() {
         categoryName = "Photography";
       } else if (categoryParam === "vfx") {
         categoryName = "VFX";
+      } else if (categoryParam === "commissions") {
+        categoryName = "Commissions";
       }
       
       setActiveCategory(categoryName);
@@ -155,6 +161,8 @@ function ProjectsContent() {
       categoryParam = "photography";
     } else if (categoryName === "VFX") {
       categoryParam = "vfx";
+    } else if (categoryName === "Commissions") {
+      categoryParam = "commissions";
     }
     
     // Use window.history to update URL without page reload
@@ -582,6 +590,15 @@ function ProjectsContent() {
               projects: [
                 { title: "Photography Project 1", description: "A placeholder photography project capturing beautiful moments." },
                 { title: "Photography Project 2", description: "A placeholder photography project capturing beautiful moments." }
+              ]
+            },
+            {
+              name: "Commissions",
+              description: "Custom projects created for clients",
+              icon: "💼",
+              projects: [
+                { title: "Commission Project 1", description: "A custom project created for a client." },
+                { title: "Commission Project 2", description: "A custom project created for a client." }
               ]
             }
           ]
