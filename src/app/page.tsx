@@ -351,7 +351,7 @@ export default function HomePage() {
             variants={fadeInUp}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            Hey, Im Miizu
+            {"Hey, I'm Miizu"}
           </motion.h1>
           <motion.p 
             className="text-xl mb-8 text-center z-150 relative"
