@@ -89,7 +89,7 @@ export default function ContactPage() {
         variants={fadeInUp}
         initial="hidden"
         animate="visible"
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.3, delay: 0 }}
       >
         <Logo />
       </motion.div>
@@ -100,7 +100,7 @@ export default function ContactPage() {
         initial="hidden"
         animate="visible"
         variants={fadeInUp}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        transition={{ duration: 0.25, delay: 0.05 }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-white/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/50 to-white/70" style={{
