@@ -1,19 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
-import { useState, useEffect } from "react";
-
-// Animation variants for staggered fade-in
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
-};
 
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
@@ -42,13 +33,6 @@ interface MessageBubble {
   };
 }
 
-interface AnimationPattern {
-  y: number;
-  x: number;
-  rotate: number;
-  duration: number;
-}
-
 const messageBubbles: MessageBubble[] = [
   { 
     src: "/message_bubbles/ContactHEY.png", 
@@ -69,17 +53,6 @@ const messageBubbles: MessageBubble[] = [
 ];
 
 export default function ContactPage() {
-  const pathname = usePathname();
-  const [patterns, setPatterns] = useState<AnimationPattern[]>(messageBubbles.map(() => createRandomPattern()));
-
-  // Update time for continuous animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPatterns(messageBubbles.map(() => createRandomPattern()));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-  
   return (
     <main className="relative w-full bg-white overflow-hidden px-4 flex flex-col">
       {/* --- Removed Logo (now part of Navbar) --- */}
