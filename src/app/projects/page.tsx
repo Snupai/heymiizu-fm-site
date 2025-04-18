@@ -615,13 +615,13 @@ export default function ProjectsPage() {
             ]
           },
           {
-            name: "@Seltix",
-            description: "I-CLIP ad-segment",
+            name: "Commissions",
+            description: "Commissioned projects",
             icon: "💼",
             projects: [
               { 
-                title: "Commission Project 1", 
-                description: "A custom project created for a client.",
+                title: "@Seltix", 
+                description: "I-CLIP ad-segment",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/rend/93wWQRnnS75_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/image/93wWQRnnS75_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6"
