@@ -3,7 +3,8 @@ import "../styles/globals.css";
 import type { Metadata } from 'next'
 import NavbarContent from "../components/Navbar";
 import FooterContent from "../components/Footer";
-import React from "react";
+import Spinner from "../components/Spinner";
+import React, { Suspense } from "react";
 const publicSans = Public_Sans({ 
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -60,7 +61,9 @@ export default function RootLayout({
       <body className={`${publicSans.variable} font-sans min-h-screen flex flex-col`}>
         <NavbarContent />
         <div className="flex-1 flex flex-col">
-          {children}
+          <Suspense fallback={<Spinner />}>
+            {children}
+          </Suspense>
         </div>
         <FooterContent />
       </body>
