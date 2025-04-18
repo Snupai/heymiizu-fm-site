@@ -30,6 +30,7 @@ type Project = {
   description: string;
   media?: Media;
   aspect?: "16:9" | "4:3" | "3:4";
+  link?: string; // Optional hyperlink for the project title
 };
 
 // Create more natural, random-looking patterns
@@ -157,7 +158,15 @@ function ProjectCard({
       {/* Card Content */}
       <div className="p-6 flex flex-col flex-1 justify-end">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-lg font-bold">{project.title}</span>
+          <span className="text-lg font-bold">
+            {project.link ? (
+              <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline">
+                {project.title}
+              </a>
+            ) : (
+              project.title
+            )}
+          </span>
           <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">
             {categoryName === "Photography" && (
               <span className="inline-block w-4 h-4 mr-1">
@@ -625,7 +634,8 @@ export default function ProjectsPage() {
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/rend/93wWQRnnS75_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/image/93wWQRnnS75_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6"
-                }
+                },
+                link: "https://youtube.com/@SELTIXX"
               },
               { 
                 title: "@Nils Schlieper", 
@@ -633,7 +643,8 @@ export default function ProjectsPage() {
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/rend/Asr26Wrp6ps_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FAsr26Wrp6ps%2Frend%2F*%21%2Fi%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Fimage%2F*%21%2FAsr26Wrp6ps%2Fcaptions%2F*%7Ehmac%3D1f2e31c3f0a490eaf0b6ce8563fed20e3a9c3049f876166dd0e7ea200dc93b8e",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/image/Asr26Wrp6ps_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FAsr26Wrp6ps%2Frend%2F*%21%2Fi%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Fimage%2F*%21%2FAsr26Wrp6ps%2Fcaptions%2F*%7Ehmac%3D1f2e31c3f0a490eaf0b6ce8563fed20e3a9c3049f876166dd0e7ea200dc93b8e"
-                }
+                },
+                link: "https://youtube.com/@nils.schlieper"
               },
               {
                 title: "@Nils Schlieper",
@@ -641,7 +652,8 @@ export default function ProjectsPage() {
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/rend/U7rUzTdyfKy_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FU7rUzTdyfKy%2Frend%2F*%21%2Fi%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Fimage%2F*%21%2FU7rUzTdyfKy%2Fcaptions%2F*%7Ehmac%3D45b9dfac4cf7db43fa8102475cd12cae2092ff5bc6678692dcb2e8afc7d07d85",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/image/U7rUzTdyfKy_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FU7rUzTdyfKy%2Frend%2F*%21%2Fi%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Fimage%2F*%21%2FU7rUzTdyfKy%2Fcaptions%2F*%7Ehmac%3D45b9dfac4cf7db43fa8102475cd12cae2092ff5bc6678692dcb2e8afc7d07d85"
-                }
+                },
+                link: "https://youtube.com/@nils.schlieper"
               },
               {
                 title: "@Nils Schlieper",
@@ -649,7 +661,8 @@ export default function ProjectsPage() {
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/rend/F6s5nwknkoG_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FF6s5nwknkoG%2Frend%2F*%21%2Fi%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Fimage%2F*%21%2FF6s5nwknkoG%2Fcaptions%2F*%7Ehmac%3D687e848e636f3d150294148d8e3fe10496b3276a2038996b8515985c762584de",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/image/F6s5nwknkoG_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FF6s5nwknkoG%2Frend%2F*%21%2Fi%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Fimage%2F*%21%2FF6s5nwknkoG%2Fcaptions%2F*%7Ehmac%3D687e848e636f3d150294148d8e3fe10496b3276a2038996b8515985c762584de"
-                }
+                },
+                link: "https://youtube.com/@nils.schlieper"
               },
               {
                 title: "@Nils Schlieper",
@@ -657,7 +670,8 @@ export default function ProjectsPage() {
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/rend/2-RgLp9Uv46_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F2-RgLp9Uv46%2Frend%2F*%21%2Fi%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Fimage%2F*%21%2F2-RgLp9Uv46%2Fcaptions%2F*%7Ehmac%3Dfddd440631fa4b887ff197d870b63cb19187e2b4b3b0ce22f7540a27c81bb205",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/image/2-RgLp9Uv46_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F2-RgLp9Uv46%2Frend%2F*%21%2Fi%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Fimage%2F*%21%2F2-RgLp9Uv46%2Fcaptions%2F*%7Ehmac%3Dfddd440631fa4b887ff197d870b63cb19187e2b4b3b0ce22f7540a27c81bb205"
-                }
+                },
+                link: "https://youtube.com/@nils.schlieper"
               }
             ]
           }
