@@ -471,12 +471,34 @@ export default function ProjectsPage() {
               { 
                 title: "VFX Project 1", 
                 description: "A placeholder VFX project with stunning visual effects.",
-                media: undefined
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/rend/KtvmmAq5UVD_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/image/KtvmmAq5UVD_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e"
+                }
               },
               { 
                 title: "VFX Project 2", 
                 description: "A placeholder VFX project with stunning visual effects.",
-                media: undefined
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/rend/CuJxJ3Urd8W_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/image/CuJxJ3Urd8W_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d"
+                }
+              },
+              {
+                title: "VFX Project 3",
+                description: "A placeholder VFX project with stunning visual effects.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/rend/Srm_tW5QJGc_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/image/Srm_tW5QJGc_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34"
+                }
+              },
+              {
+                title: "VFX Project 4",
+                description: "A placeholder VFX project with stunning visual effects.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/rend/GjZsHjGMijY_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/image/GjZsHjGMijY_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552"
+                }
               }
             ]
           },
@@ -514,12 +536,42 @@ export default function ProjectsPage() {
               { 
                 title: "Commission Project 1", 
                 description: "A custom project created for a client.",
-                media: undefined
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/rend/93wWQRnnS75_576.mp4",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/image/93wWQRnnS75_poster.jpg"
+                }
               },
               { 
                 title: "Commission Project 2", 
                 description: "A custom project created for a client.",
-                media: undefined
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/rend/Asr26Wrp6ps_576.mp4",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/image/Asr26Wrp6ps_poster.jpg"
+                }
+              },
+              {
+                title: "Commission Project 3",
+                description: "A custom project created for a client.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/rend/U7rUzTdyfKy_576.mp4",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/image/U7rUzTdyfKy_poster.jpg"
+                }
+              },
+              {
+                title: "Commission Project 4",
+                description: "A custom project created for a client.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/rend/F6s5nwknkoG_576.mp4",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/image/F6s5nwknkoG_poster.jpg"
+                }
+              },
+              {
+                title: "Commission Project 5",
+                description: "A custom project created for a client.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/rend/2-RgLp9Uv46_576.mp4",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/image/2-RgLp9Uv46_poster.jpg"
+                }
               }
             ]
           }
