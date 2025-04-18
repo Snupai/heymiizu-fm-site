@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 interface MessageBubble {
@@ -21,6 +21,7 @@ interface MessageBubble {
 
 type Media = {
   src: string;
+  thumbnail?: string;
 };
 
 type Project = {
@@ -65,6 +66,40 @@ const pageVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 }
 };
+
+function VideoPlayer({ src, poster }: { src: string; poster: string }) {
+  const [showControls, setShowControls] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlay = () => {
+    setShowControls(true);
+    videoRef.current?.play();
+  };
+
+  return (
+    <div className="absolute top-0 left-0 w-full h-full object-contain rounded-lg bg-black" style={{ borderRadius: 'inherit', background: '#000' }}>
+      {!showControls && (
+        <button
+          className="absolute inset-0 flex items-center justify-center w-full h-full z-10 cursor-pointer hover:cursor-pointer"
+          onClick={handlePlay}
+          style={{ background: "rgba(0,0,0,0.3)" }}
+          aria-label="Play video"
+        >
+          <svg width="64" height="64" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      )}
+      <video
+        ref={videoRef}
+        src={src}
+        controls={showControls}
+        poster={poster}
+        className="w-full h-full object-contain rounded-lg"
+        style={{ borderRadius: 'inherit', background: '#000' }}
+        onPlay={() => setShowControls(true)}
+      />
+    </div>
+  );
+}
 
 // Create a separate component for the main content
 export default function ProjectsPage() {
@@ -333,16 +368,98 @@ export default function ProjectsPage() {
               { 
                 title: "Animation Project 1", 
                 description: "A placeholder animation project showcasing various techniques.",
-                media: undefined
-                /*media: {
-                  src: 'https://cdn.discordapp.com/attachments/1295130916326477844/1362148553593721003/Bildschirmfoto_2025-04-16_um_21.31.54.
-                  png?ex=68015732&is=680005b2&hm=7ab0f904c204bc68018ade1bbbcd1f987221d05423e39d2184373d02fa9fcd94&'
-                }*/
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/Pz8mQY9e-xa/rend/Pz8mQY9e-xa_576.mp4?hdnts=st%3D1745006750%7Eexp%3D1745265950%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPz8mQY9e-xa%2Frend%2F*%21%2Fi%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Fimage%2F*%21%2FPz8mQY9e-xa%2Fcaptions%2F*%7Ehmac%3D883615180a7423e9560218f250675dad0c85a54d218fdc06d7c849bd2fc9ef12",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/Pz8mQY9e-xa/image/Pz8mQY9e-xa_poster.jpg?hdnts=st%3D1745007847%7Eexp%3D1745267047%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPz8mQY9e-xa%2Frend%2F*%21%2Fi%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Fimage%2F*%21%2FPz8mQY9e-xa%2Fcaptions%2F*%7Ehmac%3Dbec82535c122bb6fbfb3ff23aeb706da31b60152f0dfad1e8469e3d8ef28dfd0"
+                }
               },
               { 
                 title: "Animation Project 2", 
                 description: "A placeholder animation project showcasing various techniques.",
-                media: undefined
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/7erYwGASLhh/rend/7erYwGASLhh_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7erYwGASLhh%2Frend%2F*%21%2Fi%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Fimage%2F*%21%2F7erYwGASLhh%2Fcaptions%2F*%7Ehmac%3Dd76c6c00b0043a9c0a6fa249ff3bf25504a5cf8a337ac015a45cda9447159b7d",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/7erYwGASLhh/image/7erYwGASLhh_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7erYwGASLhh%2Frend%2F*%21%2Fi%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Fimage%2F*%21%2F7erYwGASLhh%2Fcaptions%2F*%7Ehmac%3Dd76c6c00b0043a9c0a6fa249ff3bf25504a5cf8a337ac015a45cda9447159b7d"
+                }
+              },
+              {
+                title: "Animation Project 3", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/I2wM4_I6vda/rend/I2wM4_I6vda_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FI2wM4_I6vda%2Frend%2F*%21%2Fi%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Fimage%2F*%21%2FI2wM4_I6vda%2Fcaptions%2F*%7Ehmac%3D7c528dc5cd722ba6f19b087c210d17fbca326de113d1b8503c2b62e231e52ab3",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/I2wM4_I6vda/image/I2wM4_I6vda_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FI2wM4_I6vda%2Frend%2F*%21%2Fi%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Fimage%2F*%21%2FI2wM4_I6vda%2Fcaptions%2F*%7Ehmac%3D7c528dc5cd722ba6f19b087c210d17fbca326de113d1b8503c2b62e231e52ab3"
+                }
+              },
+              {
+                title: "Animation Project 4", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/MLEbpIMFmgE/rend/MLEbpIMFmgE_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FMLEbpIMFmgE%2Frend%2F*%21%2Fi%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Fimage%2F*%21%2FMLEbpIMFmgE%2Fcaptions%2F*%7Ehmac%3De2ae256e4457d000bdd8a3f04ffbe92dbce5362619a67e975e8ae084481934f0",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/MLEbpIMFmgE/image/MLEbpIMFmgE_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FMLEbpIMFmgE%2Frend%2F*%21%2Fi%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Fimage%2F*%21%2FMLEbpIMFmgE%2Fcaptions%2F*%7Ehmac%3De2ae256e4457d000bdd8a3f04ffbe92dbce5362619a67e975e8ae084481934f0"
+                }
+              },
+              {
+                title: "Animation Project 5", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/LtWHS7kxZLB/rend/LtWHS7kxZLB_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FLtWHS7kxZLB%2Frend%2F*%21%2Fi%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Fimage%2F*%21%2FLtWHS7kxZLB%2Fcaptions%2F*%7Ehmac%3D2f77f99e9f08fec95fe596a204f47a664ea78da029ef69a5ee2cdda50d605ddd",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/LtWHS7kxZLB/image/LtWHS7kxZLB_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FLtWHS7kxZLB%2Frend%2F*%21%2Fi%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Fimage%2F*%21%2FLtWHS7kxZLB%2Fcaptions%2F*%7Ehmac%3D2f77f99e9f08fec95fe596a204f47a664ea78da029ef69a5ee2cdda50d605ddd"  
+                }
+              },
+              {
+                title: "Animation Project 6", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/NBfN3uLIRcB/rend/NBfN3uLIRcB_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FNBfN3uLIRcB%2Frend%2F*%21%2Fi%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Fimage%2F*%21%2FNBfN3uLIRcB%2Fcaptions%2F*%7Ehmac%3D1871cdc92ba484b9794d2d0a4080c1bdf123d5c50e7a511326ac2e0051f56d9b",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/NBfN3uLIRcB/image/NBfN3uLIRcB_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FNBfN3uLIRcB%2Frend%2F*%21%2Fi%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Fimage%2F*%21%2FNBfN3uLIRcB%2Fcaptions%2F*%7Ehmac%3D1871cdc92ba484b9794d2d0a4080c1bdf123d5c50e7a511326ac2e0051f56d9b"
+                }
+              },
+              {
+                title: "Animation Project 7", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/Krb68pt3Lxm/rend/Krb68pt3Lxm_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKrb68pt3Lxm%2Frend%2F*%21%2Fi%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Fimage%2F*%21%2FKrb68pt3Lxm%2Fcaptions%2F*%7Ehmac%3D83e7cabe16838ee8df8f70404aafbb19da16d6314479b89da03bc67e1ffe84ac",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/Krb68pt3Lxm/image/Krb68pt3Lxm_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKrb68pt3Lxm%2Frend%2F*%21%2Fi%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Fimage%2F*%21%2FKrb68pt3Lxm%2Fcaptions%2F*%7Ehmac%3D83e7cabe16838ee8df8f70404aafbb19da16d6314479b89da03bc67e1ffe84ac"  
+                }
+              },
+              {
+                title: "Animation Project 8", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/UHEC9WibFXQ/rend/UHEC9WibFXQ_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FUHEC9WibFXQ%2Frend%2F*%21%2Fi%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Fimage%2F*%21%2FUHEC9WibFXQ%2Fcaptions%2F*%7Ehmac%3D48e49a585af32dae6709884ca14d69eeee1633ff20ff01a569d23d57bf175fef",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/UHEC9WibFXQ/image/UHEC9WibFXQ_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FUHEC9WibFXQ%2Frend%2F*%21%2Fi%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Fimage%2F*%21%2FUHEC9WibFXQ%2Fcaptions%2F*%7Ehmac%3D48e49a585af32dae6709884ca14d69eeee1633ff20ff01a569d23d57bf175fef"
+                }
+              },
+              {
+                title: "Animation Project 9", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/-XpV93qw-Dh/rend/-XpV93qw-Dh_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-XpV93qw-Dh%2Frend%2F*%21%2Fi%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Fimage%2F*%21%2F-XpV93qw-Dh%2Fcaptions%2F*%7Ehmac%3Db8c5a23303f93e9328e15a663c477fa70fffa84b1fefe82aba335ff4d94a527b",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/-XpV93qw-Dh/image/-XpV93qw-Dh_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-XpV93qw-Dh%2Frend%2F*%21%2Fi%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Fimage%2F*%21%2F-XpV93qw-Dh%2Fcaptions%2F*%7Ehmac%3Db8c5a23303f93e9328e15a663c477fa70fffa84b1fefe82aba335ff4d94a527b"
+                }
+              },
+              {
+                title: "Animation Project 10", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/CXvU6bUvVp8/rend/CXvU6bUvVp8_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCXvU6bUvVp8%2Frend%2F*%21%2Fi%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Fimage%2F*%21%2FCXvU6bUvVp8%2Fcaptions%2F*%7Ehmac%3D41a0da38596a94c6c6e45c1f0fbfebf2e7405e45f970888aed5efa8aff12dab2",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/CXvU6bUvVp8/image/CXvU6bUvVp8_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCXvU6bUvVp8%2Frend%2F*%21%2Fi%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Fimage%2F*%21%2FCXvU6bUvVp8%2Fcaptions%2F*%7Ehmac%3D41a0da38596a94c6c6e45c1f0fbfebf2e7405e45f970888aed5efa8aff12dab2"
+                }
+              },
+              {
+                title: "Animation Project 11", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/rend/HXLiRAQ-aAg_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/image/HXLiRAQ-aAg_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6"
+                }
+              },
+              {
+                title: "Animation Project 12", 
+                description: "A placeholder animation project showcasing various techniques.",
+                media: {
+                  src: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/rend/7XVYiHErCru_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/image/7XVYiHErCru_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca"
+                }
               }
             ]
           },
@@ -453,14 +570,21 @@ export default function ProjectsPage() {
                     className="bg-white rounded-xl shadow-lg overflow-hidden"
                   >
                     <div className="relative w-full" style={{ paddingTop: '56.25%' }}> {/* 16:9 aspect ratio */}
-                      <Image
-                        src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-                        alt={project.title}
-                        fill
-                        className="object-contain bg-[#f3caed]"
-                        unoptimized={false}
-                        priority={true}
-                      />
+                      {project.media?.src && project.media.src.match(/\.(mp4|webm|ogg)(\?.*)?$/i) ? (
+                        <VideoPlayer
+                          src={project.media.src}
+                          poster={project.media.thumbnail || "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                        />
+                      ) : (
+                        <Image
+                          src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                          alt={project.title}
+                          fill
+                          className="object-contain bg-[#f3caed]"
+                          unoptimized={false}
+                          priority={true}
+                        />
+                      )}
                     </div>
                     <div className="p-6 relative">
                       <div className="flex justify-between items-start mb-2">
