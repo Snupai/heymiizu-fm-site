@@ -1,106 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 
 export default function Logo() {
-  const [isHovered, setIsHovered] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
-  
-  // Function to get a random number between min and max
-  const getRandomDelay = (min: number, max: number) => {
-    return Math.random() * (max - min) + min;
-  };
-  
-  // Handle hover state changes
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    if (isHovered) {
-      // Start animation cycle when hovered
-      const startAnimationCycle = () => {
-        // Start animation
-        setShouldAnimate(true);
-        
-        // After animation completes, wait for a random time before starting again
-        timeoutId = setTimeout(() => {
-          setShouldAnimate(false);
-          
-          // Only continue the cycle if still hovered
-          if (isHovered) {
-            // Random pause between 1-3 seconds
-            const pauseDuration = getRandomDelay(1000, 3000);
-            timeoutId = setTimeout(startAnimationCycle, pauseDuration);
-          }
-        }, 3000); // Match the animation duration
-      };
-      
-      // Start the cycle immediately
-      startAnimationCycle();
-    } else {
-      // Stop animation when not hovered
-      setShouldAnimate(false);
-    }
-    
-    // Clean up on unmount or when hover state changes
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [isHovered]);
-
   return (
-    <Link 
-      href="/" 
-      className="block transform hover:scale-110 transition-transform duration-200"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <Link href="/" className="block">
       <div className="w-10 h-10 relative">
-        <svg 
-          viewBox="0 0 1600 1600" 
-          className="w-full h-full"
-          fill="currentColor"
-        >
-          <g transform="translate(0.000000,1600.000000) scale(0.100000,-0.100000)">
-            {/* Left leaf */}
-            <motion.g
-              animate={shouldAnimate ? {
-                rotate: [0, -3, 3, -2, 2, 0],
-              } : {
-                rotate: 0
-              }}
-              transition={{
-                duration: 3,
-                repeat: 0,
-                ease: [0.4, 0, 0.2, 1], // Custom cubic bezier for smoother motion
-                times: [0, 0.2, 0.4, 0.6, 0.8, 1] // Control timing of keyframes
-              }}
-              style={{ transformOrigin: "bottom right" }}
-            >
-              <path d="M3278 14614 c-361 -389 -680 -795 -963 -1224 -883 -1341 -1245 -2642 -1054 -3790 117 -705 452 -1331 995 -1860 239 -233 536 -458 818 -620 130 -75 415 -214 422 -207 3 3 -25 88 -62 189 -248 678 -418 1319 -498 1878 -80 553 -81 1112 -5 1645 45 316 152 796 253 1135 l35 115 0 -170 c2 -448 47 -1084 112 -1575 125 -956 375 -1935 664 -2595 31 -72 59 -138 62 -147 3 -10 11 -18 17 -18 6 0 58 51 115 114 612 678 1035 1539 1180 2401 40 237 54 419 54 695 0 285 -14 454 -58 718 -148 872 -695 1951 -1533 3027 -120 153 -265 330 -349 424 l-39 44 -166 -179z" />
-            </motion.g>
-            
-            {/* Right leaf */}
-            <motion.g
-              animate={shouldAnimate ? {
-                rotate: [0, 3, -3, 2, -2, 0],
-              } : {
-                rotate: 0
-              }}
-              transition={{
-                duration: 3,
-                repeat: 0,
-                ease: [0.4, 0, 0.2, 1], // Custom cubic bezier for smoother motion
-                times: [0, 0.2, 0.4, 0.6, 0.8, 1] // Control timing of keyframes
-              }}
-              style={{ transformOrigin: "bottom left" }}
-            >
-              <path d="M8265 9329 c-854 -28 -1655 -278 -2249 -703 -271 -194 -555 -461 -750 -706 -453 -568 -777 -1285 -936 -2070 -37 -185 -75 -438 -67 -446 2 -2 71 60 153 137 631 598 1304 1084 1836 1325 320 144 816 297 1243 383 765 152 1538 159 2280 20 354 -66 773 -194 1029 -313 l89 -41 -574 0 c-695 0 -1085 -23 -1588 -91 -650 -88 -1076 -213 -1606 -474 -726 -357 -1364 -828 -2050 -1515 -663 -662 -1243 -1402 -1884 -2403 -127 -198 -154 -272 -154 -417 0 -161 53 -287 167 -401 112 -112 216 -154 381 -154 201 0 370 79 476 221 21 26 111 194 202 371 267 524 586 1119 810 1513 118 207 241 405 252 405 3 0 36 -15 73 -34 232 -116 652 -260 1068 -367 736 -188 1662 -299 2494 -299 959 0 1892 298 2848 908 299 190 704 498 1012 768 363 319 855 833 1195 1249 206 252 525 686 525 714 0 13 -259 229 -440 367 -721 549 -1546 1026 -2370 1371 -1169 489 -2331 718 -3465 682z" />
-            </motion.g>
-          </g>
-        </svg>
+        <img
+          src="/Sentimental_Icon.svg"
+          alt="Sentimental Icon"
+          className="w-full h-full object-contain"
+          draggable="false"
+        />
       </div>
     </Link>
   );
-} 
+}
