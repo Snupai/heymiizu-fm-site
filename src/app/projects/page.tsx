@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect, Suspense, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 interface MessageBubble {
@@ -73,7 +73,7 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
 
   const handlePlay = () => {
     setShowControls(true);
-    videoRef.current?.play();
+    void videoRef.current?.play();
   };
 
   return (
@@ -570,10 +570,10 @@ export default function ProjectsPage() {
                     className="bg-white rounded-xl shadow-lg overflow-hidden"
                   >
                     <div className="relative w-full" style={{ paddingTop: '56.25%' }}> {/* 16:9 aspect ratio */}
-                      {project.media?.src && project.media.src.match(/\.(mp4|webm|ogg)(\?.*)?$/i) ? (
+                      {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
                         <VideoPlayer
                           src={project.media.src}
-                          poster={project.media.thumbnail || "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                          poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
                         />
                       ) : (
                         <Image

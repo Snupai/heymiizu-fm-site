@@ -1,9 +1,8 @@
 "use client";
 
-import { AnimatePresence, useScroll } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import Logo from "./Logo";
