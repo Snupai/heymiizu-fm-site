@@ -115,70 +115,76 @@ return (
         }} />
 
         <div className="container mx-auto px-12 py-8 relative">
-          <ul className="flex gap-12 text-lg justify-end">
-            <li>
+          <ul className="flex gap-8 text-lg justify-end">
+            <li className="inline-flex flex-col items-center">
               <motion.div
                 initial="initial"
                 whileHover="hover"
                 animate="initial"
-                className="relative group hover:scale-105"
+                className="relative group"
               >
-                <Link href="/" className="relative block" onClick={(e) => handleLinkClick(e, "/")}>
-                  <span className={`relative z-10 ${pathname === "/" ? "text-[#fc87f0]" : ""}`}>
-                    <span className="hover:scale-110 inline-block">H</span>ome
+                <Link href="/" className="relative block group" onClick={(e) => handleLinkClick(e, "/")}>  
+                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/" ? "text-[#a95fa8]" : ""}`}
+                        style={{ transformOrigin: 'center' }}>
+                    Home
+                    <motion.span
+                      className="block h-[2px] bg-[#319aef] absolute left-0 bottom-0"
+                      style={{ width: '100%' }}
+                      initial={{ scaleX: 0, originX: 0 }}
+                      variants={{
+                        hover: { scaleX: 1, originX: 0 }
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
                   </span>
-                  <motion.span
-                    className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#319aef]"
-                    initial={{ width: "0%" }}
-                    variants={{
-                      hover: { width: "100%" }
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
                 </Link>
               </motion.div>
             </li>
-            <li>
+            <li className="inline-flex flex-col items-center">
               <motion.div
                 initial="initial"
                 whileHover="hover"
                 animate="initial"
-                className="relative group hover:scale-105"
+                className="relative group"
               >
-                <Link href="/projects" className="relative block" onClick={(e) => handleLinkClick(e, "/projects")}>
-                  <span className={`relative z-10 ${pathname === "/projects" ? "text-[#fc87f0]" : ""}`}>
-                    <span className="hover:scale-110 inline-block">P</span>rojects
+                <Link href="/projects" className="relative block group" onClick={(e) => handleLinkClick(e, "/projects")}>  
+                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/projects" ? "text-[#a95fa8]" : ""}`}
+                        style={{ transformOrigin: 'center' }}>
+                    Projects
+                    <motion.span
+                      className="block h-[2px] bg-[#319aef] absolute left-0 bottom-0"
+                      style={{ width: '100%' }}
+                      initial={{ scaleX: 0, originX: 0 }}
+                      variants={{
+                        hover: { scaleX: 1, originX: 0 }
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
                   </span>
-                  <motion.span
-                    className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#319aef]"
-                    initial={{ width: "0%" }}
-                    variants={{
-                      hover: { width: "100%" }
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
                 </Link>
               </motion.div>
             </li>
-            <li>
+            <li className="inline-flex flex-col items-center">
               <motion.div
                 initial="initial"
                 whileHover="hover"
                 animate="initial"
-                className="relative group hover:scale-105"
+                className="relative group"
               >
-                <Link href="/contact" className="relative block" onClick={(e) => handleLinkClick(e, "/contact")}>
-                  <span className={`relative z-10 ${pathname === "/contact" ? "text-[#fc87f0]" : ""}`}>
-                    <span className="hover:scale-110 inline-block">C</span>ontact <span className="hover:scale-110 inline-block">M</span>e
+                <Link href="/contact" className="relative block group" onClick={(e) => handleLinkClick(e, "/contact")}>  
+                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/contact" ? "text-[#a95fa8]" : ""}`}
+                        style={{ transformOrigin: 'center' }}>
+                    Contact Me
+                    <motion.span
+                      className="block h-[2px] bg-[#319aef] absolute left-0 bottom-0"
+                      style={{ width: '100%' }}
+                      initial={{ scaleX: 0, originX: 0 }}
+                      variants={{
+                        hover: { scaleX: 1, originX: 0 }
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
                   </span>
-                  <motion.span
-                    className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#319aef]"
-                    initial={{ width: "0%" }}
-                    variants={{
-                      hover: { width: "100%" }
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
                 </Link>
               </motion.div>
             </li>
