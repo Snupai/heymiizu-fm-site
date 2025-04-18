@@ -119,6 +119,7 @@ function ProjectCard({
   let aspectClass = "aspect-video"; // 16:9
   if (cardAspect === "4:3") aspectClass = "aspect-[4/3]";
   if (cardAspect === "3:4") aspectClass = "aspect-[3/4]";
+  if (cardAspect === "16:9") aspectClass = "aspect-[16/9]";
   return (
     <motion.div
       key={project.title}
@@ -134,7 +135,7 @@ function ProjectCard({
           ease: "easeOut"
         }
       }}
-      className="break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
+      className="break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px]"
     >
       <div className={`relative w-full ${aspectClass}`}>
         {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
@@ -684,35 +685,49 @@ export default function ProjectsPage() {
               </div>
 
               {/* Category Projects */}
-              <Masonry
-                breakpointCols={{ default: 2, 768: 1 }}
-                className="flex gap-8"
-                columnClassName="masonry-column"
-              >
-                {[...category.projects].map((project, _index) => {
-                  const aspect = (project as Partial<Project>).aspect;
-                  // Type guard: only render if project fits the Project type
-                  if (
-                    typeof project.title === "string" &&
-                    typeof project.description === "string" &&
-                    (
-                      aspect === undefined ||
-                      aspect === "16:9" ||
-                      aspect === "4:3" ||
-                      aspect === "3:4"
-                    )
-                  ) {
-                    return (
-                      <ProjectCard
-                        key={`${project.title}-${_index}`}
-                        project={project as Project}
-                        categoryName={category.name}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </Masonry>
+              {category.projects.length === 1 ? (
+                <div className="flex justify-center">
+                  <ProjectCard
+                    key={`${category.projects[0]?.title ?? 'unknown'}-0`}
+                    project={category.projects[0] as Project}
+                    categoryName={category.name}
+                  />
+                </div>
+              ) : (
+                <Masonry
+                  breakpointCols={{ default: 2, 768: 1 }}
+                  className="flex gap-8"
+                  columnClassName="masonry-column w-1/2"
+                >
+                  {[...category.projects].map((project, _index) => {
+                    const aspect = (project as Partial<Project>).aspect;
+                    // Type guard: only render if project fits the Project type
+                    if (
+                      typeof project.title === "string" &&
+                      typeof project.description === "string" &&
+                      (
+                        aspect === undefined ||
+                        aspect === "16:9" ||
+                        aspect === "4:3" ||
+                        aspect === "3:4"
+                      )
+                    ) {
+                      return (
+                        <ProjectCard
+                          key={`${project.title}-${_index}`}
+                          project={project as Project}
+                          categoryName={category.name}
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+                  {/* Optional: Add a single invisible placeholder if there is only one project, to keep the card size stable */}
+                  {category.projects.length === 1 && (
+                    <div key="placeholder" className="invisible" aria-hidden="true" />
+                  )}
+                </Masonry>
+              )}
             </motion.div>
           ))}
       </motion.div>
