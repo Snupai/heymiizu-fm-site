@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Logo() {
   return (
     <Link href="/" className="block">
       <div className="w-10 h-10 relative">
-        <img
+        <Image
           src="/Sentimental_Icon.svg"
           alt="Sentimental Icon"
-          className="w-full h-full object-contain"
-          draggable="false"
+          fill
+          className="object-contain"
+          draggable={false}
         />
       </div>
     </Link>

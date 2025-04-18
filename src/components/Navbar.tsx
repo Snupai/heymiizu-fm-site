@@ -11,11 +11,6 @@ import Logo from "./Logo";
 function NavbarContent() {
     const containerRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const { scrollYProgress } = useScroll({
-      target: containerRef,
-      offset: ["start start", "end start"]
-    });
 
     // Animation variants for staggered fade-in
     const fadeInUp = {
@@ -45,7 +40,7 @@ return (
     >
       {/* Page Transition Overlay */}
       <AnimatePresence>
-        {isTransitioning && (
+        {false && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
