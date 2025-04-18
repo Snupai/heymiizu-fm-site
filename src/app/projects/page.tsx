@@ -2,19 +2,8 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect, useRef, Suspense } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-
-// Animation variants for staggered fade-in
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
-};
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 }
-};
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface MessageBubble {
   src: string;
@@ -78,11 +67,8 @@ const pageVariants = {
 };
 
 // Create a separate component for the main content
-function ProjectsContent() {
+export default function ProjectsPage() {
   const [activeCategory, setActiveCategory] = useState("Everything");
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   
   // Define categories
@@ -156,12 +142,6 @@ function ProjectsContent() {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  // Handle link click for navigation
-  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
-    // Disable transition animation for navigation
-    // No need to set isTransitioning or nextPage
-  };
 
   // Handle category change
   const handleCategoryChange = (categoryName: string) => {
@@ -530,11 +510,3 @@ function ProjectsContent() {
     </motion.main>
   );
 }
-
-export default function ProjectsPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ProjectsContent />
-    </Suspense>
-  );
-} 

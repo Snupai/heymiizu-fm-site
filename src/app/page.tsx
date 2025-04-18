@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 const messageBubbles = [
   { src: "/message_bubbles/Hello.png", position: { x: -42, y: 0 }, side: "left", rotate: -6, scale: 0.8 },
