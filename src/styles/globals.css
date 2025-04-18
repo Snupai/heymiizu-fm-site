@@ -51,7 +51,7 @@
   font-display: swap;
 }
 
-@theme {
+:root {
   --font-sans: 'SF Pro Display', var(--font-public-sans);
 }
 

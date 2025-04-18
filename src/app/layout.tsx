@@ -1,7 +1,9 @@
 import { Public_Sans } from "next/font/google";
 import "../styles/globals.css";
 import type { Metadata } from 'next'
-
+import NavbarContent from "../components/Navbar";
+import FooterContent from "../components/Footer";
+import React from "react";
 const publicSans = Public_Sans({ 
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -55,9 +57,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${publicSans.variable} font-sans`}>
-        {children}
+      <body className={`${publicSans.variable} font-sans min-h-screen flex flex-col`}>
+        <NavbarContent />
+        <div className="flex-1 flex flex-col">
+          {children}
+        </div>
+        <FooterContent />
       </body>
     </html>
   );
-} 
+}

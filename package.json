@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.0.15",
+    "@tailwindcss/postcss": "^4.1.4",
     "@types/node": "^20.14.10",
     "@types/normalize-wheel": "^1.0.4",
     "@types/react": "^19.0.0",
