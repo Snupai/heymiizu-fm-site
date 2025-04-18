@@ -114,7 +114,7 @@ function ProjectCard({
   aspect?: "16:9" | "4:3" | "3:4";
 }) {
   // Use project.aspect if provided, else prop aspect, else default to 16:9
-  const cardAspect = project.aspect || aspect || "16:9";
+  const cardAspect = project.aspect ?? aspect ?? "16:9";
   // Tailwind aspect class
   let aspectClass = "aspect-video"; // 16:9
   if (cardAspect === "4:3") aspectClass = "aspect-[4/3]";
@@ -689,8 +689,8 @@ export default function ProjectsPage() {
                 className="flex gap-8"
                 columnClassName="masonry-column"
               >
-                {[...category.projects].map((project, index) => {
-                  const aspect = (project as any).aspect;
+                {[...category.projects].map((project, _index) => {
+                  const aspect = (project as Partial<Project>).aspect;
                   // Type guard: only render if project fits the Project type
                   if (
                     typeof project.title === "string" &&
@@ -704,7 +704,7 @@ export default function ProjectsPage() {
                   ) {
                     return (
                       <ProjectCard
-                        key={project.title}
+                        key={`${project.title}-${_index}`}
                         project={project as Project}
                         categoryName={category.name}
                       />
