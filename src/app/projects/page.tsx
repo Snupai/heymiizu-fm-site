@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import Masonry from "react-masonry-css";
 
 interface MessageBubble {
   src: string;
@@ -28,6 +29,7 @@ type Project = {
   title: string;
   description: string;
   media?: Media;
+  aspect?: "16:9" | "4:3" | "3:4";
 };
 
 // Create more natural, random-looking patterns
@@ -98,6 +100,75 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
         onPlay={() => setShowControls(true)}
       />
     </div>
+  );
+}
+
+// Card component supporting 16:9, 4:3 and 3:4 aspect ratios
+function ProjectCard({
+  project,
+  categoryName,
+  aspect
+}: {
+  project: Project;
+  categoryName: string;
+  aspect?: "16:9" | "4:3" | "3:4";
+}) {
+  // Use project.aspect if provided, else prop aspect, else default to 16:9
+  const cardAspect = project.aspect || aspect || "16:9";
+  // Tailwind aspect class
+  let aspectClass = "aspect-video"; // 16:9
+  if (cardAspect === "4:3") aspectClass = "aspect-[4/3]";
+  if (cardAspect === "3:4") aspectClass = "aspect-[3/4]";
+  return (
+    <motion.div
+      key={project.title}
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{
+        duration: 0.2,
+        delay: 0.1,
+        layout: {
+          duration: 0.2,
+          ease: "easeOut"
+        }
+      }}
+      className="break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
+    >
+      <div className={`relative w-full ${aspectClass}`}>
+        {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
+          <VideoPlayer
+            src={project.media.src}
+            poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+          />
+        ) : (
+          <Image
+            src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+            alt={project.title}
+            fill
+            className="object-contain bg-[#f3caed]"
+            unoptimized={false}
+            priority={true}
+          />
+        )}
+      </div>
+      {/* Card Content */}
+      <div className="p-6 flex flex-col flex-1 justify-end">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-lg font-bold">{project.title}</span>
+          <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">
+            {categoryName === "Photography" && (
+              <span className="inline-block w-4 h-4 mr-1">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 01.993.883L13 3v1h2.382a1 1 0 01.894.553l.724 1.447 1.447.724A1 1 0 0120 7.618V10h1a1 1 0 01.993.883L22 11v2a1 1 0 01-.883.993L21 14h-1v2.382a1 1 0 01-.553.894l-1.447.724-.724 1.447A1 1 0 0116.382 20H14v1a1 1 0 01-.883.993L13 22h-2a1 1 0 01-.993-.883L10 21v-1H7.618a1 1 0 01-.894-.553l-.724-1.447-1.447-.724A1 1 0 014 16.382V14H3a1 1 0 01-.993-.883L2 13v-2a1 1 0 01.883-.993L3 10h1V7.618a1 1 0 01.553-.894l1.447-.724.724-1.447A1 1 0 017.618 4H10V3a1 1 0 01.883-.993L11 2h2z" /></svg>
+              </span>
+            )}
+            {categoryName}
+          </span>
+        </div>
+        <p className="text-gray-600 text-base">{project.description}</p>
+      </div>
+    </motion.div>
   );
 }
 
@@ -366,96 +437,96 @@ export default function ProjectsPage() {
             ),
             projects: [
               { 
-                title: "Animation Project 1", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Basic Animation", 
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/Pz8mQY9e-xa/rend/Pz8mQY9e-xa_576.mp4?hdnts=st%3D1745006750%7Eexp%3D1745265950%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPz8mQY9e-xa%2Frend%2F*%21%2Fi%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Fimage%2F*%21%2FPz8mQY9e-xa%2Fcaptions%2F*%7Ehmac%3D883615180a7423e9560218f250675dad0c85a54d218fdc06d7c849bd2fc9ef12",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/Pz8mQY9e-xa/image/Pz8mQY9e-xa_poster.jpg?hdnts=st%3D1745007847%7Eexp%3D1745267047%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPz8mQY9e-xa%2Frend%2F*%21%2Fi%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Fimage%2F*%21%2FPz8mQY9e-xa%2Fcaptions%2F*%7Ehmac%3Dbec82535c122bb6fbfb3ff23aeb706da31b60152f0dfad1e8469e3d8ef28dfd0"
                 }
               },
               { 
-                title: "Animation Project 2", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Basic Animation", 
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/7erYwGASLhh/rend/7erYwGASLhh_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7erYwGASLhh%2Frend%2F*%21%2Fi%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Fimage%2F*%21%2F7erYwGASLhh%2Fcaptions%2F*%7Ehmac%3Dd76c6c00b0043a9c0a6fa249ff3bf25504a5cf8a337ac015a45cda9447159b7d",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/7erYwGASLhh/image/7erYwGASLhh_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7erYwGASLhh%2Frend%2F*%21%2Fi%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Fimage%2F*%21%2F7erYwGASLhh%2Fcaptions%2F*%7Ehmac%3Dd76c6c00b0043a9c0a6fa249ff3bf25504a5cf8a337ac015a45cda9447159b7d"
                 }
               },
               {
-                title: "Animation Project 3", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Basic Animation", 
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/I2wM4_I6vda/rend/I2wM4_I6vda_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FI2wM4_I6vda%2Frend%2F*%21%2Fi%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Fimage%2F*%21%2FI2wM4_I6vda%2Fcaptions%2F*%7Ehmac%3D7c528dc5cd722ba6f19b087c210d17fbca326de113d1b8503c2b62e231e52ab3",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/I2wM4_I6vda/image/I2wM4_I6vda_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FI2wM4_I6vda%2Frend%2F*%21%2Fi%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Fimage%2F*%21%2FI2wM4_I6vda%2Fcaptions%2F*%7Ehmac%3D7c528dc5cd722ba6f19b087c210d17fbca326de113d1b8503c2b62e231e52ab3"
                 }
               },
               {
-                title: "Animation Project 4", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Youtube Outro", 
+                description: "My Youtube Outro :>",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/MLEbpIMFmgE/rend/MLEbpIMFmgE_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FMLEbpIMFmgE%2Frend%2F*%21%2Fi%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Fimage%2F*%21%2FMLEbpIMFmgE%2Fcaptions%2F*%7Ehmac%3De2ae256e4457d000bdd8a3f04ffbe92dbce5362619a67e975e8ae084481934f0",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/MLEbpIMFmgE/image/MLEbpIMFmgE_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FMLEbpIMFmgE%2Frend%2F*%21%2Fi%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Fimage%2F*%21%2FMLEbpIMFmgE%2Fcaptions%2F*%7Ehmac%3De2ae256e4457d000bdd8a3f04ffbe92dbce5362619a67e975e8ae084481934f0"
                 }
               },
               {
-                title: "Animation Project 5", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Stream Donation", 
+                description: "Stream alert for Twitch",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/LtWHS7kxZLB/rend/LtWHS7kxZLB_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FLtWHS7kxZLB%2Frend%2F*%21%2Fi%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Fimage%2F*%21%2FLtWHS7kxZLB%2Fcaptions%2F*%7Ehmac%3D2f77f99e9f08fec95fe596a204f47a664ea78da029ef69a5ee2cdda50d605ddd",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/LtWHS7kxZLB/image/LtWHS7kxZLB_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FLtWHS7kxZLB%2Frend%2F*%21%2Fi%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Fimage%2F*%21%2FLtWHS7kxZLB%2Fcaptions%2F*%7Ehmac%3D2f77f99e9f08fec95fe596a204f47a664ea78da029ef69a5ee2cdda50d605ddd"  
                 }
               },
               {
-                title: "Animation Project 6", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Joyride Animation", 
+                description: "Ryan liked it",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/NBfN3uLIRcB/rend/NBfN3uLIRcB_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FNBfN3uLIRcB%2Frend%2F*%21%2Fi%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Fimage%2F*%21%2FNBfN3uLIRcB%2Fcaptions%2F*%7Ehmac%3D1871cdc92ba484b9794d2d0a4080c1bdf123d5c50e7a511326ac2e0051f56d9b",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/NBfN3uLIRcB/image/NBfN3uLIRcB_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FNBfN3uLIRcB%2Frend%2F*%21%2Fi%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Fimage%2F*%21%2FNBfN3uLIRcB%2Fcaptions%2F*%7Ehmac%3D1871cdc92ba484b9794d2d0a4080c1bdf123d5c50e7a511326ac2e0051f56d9b"
                 }
               },
               {
-                title: "Animation Project 7", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Zorro Edit", 
+                description: "Proof of concept",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/Krb68pt3Lxm/rend/Krb68pt3Lxm_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKrb68pt3Lxm%2Frend%2F*%21%2Fi%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Fimage%2F*%21%2FKrb68pt3Lxm%2Fcaptions%2F*%7Ehmac%3D83e7cabe16838ee8df8f70404aafbb19da16d6314479b89da03bc67e1ffe84ac",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/Krb68pt3Lxm/image/Krb68pt3Lxm_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKrb68pt3Lxm%2Frend%2F*%21%2Fi%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Fimage%2F*%21%2FKrb68pt3Lxm%2Fcaptions%2F*%7Ehmac%3D83e7cabe16838ee8df8f70404aafbb19da16d6314479b89da03bc67e1ffe84ac"  
                 }
               },
               {
-                title: "Animation Project 8", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "VRCU Intro", 
+                description: "Part of the intro of a Youtube Series",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/UHEC9WibFXQ/rend/UHEC9WibFXQ_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FUHEC9WibFXQ%2Frend%2F*%21%2Fi%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Fimage%2F*%21%2FUHEC9WibFXQ%2Fcaptions%2F*%7Ehmac%3D48e49a585af32dae6709884ca14d69eeee1633ff20ff01a569d23d57bf175fef",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/UHEC9WibFXQ/image/UHEC9WibFXQ_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FUHEC9WibFXQ%2Frend%2F*%21%2Fi%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Fimage%2F*%21%2FUHEC9WibFXQ%2Fcaptions%2F*%7Ehmac%3D48e49a585af32dae6709884ca14d69eeee1633ff20ff01a569d23d57bf175fef"
                 }
               },
               {
-                title: "Animation Project 9", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Carrd.co Animation", 
+                description: "Animated carrd.co startup",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/-XpV93qw-Dh/rend/-XpV93qw-Dh_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-XpV93qw-Dh%2Frend%2F*%21%2Fi%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Fimage%2F*%21%2F-XpV93qw-Dh%2Fcaptions%2F*%7Ehmac%3Db8c5a23303f93e9328e15a663c477fa70fffa84b1fefe82aba335ff4d94a527b",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/-XpV93qw-Dh/image/-XpV93qw-Dh_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-XpV93qw-Dh%2Frend%2F*%21%2Fi%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Fimage%2F*%21%2F-XpV93qw-Dh%2Fcaptions%2F*%7Ehmac%3Db8c5a23303f93e9328e15a663c477fa70fffa84b1fefe82aba335ff4d94a527b"
                 }
               },
               {
-                title: "Animation Project 10", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Cuttingweek NOV24", 
+                description: "Framelab Cuttingweek preintro contest",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/CXvU6bUvVp8/rend/CXvU6bUvVp8_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCXvU6bUvVp8%2Frend%2F*%21%2Fi%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Fimage%2F*%21%2FCXvU6bUvVp8%2Fcaptions%2F*%7Ehmac%3D41a0da38596a94c6c6e45c1f0fbfebf2e7405e45f970888aed5efa8aff12dab2",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/CXvU6bUvVp8/image/CXvU6bUvVp8_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCXvU6bUvVp8%2Frend%2F*%21%2Fi%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Fimage%2F*%21%2FCXvU6bUvVp8%2Fcaptions%2F*%7Ehmac%3D41a0da38596a94c6c6e45c1f0fbfebf2e7405e45f970888aed5efa8aff12dab2"
                 }
               },
               {
-                title: "Animation Project 11", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Take me back to Mexico Edit", 
+                description: "A short motion design edit",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/rend/HXLiRAQ-aAg_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/image/HXLiRAQ-aAg_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6"
                 }
               },
               {
-                title: "Animation Project 12", 
-                description: "A placeholder animation project showcasing various techniques.",
+                title: "Showreel 2024", 
+                description: "The Motion Design Showreel of 2024",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/rend/7XVYiHErCru_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/image/7XVYiHErCru_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca"
@@ -469,32 +540,32 @@ export default function ProjectsPage() {
             icon: "✨",
             projects: [
               { 
-                title: "VFX Project 1", 
-                description: "A placeholder VFX project with stunning visual effects.",
+                title: "Basic VFX", 
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/rend/KtvmmAq5UVD_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/image/KtvmmAq5UVD_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e"
                 }
               },
               { 
-                title: "VFX Project 2", 
-                description: "A placeholder VFX project with stunning visual effects.",
+                title: "Basic VFX", 
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/rend/CuJxJ3Urd8W_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/image/CuJxJ3Urd8W_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d"
                 }
               },
               {
-                title: "VFX Project 3",
-                description: "A placeholder VFX project with stunning visual effects.",
+                title: "Basic VFX",
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/rend/Srm_tW5QJGc_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/image/Srm_tW5QJGc_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34"
                 }
               },
               {
-                title: "VFX Project 4",
-                description: "A placeholder VFX project with stunning visual effects.",
+                title: "Basic VFX",
+                description: "Part of a Youtube Video",
                 media: {
                   src: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/rend/GjZsHjGMijY_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552",
                   thumbnail: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/image/GjZsHjGMijY_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552"
@@ -519,12 +590,26 @@ export default function ProjectsPage() {
               { 
                 title: "Photography Project 1", 
                 description: "A placeholder photography project capturing beautiful moments.",
-                media: undefined
+                media: { src: "/projects/photography/superior.jpg" },
+                aspect: "3:4"
               },
               { 
                 title: "Photography Project 2", 
                 description: "A placeholder photography project capturing beautiful moments.",
-                media: undefined
+                media: { src: "/projects/photography/Ski_.jpg" },
+                aspect: "3:4"
+              },
+              {
+                title: "Photography Project 3", 
+                description: "A placeholder photography project capturing beautiful moments.",
+                media: { src: "/projects/photography/Mountain.jpg" },
+                aspect: "3:4"
+              },
+              {
+                title: "Photography Project 4", 
+                description: "A placeholder photography project capturing beautiful moments.",
+                media: { src: "/projects/photography/house_at_night.jpg" },
+                aspect: "3:4"
               }
             ]
           },
@@ -599,87 +684,35 @@ export default function ProjectsPage() {
               </div>
 
               {/* Category Projects */}
-              <motion.div 
-                className="grid grid-cols-1 md:grid-cols-2 gap-8"
-                layout
+              <Masonry
+                breakpointCols={{ default: 2, 768: 1 }}
+                className="flex gap-8"
+                columnClassName="masonry-column"
               >
-              {/*{category.projects.map((project: Project, index) => (*/}
-                {[...category.projects].reverse().map((project: Project, index) => (
-                  <motion.div 
-                    key={project.title}
-                    layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ 
-                      duration: 0.2,
-                      delay: 0.1 + (index * 0.05),
-                      layout: {
-                        duration: 0.2,
-                        ease: "easeOut"
-                      }
-                    }}
-                    className="bg-white rounded-xl shadow-lg overflow-hidden"
-                  >
-                    <div className="relative w-full" style={{ paddingTop: '56.25%' }}> {/* 16:9 aspect ratio */}
-                      {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
-                        <VideoPlayer
-                          src={project.media.src}
-                          poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-                        />
-                      ) : (
-                        <Image
-                          src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-                          alt={project.title}
-                          fill
-                          className="object-contain bg-[#f3caed]"
-                          unoptimized={false}
-                          priority={true}
-                        />
-                      )}
-                    </div>
-                    <div className="p-6 relative">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-2xl font-bold">{project.title}</h3>
-                        {/* Category Badge */}
-                        <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                          category.name === "Animations" 
-                            ? "bg-purple-100 text-purple-700"
-                            : category.name === "VFX"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-pink-100 text-pink-700"
-                        }`}>
-                          <span className="flex items-center gap-1.5">
-                            {category.name === "Animations" && (
-                              <div className="relative w-5 h-5">
-                                <Image
-                                  src="/Adobe_After_Effects_CC_Icon.png"
-                                  alt="After Effects Icon"
-                                  fill
-                                  className="object-contain"
-                                />
-                              </div>
-                            )}
-                            {category.name === "VFX" && "✨ "}
-                            {category.name === "Photography" && (
-                              <div className="relative w-5 h-5">
-                                <Image
-                                  src="/fx3_square.png"
-                                  alt="FX3 Camera Icon"
-                                  fill
-                                  className="object-contain"
-                                />
-                              </div>
-                            )}
-                            {category.name}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-gray-600">{project.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
+                {[...category.projects].map((project, index) => {
+                  const aspect = (project as any).aspect;
+                  // Type guard: only render if project fits the Project type
+                  if (
+                    typeof project.title === "string" &&
+                    typeof project.description === "string" &&
+                    (
+                      aspect === undefined ||
+                      aspect === "16:9" ||
+                      aspect === "4:3" ||
+                      aspect === "3:4"
+                    )
+                  ) {
+                    return (
+                      <ProjectCard
+                        key={project.title}
+                        project={project as Project}
+                        categoryName={category.name}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Masonry>
             </motion.div>
           ))}
       </motion.div>
