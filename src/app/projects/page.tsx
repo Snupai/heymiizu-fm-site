@@ -537,40 +537,40 @@ export default function ProjectsPage() {
                 title: "Commission Project 1", 
                 description: "A custom project created for a client.",
                 media: {
-                  src: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/rend/93wWQRnnS75_576.mp4",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/image/93wWQRnnS75_poster.jpg"
+                  src: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/rend/93wWQRnnS75_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/image/93wWQRnnS75_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6"
                 }
               },
               { 
                 title: "Commission Project 2", 
                 description: "A custom project created for a client.",
                 media: {
-                  src: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/rend/Asr26Wrp6ps_576.mp4",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/image/Asr26Wrp6ps_poster.jpg"
+                  src: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/rend/Asr26Wrp6ps_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FAsr26Wrp6ps%2Frend%2F*%21%2Fi%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Fimage%2F*%21%2FAsr26Wrp6ps%2Fcaptions%2F*%7Ehmac%3D1f2e31c3f0a490eaf0b6ce8563fed20e3a9c3049f876166dd0e7ea200dc93b8e",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/image/Asr26Wrp6ps_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FAsr26Wrp6ps%2Frend%2F*%21%2Fi%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Fimage%2F*%21%2FAsr26Wrp6ps%2Fcaptions%2F*%7Ehmac%3D1f2e31c3f0a490eaf0b6ce8563fed20e3a9c3049f876166dd0e7ea200dc93b8e"
                 }
               },
               {
                 title: "Commission Project 3",
                 description: "A custom project created for a client.",
                 media: {
-                  src: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/rend/U7rUzTdyfKy_576.mp4",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/image/U7rUzTdyfKy_poster.jpg"
+                  src: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/rend/U7rUzTdyfKy_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FU7rUzTdyfKy%2Frend%2F*%21%2Fi%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Fimage%2F*%21%2FU7rUzTdyfKy%2Fcaptions%2F*%7Ehmac%3D45b9dfac4cf7db43fa8102475cd12cae2092ff5bc6678692dcb2e8afc7d07d85",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/image/U7rUzTdyfKy_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FU7rUzTdyfKy%2Frend%2F*%21%2Fi%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Fimage%2F*%21%2FU7rUzTdyfKy%2Fcaptions%2F*%7Ehmac%3D45b9dfac4cf7db43fa8102475cd12cae2092ff5bc6678692dcb2e8afc7d07d85"
                 }
               },
               {
                 title: "Commission Project 4",
                 description: "A custom project created for a client.",
                 media: {
-                  src: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/rend/F6s5nwknkoG_576.mp4",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/image/F6s5nwknkoG_poster.jpg"
+                  src: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/rend/F6s5nwknkoG_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FF6s5nwknkoG%2Frend%2F*%21%2Fi%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Fimage%2F*%21%2FF6s5nwknkoG%2Fcaptions%2F*%7Ehmac%3D687e848e636f3d150294148d8e3fe10496b3276a2038996b8515985c762584de",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/image/F6s5nwknkoG_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FF6s5nwknkoG%2Frend%2F*%21%2Fi%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Fimage%2F*%21%2FF6s5nwknkoG%2Fcaptions%2F*%7Ehmac%3D687e848e636f3d150294148d8e3fe10496b3276a2038996b8515985c762584de"
                 }
               },
               {
                 title: "Commission Project 5",
                 description: "A custom project created for a client.",
                 media: {
-                  src: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/rend/2-RgLp9Uv46_576.mp4",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/image/2-RgLp9Uv46_poster.jpg"
+                  src: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/rend/2-RgLp9Uv46_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F2-RgLp9Uv46%2Frend%2F*%21%2Fi%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Fimage%2F*%21%2F2-RgLp9Uv46%2Fcaptions%2F*%7Ehmac%3Dfddd440631fa4b887ff197d870b63cb19187e2b4b3b0ce22f7540a27c81bb205",
+                  thumbnail: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/image/2-RgLp9Uv46_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F2-RgLp9Uv46%2Frend%2F*%21%2Fi%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Fimage%2F*%21%2F2-RgLp9Uv46%2Fcaptions%2F*%7Ehmac%3Dfddd440631fa4b887ff197d870b63cb19187e2b4b3b0ce22f7540a27c81bb205"
                 }
               }
             ]
