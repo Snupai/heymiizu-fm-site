@@ -3,6 +3,21 @@ import type { Category } from "./ProjectsSimple";
 
 const projectsData: Category[] = [
   {
+    name: "Special",
+    description: "Special Showcases",
+    icon: "✨",
+    projects: [
+      {
+        title: "Showreel 2024",
+        description: "The Motion Design Showreel of 2024",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/rend/7XVYiHErCru_576.mp4?hdnts=st%3D1745067502%7Eexp%3D1745326702%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3Df1c1e57d299d096d962b63d459ec1da5e8826ab64782e691df18790a5a4e000a",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/image/7XVYiHErCru_poster.jpg?hdnts=st%3D1745067502%7Eexp%3D1745326702%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3Df1c1e57d299d096d962b63d459ec1da5e8826ab64782e691df18790a5a4e000a"
+        }
+      }
+    ]
+  },
+  {
     name: "Animations",
     description: "Animations made with After Effects, Premiere Pro and Photoshop",
     icon: "after-effects",
@@ -94,53 +109,6 @@ const projectsData: Category[] = [
           src: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/rend/HXLiRAQ-aAg_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6",
           thumbnail: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/image/HXLiRAQ-aAg_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6"
         }
-      },
-      {
-        title: "Showreel 2024", 
-        description: "The Motion Design Showreel of 2024",
-        media: {
-          src: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/rend/7XVYiHErCru_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca",
-          thumbnail: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/image/7XVYiHErCru_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca"
-        }
-      }
-    ]
-  },
-  {
-    name: "VFX",
-    description: "Visual effects and motion graphics created for various projects",
-    icon: "✨",
-    projects: [
-      { 
-        title: "Basic VFX", 
-        description: "Part of a Youtube Video",
-        media: {
-          src: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/rend/KtvmmAq5UVD_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e",
-          thumbnail: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/image/KtvmmAq5UVD_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e"
-        }
-      },
-      { 
-        title: "Basic VFX", 
-        description: "Part of a Youtube Video",
-        media: {
-          src: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/rend/CuJxJ3Urd8W_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d",
-          thumbnail: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/image/CuJxJ3Urd8W_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d"
-        }
-      },
-      {
-        title: "Basic VFX",
-        description: "Part of a Youtube Video",
-        media: {
-          src: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/rend/Srm_tW5QJGc_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34",
-          thumbnail: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/image/Srm_tW5QJGc_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34"
-        }
-      },
-      {
-        title: "Basic VFX",
-        description: "Part of a Youtube Video",
-        media: {
-          src: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/rend/GjZsHjGMijY_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552",
-          thumbnail: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/image/GjZsHjGMijY_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552"
-        }
       }
     ]
   },
@@ -159,7 +127,7 @@ const projectsData: Category[] = [
         title: "Photography Project 2", 
         description: "A placeholder photography project capturing beautiful moments.",
         media: { src: "/projects/photography/Ski_.jpg" },
-        aspect: "4:3"
+        aspect: "3:4"
       },
       {
         title: "Photography Project 3", 

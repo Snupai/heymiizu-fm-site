@@ -117,11 +117,13 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
 function ProjectCard({
   project,
   categoryName,
-  aspect
+  aspect,
+  className,
 }: {
   project: Project;
   categoryName: string;
   aspect?: "16:9" | "4:3" | "3:4";
+  className?: string;
 }) {
   // Use project.aspect if provided, else prop aspect, else default to 16:9
   const cardAspect = project.aspect ?? aspect ?? "16:9";
@@ -145,7 +147,7 @@ function ProjectCard({
           ease: "easeOut"
         }
       }}
-      className="break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px]"
+      className={`break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px] ${className}`}
     >
       <div className={`relative w-full ${aspectClass}`}>
         {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
@@ -247,8 +249,8 @@ export default function ProjectsPage() {
         categoryName = "Animations";
       } else if (categoryParam === "photography") {
         categoryName = "Photography";
-      } else if (categoryParam === "vfx") {
-        categoryName = "VFX";
+      } else if (categoryParam === "special") {
+        categoryName = "Special";
       } else if (categoryParam === "commissions") {
         categoryName = "Commissions";
       }
@@ -276,8 +278,8 @@ export default function ProjectsPage() {
       categoryParam = "after-effects";
     } else if (categoryName === "Photography") {
       categoryParam = "photography";
-    } else if (categoryName === "VFX") {
-      categoryParam = "vfx";
+    } else if (categoryName === "Special") {
+      categoryParam = "special";
     } else if (categoryName === "Commissions") {
       categoryParam = "commissions";
     }
@@ -305,234 +307,241 @@ export default function ProjectsPage() {
 
   return (
     <motion.main 
-      className="relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto pt-48 px-4"
-      initial="hidden"
-      animate="visible"
-      variants={pageVariants}
-      transition={{ duration: 0.8 }}
+      className="flex-1 flex flex-col items-center justify-start w-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6 }}
     >
-      <motion.h1 
-        className="text-7xl font-bold mb-4 text-center relative"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        My Projects
-      </motion.h1>
-      
-      <motion.p 
-        className="text-lg mb-12 text-center relative"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        Here are some of my projects, feel free to browse :D
-      </motion.p>
-
-      {/* Floating Message Bubbles */}
-      <div className="absolute inset-0 overflow-visible pointer-events-none z-20">
-        {messageBubbles.map((bubble, index) => (
-          <motion.div
-            key={bubble.src}
-            className="absolute z-20 select-none"
-            initial={{
-              x: `${bubble.position.x}%`,
-              y: `${bubble.position.y}%`,
-              rotate: bubble.rotate,
-              scale: 0,
-              opacity: 0
-            }}
-            animate={{
-              opacity: 1,
-              scale: bubble.scale,
-              y: [
-                `${bubble.position.y}%`,
-                `${bubble.position.y - 1.2}%`,
-                `${bubble.position.y + 0.3}%`,
-                `${bubble.position.y - 0.5}%`,
-                `${bubble.position.y + 0.8}%`,
-                `${bubble.position.y - 0.2}%`,
-                `${bubble.position.y + 1.1}%`,
-                `${bubble.position.y}%`
-              ],
-              x: [
-                `${bubble.position.x}%`,
-                `${bubble.position.x + 0.8}%`,
-                `${bubble.position.x - 0.4}%`,
-                `${bubble.position.x + 0.2}%`,
-                `${bubble.position.x - 0.9}%`,
-                `${bubble.position.x + 0.5}%`,
-                `${bubble.position.x - 0.3}%`,
-                `${bubble.position.x}%`
-              ],
-              rotate: [
-                bubble.rotate,
-                bubble.rotate + 1.5,
-                bubble.rotate - 0.5,
-                bubble.rotate + 0.8,
-                bubble.rotate - 1.2,
-                bubble.rotate + 0.3,
-                bubble.rotate - 0.8,
-                bubble.rotate
-              ],
-            }}
-            transition={{
-              opacity: { duration: 0.5, delay: 0.2 + (index * 0.1) },
-              scale: { 
-                duration: 0.5,
-                delay: 0.2 + (index * 0.1),
-                ease: "easeOut"
-              },
-              y: { 
-                duration: 8 + Math.random() * 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.2, 0.3, 0.45, 0.6, 0.75, 0.9, 1]
-              },
-              x: { 
-                duration: 9 + Math.random() * 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.15, 0.35, 0.5, 0.65, 0.8, 0.9, 1]
-              },
-              rotate: { 
-                duration: 10 + Math.random() * 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.1, 0.25, 0.4, 0.6, 0.8, 0.9, 1]
-              }
-            }}
-            style={{
-              left: 0,
-              top: 0,
-              transformOrigin: "center",
-            }}
-          >
-            <div className="w-[1000px] h-[440px] relative">
-              <Image
-                src={bubble.src}
-                alt="Message Bubble"
-                fill
-                className="object-contain pointer-events-none"
-                priority
-              />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Category Filters */}
-      <motion.div 
-        className="flex gap-8 mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-      >
-        {/* Everything Button */}
-        <button
-          key="Everything"
-          onClick={() => handleCategoryChange("Everything")}
-          className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
-            activeCategory === "Everything"
-              ? "bg-black text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-          }`}
-        >
-          <span className="flex items-center text-lg">&#9733;</span> {/* Star icon for Everything */}
-          Everything
-        </button>
-        {categories.map((category: Category) => (
-          <button
-            key={category.name}
-            onClick={() => handleCategoryChange(category.name)}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
-              activeCategory === category.name
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-          >
-            <span className="flex items-center text-lg">{renderCategoryIcon(category.icon)}</span>
-            {category.name}
-          </button>
-        ))}
-      </motion.div>
-
-      {/* Projects Section */}
-      <motion.div 
-        className="w-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-      >
-        {/* Categories */}
-        {categories
-          .filter(category => activeCategory === "Everything" || category.name === activeCategory)
-          .map((category, categoryIndex) => (
-            <motion.div
-              key={category.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ 
-                duration: 0.2,
-                delay: 0.1 + (categoryIndex * 0.05)
-              }}
-              className="mb-20"
-            >
-              {/* Category Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl">{renderCategoryIcon(category.icon)}</span>
-                  <h3 className="text-3xl font-bold">{category.name}</h3>
-                </div>
-                <p className="text-gray-600 text-lg">{category.description}</p>
-              </div>
-
-              {/* Category Projects */}
-              {category.projects.length === 1 && category.projects[0] ? (
-                <div className="flex justify-center">
-                  <ProjectCard
-                    key={`single-project-${category.name}-0`}
-                    project={category.projects[0]}
-                    categoryName={category.name}
+      <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
+        {/* HEADER, SUBTITLE, BUBBLES WRAPPER */}
+        <div className="w-full flex flex-col items-center relative mb-16">
+          {/* Message bubbles absolutely positioned, stay at top */}
+          <div className="absolute inset-0 overflow-visible pointer-events-none z-20">
+            {messageBubbles.map((bubble, index) => (
+              <motion.div
+                key={bubble.src}
+                className="absolute z-20 select-none"
+                initial={{
+                  x: `${bubble.position.x}%`,
+                  y: `${bubble.position.y}%`,
+                  rotate: bubble.rotate,
+                  scale: 0,
+                  opacity: 0
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: bubble.scale,
+                  y: [
+                    `${bubble.position.y}%`,
+                    `${bubble.position.y + 0.3}%`,
+                    `${bubble.position.y - 0.5}%`,
+                    `${bubble.position.y + 0.8}%`,
+                    `${bubble.position.y - 0.2}%`,
+                    `${bubble.position.y + 1.1}%`,
+                    `${bubble.position.y}%`
+                  ],
+                  x: [
+                    `${bubble.position.x}%`,
+                    `${bubble.position.x + 0.8}%`,
+                    `${bubble.position.x - 0.4}%`,
+                    `${bubble.position.x + 0.2}%`,
+                    `${bubble.position.x - 0.9}%`,
+                    `${bubble.position.x + 0.5}%`,
+                    `${bubble.position.x - 0.3}%`,
+                    `${bubble.position.x}%`
+                  ],
+                  rotate: [
+                    bubble.rotate,
+                    bubble.rotate + 1.5,
+                    bubble.rotate - 0.5,
+                    bubble.rotate + 0.8,
+                    bubble.rotate - 1.2,
+                    bubble.rotate + 0.3,
+                    bubble.rotate - 0.8,
+                    bubble.rotate
+                  ],
+                }}
+                transition={{
+                  opacity: { duration: 0.5, delay: 0.2 + (index * 0.1) },
+                  scale: { 
+                    duration: 0.5,
+                    delay: 0.2 + (index * 0.1),
+                    ease: "easeOut"
+                  },
+                  y: { 
+                    duration: 8 + Math.random() * 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    times: [0, 0.2, 0.3, 0.45, 0.6, 0.75, 0.9, 1]
+                  },
+                  x: { 
+                    duration: 9 + Math.random() * 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    times: [0, 0.15, 0.35, 0.5, 0.65, 0.8, 0.9, 1]
+                  },
+                  rotate: { 
+                    duration: 10 + Math.random() * 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    times: [0, 0.1, 0.25, 0.4, 0.6, 0.8, 0.9, 1]
+                  }
+                }}
+                style={{
+                  left: 0,
+                  top: 0,
+                  transformOrigin: "center",
+                }}
+              >
+                <div className="w-[1000px] h-[440px] relative">
+                  <Image
+                    src={bubble.src}
+                    alt="Message Bubble"
+                    fill
+                    className="object-contain select-none"
+                    draggable={false}
+                    priority={true}
+                    unoptimized={true}
                   />
                 </div>
-              ) : (
-                <Masonry
-                  breakpointCols={{ default: 2, 768: 1 }}
-                  className="flex gap-8"
-                  columnClassName="masonry-column w-1/2"
+              </motion.div>
+            ))}
+          </div>
+          {/* Add padding-top to push content down, but not bubbles */}
+          <div className="pt-56 w-full flex flex-col items-center">
+            <motion.h1 
+              className="text-7xl font-bold mb-4 text-center relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              My Projects
+            </motion.h1>
+            <motion.p 
+              className="text-lg mb-4 text-center relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              Here are some of my projects, feel free to browse :D
+            </motion.p>
+          </div>
+        </div>
+        {/* CATEGORY FILTERS & PROJECTS WRAPPER */}
+        <div className="w-full">
+          {/* Category Filters */}
+          <motion.div 
+            className="flex justify-center gap-8 mb-12 w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            {/* Everything Button */}
+            <button
+              key="Everything"
+              onClick={() => handleCategoryChange("Everything")}
+              className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
+                activeCategory === "Everything"
+                  ? "bg-black text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              <span className="flex items-center text-lg">&#9733;</span> {/* Star icon for Everything */}
+              Everything
+            </button>
+            {categories.map((category: Category) => (
+              <button
+                key={category.name}
+                onClick={() => handleCategoryChange(category.name)}
+                className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
+                  activeCategory === category.name
+                    ? "bg-black text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                <span className="flex items-center text-lg">{renderCategoryIcon(category.icon)}</span>
+                {category.name}
+              </button>
+            ))}
+          </motion.div>
+
+          {/* Projects Section */}
+          <motion.div 
+            className="w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            {/* Categories */}
+            {categories
+              .filter(category => activeCategory === "Everything" || category.name === activeCategory)
+              .map((category, categoryIndex) => (
+                <motion.div
+                  key={category.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ 
+                    duration: 0.2,
+                    delay: 0.1 + (categoryIndex * 0.05)
+                  }}
+                  className="mb-20 flex flex-col items-center w-full"
                 >
-                  {[...category.projects].reverse().map((project, idx) => {
-                    const aspect = project.aspect;
-                    if (
-                      typeof project.title === "string" &&
-                      typeof project.description === "string" &&
-                      (
-                        aspect === undefined ||
-                        aspect === "16:9" ||
-                        aspect === "4:3" ||
-                        aspect === "3:4"
-                      )
-                    ) {
-                      return (
-                        <ProjectCard
-                          key={`${category.name}-${idx}`}
-                          project={project}
-                          categoryName={category.name}
-                        />
-                      );
-                    }
-                    return null;
-                  })}
-                  {category.projects.length === 1 && (
-                    <div key="placeholder" className="invisible" aria-hidden="true" />
+                  {/* Category Header */}
+                  <div className="mb-8 w-full">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-2xl">{renderCategoryIcon(category.icon)}</span>
+                      <h3 className="text-3xl font-bold">{category.name}</h3>
+                    </div>
+                    <p className="text-gray-600 text-lg">{category.description}</p>
+                  </div>
+                  {/* Category Projects */}
+                  {category.projects.length === 1 && category.projects[0] ? (
+                    <ProjectCard
+                      key={`single-project-${category.name}-0`}
+                      project={category.projects[0]}
+                      categoryName={category.name}
+                      className="w-[750px] max-w-full mx-auto"
+                    />
+                  ) : (
+                    <Masonry
+                      breakpointCols={{ default: 2, 768: 1 }}
+                      className="flex gap-8 w-full"
+                      columnClassName="masonry-column w-1/2"
+                    >
+                      {[...category.projects].reverse().map((project, idx) => {
+                        const aspect = project.aspect;
+                        if (
+                          typeof project.title === "string" &&
+                          typeof project.description === "string" &&
+                          (
+                            aspect === undefined ||
+                            aspect === "16:9" ||
+                            aspect === "4:3" ||
+                            aspect === "3:4"
+                          )
+                        ) {
+                          return (
+                            <ProjectCard
+                              key={`${category.name}-${idx}`}
+                              project={project}
+                              categoryName={category.name}
+                            />
+                          );
+                        }
+                        return null;
+                      })}
+                      {category.projects.length === 1 && (
+                        <div key="placeholder" className="invisible" aria-hidden="true" />
+                      )}
+                    </Masonry>
                   )}
-                </Masonry>
-              )}
-            </motion.div>
-          ))}
-      </motion.div>
+                </motion.div>
+              ))}
+          </motion.div>
+        </div>
+      </div>
     </motion.main>
   );
 }
