@@ -5,6 +5,13 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Masonry from "react-masonry-css";
+import dynamic from "next/dynamic"; 
+import { getDeviceType } from "../../utils/deviceType";
+import ProjectsSimple from "./ProjectsSimple";
+import type { Category } from "./ProjectsSimple";
+import projectsData from "~/app/projects/projectsData";
+
+const MobileFallback = dynamic(() => import("../../components/MobileFallback"), { ssr: false });
 
 interface MessageBubble {
   src: string;
@@ -20,18 +27,18 @@ interface MessageBubble {
   };
 }
 
-type Media = {
+interface Media {
   src: string;
   thumbnail?: string;
-};
+}
 
-type Project = {
+interface Project {
   title: string;
   description: string;
   media?: Media;
   aspect?: "16:9" | "4:3" | "3:4";
-  link?: string; // Optional hyperlink for the project title
-};
+  link?: string;
+}
 
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
@@ -182,17 +189,11 @@ function ProjectCard({
   );
 }
 
-// Create a separate component for the main content
-export default function ProjectsPage() {
-  const [activeCategory, setActiveCategory] = useState("Everything");
-  const searchParams = useSearchParams();
-  
-  // Define categories
-  const categories = [
-    { name: "Everything", icon: "•" },
-    { 
-      name: "Animations", 
-      icon: (
+// Helper to render icons from string IDs
+function renderCategoryIcon(icon: string) {
+  switch (icon) {
+    case "after-effects":
+      return (
         <div className="relative w-6 h-6">
           <Image
             src="/Adobe_After_Effects_CC_Icon.png"
@@ -201,12 +202,9 @@ export default function ProjectsPage() {
             className="object-contain"
           />
         </div>
-      )
-    },
-    { name: "VFX", icon: "✨" },
-    { 
-      name: "Photography", 
-      icon: (
+      );
+    case "fx3-camera":
+      return (
         <div className="relative w-6 h-6">
           <Image
             src="/fx3_square.png"
@@ -215,20 +213,29 @@ export default function ProjectsPage() {
             className="object-contain"
           />
         </div>
-      )
-    },
-    { 
-      name: "Commissions", 
-      icon: "💼"
-    },
-  ];
-  
-  // Scroll to top on page load
+      );
+    default:
+      return icon;
+  }
+}
+
+export default function ProjectsPage() {
+  const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
+  const [activeCategory, setActiveCategory] = useState<string>("Everything");
+  const searchParams = useSearchParams();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setDeviceType(getDeviceType());
+    const handleResize = () => setDeviceType(getDeviceType());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Update active category based on URL parameter
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
@@ -249,7 +256,6 @@ export default function ProjectsPage() {
     }
   }, [searchParams]);
 
-  // Update time for continuous animation
   useEffect(() => {
     const interval = setInterval(() => {
       messageBubbles.forEach(bubble => {
@@ -259,7 +265,6 @@ export default function ProjectsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle category change
   const handleCategoryChange = (categoryName: string) => {
     setActiveCategory(categoryName);
     
@@ -281,6 +286,21 @@ export default function ProjectsPage() {
     url.searchParams.set('category', categoryParam);
     window.history.pushState({}, '', url.toString());
   };
+
+  const categories = projectsData as Category[];
+  
+  // Conditional rendering AFTER all hooks
+  if (deviceType === null) return null;
+  if (deviceType === "mobile") return <MobileFallback />;
+  if (deviceType === "small") {
+    return (
+      <ProjectsSimple
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategoryChange={handleCategoryChange}
+      />
+    );
+  }
 
   return (
     <motion.main 
@@ -407,17 +427,30 @@ export default function ProjectsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        {categories.map((category) => (
+        {/* Everything Button */}
+        <button
+          key="Everything"
+          onClick={() => handleCategoryChange("Everything")}
+          className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
+            activeCategory === "Everything"
+              ? "bg-black text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          <span className="flex items-center text-lg">&#9733;</span> {/* Star icon for Everything */}
+          Everything
+        </button>
+        {categories.map((category: Category) => (
           <button
             key={category.name}
             onClick={() => handleCategoryChange(category.name)}
             className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all ${
               activeCategory === category.name
-              ? "bg-black text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-black text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            <span className="flex items-center text-lg">{category.icon}</span>
+            <span className="flex items-center text-lg">{renderCategoryIcon(category.icon)}</span>
             {category.name}
           </button>
         ))}
@@ -431,253 +464,9 @@ export default function ProjectsPage() {
         transition={{ duration: 0.6, delay: 0.6 }}
       >
         {/* Categories */}
-        {[
-          {
-            name: "Animations",
-            description: "Animations made with After Effects, Premiere Pro and Photoshop",
-            icon: (
-              <div className="relative w-6 h-6">
-                <Image
-                  src="/Adobe_After_Effects_CC_Icon.png"
-                  alt="After Effects Icon"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ),
-            projects: [
-              { 
-                title: "Basic Animation", 
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/Pz8mQY9e-xa/rend/Pz8mQY9e-xa_576.mp4?hdnts=st%3D1745006750%7Eexp%3D1745265950%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPz8mQY9e-xa%2Frend%2F*%21%2Fi%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Fimage%2F*%21%2FPz8mQY9e-xa%2Fcaptions%2F*%7Ehmac%3D883615180a7423e9560218f250675dad0c85a54d218fdc06d7c849bd2fc9ef12",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/Pz8mQY9e-xa/image/Pz8mQY9e-xa_poster.jpg?hdnts=st%3D1745007847%7Eexp%3D1745267047%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPz8mQY9e-xa%2Frend%2F*%21%2Fi%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Frend%2F*%21%2FPz8mQY9e-xa%2Fimage%2F*%21%2FPz8mQY9e-xa%2Fcaptions%2F*%7Ehmac%3Dbec82535c122bb6fbfb3ff23aeb706da31b60152f0dfad1e8469e3d8ef28dfd0"
-                }
-              },
-              { 
-                title: "Basic Animation", 
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/7erYwGASLhh/rend/7erYwGASLhh_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7erYwGASLhh%2Frend%2F*%21%2Fi%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Fimage%2F*%21%2F7erYwGASLhh%2Fcaptions%2F*%7Ehmac%3Dd76c6c00b0043a9c0a6fa249ff3bf25504a5cf8a337ac015a45cda9447159b7d",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/7erYwGASLhh/image/7erYwGASLhh_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7erYwGASLhh%2Frend%2F*%21%2Fi%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Frend%2F*%21%2F7erYwGASLhh%2Fimage%2F*%21%2F7erYwGASLhh%2Fcaptions%2F*%7Ehmac%3Dd76c6c00b0043a9c0a6fa249ff3bf25504a5cf8a337ac015a45cda9447159b7d"
-                }
-              },
-              {
-                title: "Basic Animation", 
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/I2wM4_I6vda/rend/I2wM4_I6vda_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FI2wM4_I6vda%2Frend%2F*%21%2Fi%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Fimage%2F*%21%2FI2wM4_I6vda%2Fcaptions%2F*%7Ehmac%3D7c528dc5cd722ba6f19b087c210d17fbca326de113d1b8503c2b62e231e52ab3",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/I2wM4_I6vda/image/I2wM4_I6vda_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FI2wM4_I6vda%2Frend%2F*%21%2Fi%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Frend%2F*%21%2FI2wM4_I6vda%2Fimage%2F*%21%2FI2wM4_I6vda%2Fcaptions%2F*%7Ehmac%3D7c528dc5cd722ba6f19b087c210d17fbca326de113d1b8503c2b62e231e52ab3"
-                }
-              },
-              {
-                title: "Youtube Outro", 
-                description: "My Youtube Outro :>",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/MLEbpIMFmgE/rend/MLEbpIMFmgE_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FMLEbpIMFmgE%2Frend%2F*%21%2Fi%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Fimage%2F*%21%2FMLEbpIMFmgE%2Fcaptions%2F*%7Ehmac%3De2ae256e4457d000bdd8a3f04ffbe92dbce5362619a67e975e8ae084481934f0",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/MLEbpIMFmgE/image/MLEbpIMFmgE_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FMLEbpIMFmgE%2Frend%2F*%21%2Fi%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Frend%2F*%21%2FMLEbpIMFmgE%2Fimage%2F*%21%2FMLEbpIMFmgE%2Fcaptions%2F*%7Ehmac%3De2ae256e4457d000bdd8a3f04ffbe92dbce5362619a67e975e8ae084481934f0"
-                }
-              },
-              {
-                title: "Stream Donation", 
-                description: "Stream alert for Twitch",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/LtWHS7kxZLB/rend/LtWHS7kxZLB_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FLtWHS7kxZLB%2Frend%2F*%21%2Fi%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Fimage%2F*%21%2FLtWHS7kxZLB%2Fcaptions%2F*%7Ehmac%3D2f77f99e9f08fec95fe596a204f47a664ea78da029ef69a5ee2cdda50d605ddd",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/LtWHS7kxZLB/image/LtWHS7kxZLB_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FLtWHS7kxZLB%2Frend%2F*%21%2Fi%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Frend%2F*%21%2FLtWHS7kxZLB%2Fimage%2F*%21%2FLtWHS7kxZLB%2Fcaptions%2F*%7Ehmac%3D2f77f99e9f08fec95fe596a204f47a664ea78da029ef69a5ee2cdda50d605ddd"  
-                }
-              },
-              {
-                title: "Joyride Animation", 
-                description: "Ryan liked it",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/NBfN3uLIRcB/rend/NBfN3uLIRcB_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FNBfN3uLIRcB%2Frend%2F*%21%2Fi%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Fimage%2F*%21%2FNBfN3uLIRcB%2Fcaptions%2F*%7Ehmac%3D1871cdc92ba484b9794d2d0a4080c1bdf123d5c50e7a511326ac2e0051f56d9b",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/NBfN3uLIRcB/image/NBfN3uLIRcB_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FNBfN3uLIRcB%2Frend%2F*%21%2Fi%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Frend%2F*%21%2FNBfN3uLIRcB%2Fimage%2F*%21%2FNBfN3uLIRcB%2Fcaptions%2F*%7Ehmac%3D1871cdc92ba484b9794d2d0a4080c1bdf123d5c50e7a511326ac2e0051f56d9b"
-                }
-              },
-              {
-                title: "Zorro Edit", 
-                description: "Proof of concept",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/Krb68pt3Lxm/rend/Krb68pt3Lxm_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKrb68pt3Lxm%2Frend%2F*%21%2Fi%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Fimage%2F*%21%2FKrb68pt3Lxm%2Fcaptions%2F*%7Ehmac%3D83e7cabe16838ee8df8f70404aafbb19da16d6314479b89da03bc67e1ffe84ac",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/Krb68pt3Lxm/image/Krb68pt3Lxm_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKrb68pt3Lxm%2Frend%2F*%21%2Fi%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Frend%2F*%21%2FKrb68pt3Lxm%2Fimage%2F*%21%2FKrb68pt3Lxm%2Fcaptions%2F*%7Ehmac%3D83e7cabe16838ee8df8f70404aafbb19da16d6314479b89da03bc67e1ffe84ac"  
-                }
-              },
-              {
-                title: "VRCU Intro", 
-                description: "Part of the intro of a Youtube Series",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/UHEC9WibFXQ/rend/UHEC9WibFXQ_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FUHEC9WibFXQ%2Frend%2F*%21%2Fi%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Fimage%2F*%21%2FUHEC9WibFXQ%2Fcaptions%2F*%7Ehmac%3D48e49a585af32dae6709884ca14d69eeee1633ff20ff01a569d23d57bf175fef",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/UHEC9WibFXQ/image/UHEC9WibFXQ_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FUHEC9WibFXQ%2Frend%2F*%21%2Fi%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Frend%2F*%21%2FUHEC9WibFXQ%2Fimage%2F*%21%2FUHEC9WibFXQ%2Fcaptions%2F*%7Ehmac%3D48e49a585af32dae6709884ca14d69eeee1633ff20ff01a569d23d57bf175fef"
-                }
-              },
-              {
-                title: "Carrd.co Animation", 
-                description: "Animated carrd.co startup",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/-XpV93qw-Dh/rend/-XpV93qw-Dh_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-XpV93qw-Dh%2Frend%2F*%21%2Fi%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Fimage%2F*%21%2F-XpV93qw-Dh%2Fcaptions%2F*%7Ehmac%3Db8c5a23303f93e9328e15a663c477fa70fffa84b1fefe82aba335ff4d94a527b",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/-XpV93qw-Dh/image/-XpV93qw-Dh_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-XpV93qw-Dh%2Frend%2F*%21%2Fi%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Frend%2F*%21%2F-XpV93qw-Dh%2Fimage%2F*%21%2F-XpV93qw-Dh%2Fcaptions%2F*%7Ehmac%3Db8c5a23303f93e9328e15a663c477fa70fffa84b1fefe82aba335ff4d94a527b"
-                }
-              },
-              {
-                title: "Cuttingweek NOV24", 
-                description: "Framelab Cuttingweek preintro contest",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/CXvU6bUvVp8/rend/CXvU6bUvVp8_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCXvU6bUvVp8%2Frend%2F*%21%2Fi%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Fimage%2F*%21%2FCXvU6bUvVp8%2Fcaptions%2F*%7Ehmac%3D41a0da38596a94c6c6e45c1f0fbfebf2e7405e45f970888aed5efa8aff12dab2",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/CXvU6bUvVp8/image/CXvU6bUvVp8_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCXvU6bUvVp8%2Frend%2F*%21%2Fi%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Frend%2F*%21%2FCXvU6bUvVp8%2Fimage%2F*%21%2FCXvU6bUvVp8%2Fcaptions%2F*%7Ehmac%3D41a0da38596a94c6c6e45c1f0fbfebf2e7405e45f970888aed5efa8aff12dab2"
-                }
-              },
-              {
-                title: "Take me back to Mexico Edit", 
-                description: "A short motion design edit",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/rend/HXLiRAQ-aAg_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/image/HXLiRAQ-aAg_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6"
-                }
-              },
-              {
-                title: "Showreel 2024", 
-                description: "The Motion Design Showreel of 2024",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/rend/7XVYiHErCru_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/image/7XVYiHErCru_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3D447f6c5a9c10f881f21a82c0e01bb33857848b3deb7faf5135d2239c01d844ca"
-                }
-              }
-            ]
-          },
-          {
-            name: "VFX",
-            description: "Visual effects and motion graphics created for various projects",
-            icon: "✨",
-            projects: [
-              { 
-                title: "Basic VFX", 
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/rend/KtvmmAq5UVD_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/KtvmmAq5UVD/image/KtvmmAq5UVD_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FKtvmmAq5UVD%2Frend%2F*%21%2Fi%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Frend%2F*%21%2FKtvmmAq5UVD%2Fimage%2F*%21%2FKtvmmAq5UVD%2Fcaptions%2F*%7Ehmac%3D9a903b0fcd26dd4a861c8af6ef3006065782323e6e4d749f2f39f73984496f2e"
-                }
-              },
-              { 
-                title: "Basic VFX", 
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/rend/CuJxJ3Urd8W_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/CuJxJ3Urd8W/image/CuJxJ3Urd8W_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FCuJxJ3Urd8W%2Frend%2F*%21%2Fi%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Frend%2F*%21%2FCuJxJ3Urd8W%2Fimage%2F*%21%2FCuJxJ3Urd8W%2Fcaptions%2F*%7Ehmac%3D901ba3fc9537bba214f749fa08fee13671a7547b21fd24c4efbd30dca3aa2f5d"
-                }
-              },
-              {
-                title: "Basic VFX",
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/rend/Srm_tW5QJGc_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/Srm_tW5QJGc/image/Srm_tW5QJGc_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FSrm_tW5QJGc%2Frend%2F*%21%2Fi%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Frend%2F*%21%2FSrm_tW5QJGc%2Fimage%2F*%21%2FSrm_tW5QJGc%2Fcaptions%2F*%7Ehmac%3D986d995967608c35d3b41746edca2fa1c558a80300a27d5e1609ce1cd7d34f34"
-                }
-              },
-              {
-                title: "Basic VFX",
-                description: "Part of a Youtube Video",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/rend/GjZsHjGMijY_576.mp4?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/GjZsHjGMijY/image/GjZsHjGMijY_poster.jpg?hdnts=st%3D1745010471%7Eexp%3D1745269671%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGjZsHjGMijY%2Frend%2F*%21%2Fi%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Frend%2F*%21%2FGjZsHjGMijY%2Fimage%2F*%21%2FGjZsHjGMijY%2Fcaptions%2F*%7Ehmac%3D45b7d4037ffe1c90e7cdad27b883507c3adec35b259569d1ea02093812048552"
-                }
-              }
-            ]
-          },
-          {
-            name: "Photography",
-            description: "Photos and cinematic video projects I made",
-            icon: (
-              <div className="relative w-6 h-6">
-                <Image
-                  src="/fx3_square.png"
-                  alt="FX3 Camera Icon"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ),
-            projects: [
-              { 
-                title: "Photography Project 1", 
-                description: "A placeholder photography project capturing beautiful moments.",
-                media: { src: "/projects/photography/superior.jpg" },
-                aspect: "3:4"
-              },
-              { 
-                title: "Photography Project 2", 
-                description: "A placeholder photography project capturing beautiful moments.",
-                media: { src: "/projects/photography/Ski_.jpg" },
-                aspect: "3:4"
-              },
-              {
-                title: "Photography Project 3", 
-                description: "A placeholder photography project capturing beautiful moments.",
-                media: { src: "/projects/photography/Mountain.jpg" },
-                aspect: "3:4"
-              },
-              {
-                title: "Photography Project 4", 
-                description: "A placeholder photography project capturing beautiful moments.",
-                media: { src: "/projects/photography/house_at_night.jpg" },
-                aspect: "3:4"
-              }
-            ]
-          },
-          {
-            name: "Commissions",
-            description: "Commissioned projects",
-            icon: "💼",
-            projects: [
-              { 
-                title: "@Seltix", 
-                description: "I-CLIP ad-segment",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/rend/93wWQRnnS75_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/93wWQRnnS75/image/93wWQRnnS75_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F93wWQRnnS75%2Frend%2F*%21%2Fi%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Frend%2F*%21%2F93wWQRnnS75%2Fimage%2F*%21%2F93wWQRnnS75%2Fcaptions%2F*%7Ehmac%3D7e98e21a512959a8675e3eab9f63557807e614ccd13acf4420e5ed1cd7f23cb6"
-                },
-                link: "https://youtube.com/@SELTIXX"
-              },
-              { 
-                title: "@Nils Schlieper", 
-                description: "Youtube Preintro 2 (7 Tage mit Elotrix)",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/rend/Asr26Wrp6ps_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FAsr26Wrp6ps%2Frend%2F*%21%2Fi%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Fimage%2F*%21%2FAsr26Wrp6ps%2Fcaptions%2F*%7Ehmac%3D1f2e31c3f0a490eaf0b6ce8563fed20e3a9c3049f876166dd0e7ea200dc93b8e",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/Asr26Wrp6ps/image/Asr26Wrp6ps_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FAsr26Wrp6ps%2Frend%2F*%21%2Fi%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Frend%2F*%21%2FAsr26Wrp6ps%2Fimage%2F*%21%2FAsr26Wrp6ps%2Fcaptions%2F*%7Ehmac%3D1f2e31c3f0a490eaf0b6ce8563fed20e3a9c3049f876166dd0e7ea200dc93b8e"
-                },
-                link: "https://youtube.com/@nils.schlieper"
-              },
-              {
-                title: "@Nils Schlieper",
-                description: "Youtube Preintro (Dubai Wohnung)",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/rend/U7rUzTdyfKy_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FU7rUzTdyfKy%2Frend%2F*%21%2Fi%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Fimage%2F*%21%2FU7rUzTdyfKy%2Fcaptions%2F*%7Ehmac%3D45b9dfac4cf7db43fa8102475cd12cae2092ff5bc6678692dcb2e8afc7d07d85",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/U7rUzTdyfKy/image/U7rUzTdyfKy_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FU7rUzTdyfKy%2Frend%2F*%21%2Fi%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Frend%2F*%21%2FU7rUzTdyfKy%2Fimage%2F*%21%2FU7rUzTdyfKy%2Fcaptions%2F*%7Ehmac%3D45b9dfac4cf7db43fa8102475cd12cae2092ff5bc6678692dcb2e8afc7d07d85"
-                },
-                link: "https://youtube.com/@nils.schlieper"
-              },
-              {
-                title: "@Nils Schlieper",
-                description: "Youtube Preintro (Pokemonkarten)",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/rend/F6s5nwknkoG_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FF6s5nwknkoG%2Frend%2F*%21%2Fi%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Fimage%2F*%21%2FF6s5nwknkoG%2Fcaptions%2F*%7Ehmac%3D687e848e636f3d150294148d8e3fe10496b3276a2038996b8515985c762584de",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/F6s5nwknkoG/image/F6s5nwknkoG_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FF6s5nwknkoG%2Frend%2F*%21%2Fi%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Frend%2F*%21%2FF6s5nwknkoG%2Fimage%2F*%21%2FF6s5nwknkoG%2Fcaptions%2F*%7Ehmac%3D687e848e636f3d150294148d8e3fe10496b3276a2038996b8515985c762584de"
-                },
-                link: "https://youtube.com/@nils.schlieper"
-              },
-              {
-                title: "@Nils Schlieper",
-                description: "Youtube Preintro (Villa Showcase)",
-                media: {
-                  src: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/rend/2-RgLp9Uv46_576.mp4?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F2-RgLp9Uv46%2Frend%2F*%21%2Fi%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Fimage%2F*%21%2F2-RgLp9Uv46%2Fcaptions%2F*%7Ehmac%3Dfddd440631fa4b887ff197d870b63cb19187e2b4b3b0ce22f7540a27c81bb205",
-                  thumbnail: "https://cdn-prod-ccv.adobe.com/2-RgLp9Uv46/image/2-RgLp9Uv46_poster.jpg?hdnts=st%3D1745010707%7Eexp%3D1745269907%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F2-RgLp9Uv46%2Frend%2F*%21%2Fi%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Frend%2F*%21%2F2-RgLp9Uv46%2Fimage%2F*%21%2F2-RgLp9Uv46%2Fcaptions%2F*%7Ehmac%3Dfddd440631fa4b887ff197d870b63cb19187e2b4b3b0ce22f7540a27c81bb205"
-                },
-                link: "https://youtube.com/@nils.schlieper"
-              }
-            ]
-          }
-        ]
-          .filter(category => activeCategory === "Everything" || category.name === activeCategory)
-          .map((category, categoryIndex) => (
+        {categories
+          .filter((category: Category) => activeCategory === "Everything" || category.name === activeCategory)
+          .map((category: Category, categoryIndex: number) => (
             <motion.div
               key={category.name}
               initial={{ opacity: 0, y: 20 }}
@@ -692,7 +481,7 @@ export default function ProjectsPage() {
               {/* Category Header */}
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl">{category.icon}</span>
+                  <span className="text-2xl">{renderCategoryIcon(category.icon)}</span>
                   <h3 className="text-3xl font-bold">{category.name}</h3>
                 </div>
                 <p className="text-gray-600 text-lg">{category.description}</p>
@@ -713,9 +502,8 @@ export default function ProjectsPage() {
                   className="flex gap-8"
                   columnClassName="masonry-column w-1/2"
                 >
-                  {[...category.projects].reverse().map((project, _index) => {
-                    const aspect = (project as Partial<Project>).aspect;
-                    // Type guard: only render if project fits the Project type
+                  {[...category.projects].reverse().map((project: Project, _index: number) => {
+                    const aspect = project.aspect;
                     if (
                       typeof project.title === "string" &&
                       typeof project.description === "string" &&
@@ -729,14 +517,13 @@ export default function ProjectsPage() {
                       return (
                         <ProjectCard
                           key={`${project.title}-${_index}`}
-                          project={project as Project}
+                          project={project}
                           categoryName={category.name}
                         />
                       );
                     }
                     return null;
                   })}
-                  {/* Optional: Add a single invisible placeholder if there is only one project, to keep the card size stable */}
                   {category.projects.length === 1 && (
                     <div key="placeholder" className="invisible" aria-hidden="true" />
                   )}

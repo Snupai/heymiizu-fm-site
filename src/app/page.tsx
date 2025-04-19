@@ -1,9 +1,14 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import { getDeviceType } from "../utils/deviceType";
+import HomeSimple from "./HomeSimple";
+
+const MobileFallback = dynamic(() => import("../components/MobileFallback"), { ssr: false });
 
 const messageBubbles = [
   { src: "/message_bubbles/Hello.png", position: { x: -42, y: 0 }, side: "left", rotate: -6, scale: 0.8 },
@@ -28,14 +33,27 @@ const fadeIn = {
 };
 
 export default function HomePage() {
+  const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
-
   const macY = useTransform(scrollYProgress, [0, 1], [0, -700]);
   const macScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+
+  useEffect(() => {
+    setDeviceType(getDeviceType());
+    const handleResize = () => setDeviceType(getDeviceType());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (deviceType === null) return null;
+  if (deviceType === "mobile") return <MobileFallback />;
+  if (deviceType === "small") {
+    return <HomeSimple />;
+  }
 
   return (
     <motion.main 

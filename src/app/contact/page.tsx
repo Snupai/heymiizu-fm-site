@@ -5,6 +5,12 @@ import Image from "next/image";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
+import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
+import { getDeviceType } from "../../utils/deviceType";
+import ContactSimple from "./ContactSimple";
+
+const MobileFallback = dynamic(() => import("../../components/MobileFallback"), { ssr: false });
 
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
@@ -53,6 +59,21 @@ const messageBubbles: MessageBubble[] = [
 ];
 
 export default function ContactPage() {
+  const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
+
+  useEffect(() => {
+    setDeviceType(getDeviceType());
+    const handleResize = () => setDeviceType(getDeviceType());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (deviceType === null) return null;
+  if (deviceType === "mobile") return <MobileFallback />;
+  if (deviceType === "small") {
+    return <ContactSimple />;
+  }
+
   return (
     <main className="relative w-full bg-white overflow-hidden px-4 flex flex-col">
       {/* --- Removed Logo (now part of Navbar) --- */}
