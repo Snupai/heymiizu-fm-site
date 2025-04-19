@@ -132,7 +132,10 @@ function ProjectCard({
   if (cardAspect === "4:3") aspectClass = "aspect-[4/3]";
   if (cardAspect === "3:4") aspectClass = "aspect-[3/4]";
   if (cardAspect === "16:9") aspectClass = "aspect-[16/9]";
-  return (
+  
+  const isSpecial = categoryName === "Special";
+
+  const card = (
     <motion.div
       key={project.title}
       layout
@@ -147,22 +150,37 @@ function ProjectCard({
           ease: "easeOut"
         }
       }}
-      className={`break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px] ${className}`}
+      className={`rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px] bg-white ${className || ""}`}
     >
-      <div className={`relative w-full ${aspectClass}`}>
+      <div className={`relative w-full ${aspectClass} overflow-hidden`}>
+        {/* Thumbnail always fills the area, is hidden when video is playing */}
         {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
-          <VideoPlayer
-            src={project.media.src}
-            poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-          />
+          <>
+            <Image
+              src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+              alt={project.title}
+              fill
+              className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
+              unoptimized={false}
+              priority={true}
+              sizes="100vw"
+              style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.015)'}}
+            />
+            <VideoPlayer
+              src={project.media.src}
+              poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+            />
+          </>
         ) : (
           <Image
             src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
             alt={project.title}
             fill
-            className="object-contain bg-[#f3caed]"
+            className="object-cover w-full h-full"
             unoptimized={false}
             priority={true}
+            sizes="100vw"
+            style={{objectFit: 'cover'}}
           />
         )}
       </div>
@@ -191,6 +209,14 @@ function ProjectCard({
       </div>
     </motion.div>
   );
+
+  return isSpecial ? (
+    <div className="special-gradient-outline-wrapper">
+      <div className="special-gradient-outline-inner">
+        {card}
+      </div>
+    </div>
+  ) : card;
 }
 
 // Helper to render icons from string IDs
@@ -508,7 +534,7 @@ export default function ProjectsPage() {
                     <Masonry
                       breakpointCols={{ default: 2, 768: 1 }}
                       className="flex gap-8 w-full"
-                      columnClassName="masonry-column w-1/2"
+                      columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
                     >
                       {[...category.projects].reverse().map((project, idx) => {
                         const aspect = project.aspect;

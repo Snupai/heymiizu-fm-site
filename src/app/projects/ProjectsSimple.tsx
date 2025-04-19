@@ -120,7 +120,7 @@ export default function ProjectsSimple({
                   {renderCategoryIcon(cat.icon)}
                   <span className="text-xl font-semibold">{cat.name}</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                   {cat.projects && cat.projects.length > 0 ? (
                     cat.projects.slice().reverse().map((project, idx) => (
                       <ProjectCard
@@ -144,7 +144,7 @@ export default function ProjectsSimple({
                     {renderCategoryIcon(cat.icon)}
                     <span className="text-xl font-semibold">{cat.name}</span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                     {cat.projects && cat.projects.length > 0 ? (
                       cat.projects.slice().reverse().map((project, idx) => (
                         <ProjectCard
@@ -208,14 +208,15 @@ function ProjectCard({
   categoryName: string;
   aspect?: "16:9" | "4:3" | "3:4";
 }) {
-  // Use project.aspect if provided, else prop aspect, else default to 16:9
   const cardAspect = project.aspect ?? aspect ?? "16:9";
-  // Tailwind aspect class
-  let aspectClass = "aspect-video"; // 16:9
+  let aspectClass = "aspect-video";
   if (cardAspect === "4:3") aspectClass = "aspect-[4/3]";
   if (cardAspect === "3:4") aspectClass = "aspect-[3/4]";
   if (cardAspect === "16:9") aspectClass = "aspect-[16/9]";
-  return (
+
+  const isSpecial = categoryName === "Special";
+
+  const card = (
     <motion.div
       key={project.title}
       layout
@@ -230,22 +231,37 @@ function ProjectCard({
           ease: "easeOut"
         }
       }}
-      className={`break-inside-avoid mb-8 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col w-full transition-all duration-200`}
+      className={`rounded-xl shadow-lg overflow-hidden flex flex-col w-full bg-white transition-all duration-200`}
     >
-      <div className={`relative w-full ${aspectClass}`}>
+      <div className={`relative w-full ${aspectClass} overflow-hidden`}>
+        {/* Thumbnail always fills the area, is hidden when video is playing */}
         {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
-          <VideoPlayer
-            src={project.media.src}
-            poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-          />
+          <>
+            <Image
+              src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+              alt={project.title}
+              fill
+              className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
+              unoptimized={false}
+              priority={true}
+              sizes="100vw"
+              style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
+            />
+            <VideoPlayer
+              src={project.media.src}
+              poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+            />
+          </>
         ) : (
           <Image
             src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
             alt={project.title}
             fill
-            className="object-contain bg-[#f3caed]"
+            className="object-cover w-full h-full"
             unoptimized={false}
             priority={true}
+            sizes="100vw"
+            style={{objectFit: 'cover'}}
           />
         )}
       </div>
@@ -274,4 +290,12 @@ function ProjectCard({
       </div>
     </motion.div>
   );
+
+  return isSpecial ? (
+    <div className="special-gradient-outline-wrapper">
+      <div className="special-gradient-outline-inner">
+        {card}
+      </div>
+    </div>
+  ) : card;
 }

@@ -1,0 +1,27 @@
+/* Animated blue gradient outline for special cards - as a wrapper */
+.special-gradient-outline-wrapper {
+  padding: 12px;
+  border-radius: 28px; /* outer_radius = inner_radius (16px) + padding (12px) */
+  background: linear-gradient(270deg, #1e90ff, #00cfff, #1e90ff, #005bea, #1e90ff);
+  background-size: 400% 400%;
+  animation: gradient-border 6s ease infinite;
+  display: inline-block;
+}
+
+@keyframes gradient-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.special-gradient-outline-inner {
+  border-radius: 1rem; /* matches rounded-xl, 16px */
+  background: white;
+  overflow: hidden;
+}
