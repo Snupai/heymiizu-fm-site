@@ -713,7 +713,7 @@ export default function ProjectsPage() {
                   className="flex gap-8"
                   columnClassName="masonry-column w-1/2"
                 >
-                  {[...category.projects].map((project, _index) => {
+                  {[...category.projects].reverse().map((project, _index) => {
                     const aspect = (project as Partial<Project>).aspect;
                     // Type guard: only render if project fits the Project type
                     if (
