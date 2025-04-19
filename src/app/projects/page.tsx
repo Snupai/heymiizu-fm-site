@@ -5,13 +5,10 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Masonry from "react-masonry-css";
-import dynamic from "next/dynamic"; 
 import { getDeviceType } from "../../utils/deviceType";
 import ProjectsSimple from "./ProjectsSimple";
 import type { Category } from "./ProjectsSimple";
 import projectsData from "~/app/projects/projectsData";
-
-const MobileFallback = dynamic(() => import("../../components/MobileFallback"), { ssr: false });
 
 interface MessageBubble {
   src: string;
@@ -73,12 +70,11 @@ const messageBubbles: MessageBubble[] = [
 ];
 
 function VideoPlayer({ src, poster, autoPlay = false }: { src: string; poster: string; autoPlay?: boolean }) {
-  const [showControls, setShowControls] = useState(autoPlay);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     if (autoPlay && videoRef.current) {
-      videoRef.current.play();
+      void videoRef.current.play();
     }
   }, [autoPlay]);
 

@@ -165,13 +165,12 @@ export default function ProjectsSimple({
 }
 
 function VideoPlayer({ src, poster, autoPlay = false }: { src: string; poster: string; autoPlay?: boolean }) {
-  const [showControls, setShowControls] = useState(autoPlay);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Auto-play when prop is set
   useEffect(() => {
     if (autoPlay && videoRef.current) {
-      videoRef.current.play();
+      void videoRef.current.play();
     }
   }, [autoPlay]);
 

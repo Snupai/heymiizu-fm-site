@@ -5,12 +5,11 @@ import Image from "next/image";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
-import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { getDeviceType } from "../../utils/deviceType";
 import ContactSimple from "./ContactSimple";
 
-const MobileFallback = dynamic(() => import("../../components/MobileFallback"), { ssr: false });
+// Removed unused MobileFallback import
 
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
