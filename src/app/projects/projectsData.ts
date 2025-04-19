@@ -109,6 +109,30 @@ const projectsData: Category[] = [
           src: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/rend/HXLiRAQ-aAg_576.mp4?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6",
           thumbnail: "https://cdn-prod-ccv.adobe.com/HXLiRAQ-aAg/image/HXLiRAQ-aAg_poster.jpg?hdnts=st%3D1745007846%7Eexp%3D1745267046%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FHXLiRAQ-aAg%2Frend%2F*%21%2Fi%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Frend%2F*%21%2FHXLiRAQ-aAg%2Fimage%2F*%21%2FHXLiRAQ-aAg%2Fcaptions%2F*%7Ehmac%3Dd61cbe27214062448f09a9215898b2450e08342f7904f5e708ac309a64245ba6"
         }
+      },
+      {
+        title: "Basic Animation", 
+        description: "Part of a Youtube Video",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/DVhM7LR8jcp/rend/DVhM7LR8jcp_576.mp4?hdnts=st%3D1745077637%7Eexp%3D1745336837%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FDVhM7LR8jcp%2Frend%2F*%21%2Fi%2FDVhM7LR8jcp%2Frend%2F*%21%2FDVhM7LR8jcp%2Frend%2F*%21%2FDVhM7LR8jcp%2Fimage%2F*%21%2FDVhM7LR8jcp%2Fcaptions%2F*%7Ehmac%3D1cec97bd3a970bd6e232d8eca1d1c9742526d20192895c87a9750e8751457b61",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/DVhM7LR8jcp/image/DVhM7LR8jcp_poster.jpg?hdnts=st%3D1745077637%7Eexp%3D1745336837%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FDVhM7LR8jcp%2Frend%2F*%21%2Fi%2FDVhM7LR8jcp%2Frend%2F*%21%2FDVhM7LR8jcp%2Frend%2F*%21%2FDVhM7LR8jcp%2Fimage%2F*%21%2FDVhM7LR8jcp%2Fcaptions%2F*%7Ehmac%3D1cec97bd3a970bd6e232d8eca1d1c9742526d20192895c87a9750e8751457b61"
+        }
+      },
+      {
+        title: "Basic Animation", 
+        description: "Part of a Youtube Video",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/Pxi54fQui7L/rend/Pxi54fQui7L_576.mp4?hdnts=st%3D1745077637%7Eexp%3D1745336837%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPxi54fQui7L%2Frend%2F*%21%2Fi%2FPxi54fQui7L%2Frend%2F*%21%2FPxi54fQui7L%2Frend%2F*%21%2FPxi54fQui7L%2Fimage%2F*%21%2FPxi54fQui7L%2Fcaptions%2F*%7Ehmac%3Def4e197126da61c04f67cea6e74df0dc0b74746f15afe1f780033dc94e3020cc",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/Pxi54fQui7L/image/Pxi54fQui7L_poster.jpg?hdnts=st%3D1745077637%7Eexp%3D1745336837%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FPxi54fQui7L%2Frend%2F*%21%2Fi%2FPxi54fQui7L%2Frend%2F*%21%2FPxi54fQui7L%2Frend%2F*%21%2FPxi54fQui7L%2Fimage%2F*%21%2FPxi54fQui7L%2Fcaptions%2F*%7Ehmac%3Def4e197126da61c04f67cea6e74df0dc0b74746f15afe1f780033dc94e3020cc"
+        }
+      },
+      {
+        title: "Basic Animation", 
+        description: "Part of a Youtube Video",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/GidxivadEiM/rend/GidxivadEiM_576.mp4?hdnts=st%3D1745077637%7Eexp%3D1745336837%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGidxivadEiM%2Frend%2F*%21%2Fi%2FGidxivadEiM%2Frend%2F*%21%2FGidxivadEiM%2Frend%2F*%21%2FGidxivadEiM%2Fimage%2F*%21%2FGidxivadEiM%2Fcaptions%2F*%7Ehmac%3De3af3abb605afe835fd7f2a0bdc0cca6bf11a7d47a4b6be9444ae467bcc1c1c8",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/GidxivadEiM/image/GidxivadEiM_poster.jpg?hdnts=st%3D1745077637%7Eexp%3D1745336837%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FGidxivadEiM%2Frend%2F*%21%2Fi%2FGidxivadEiM%2Frend%2F*%21%2FGidxivadEiM%2Frend%2F*%21%2FGidxivadEiM%2Fimage%2F*%21%2FGidxivadEiM%2Fcaptions%2F*%7Ehmac%3De3af3abb605afe835fd7f2a0bdc0cca6bf11a7d47a4b6be9444ae467bcc1c1c8"
+        }
       }
     ]
   },
