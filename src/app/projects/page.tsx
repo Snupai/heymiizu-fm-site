@@ -315,8 +315,8 @@ export default function ProjectsPage() {
   
   // Conditional rendering AFTER all hooks
   if (deviceType === null) return null;
-  if (deviceType === "mobile") return <MobileFallback />;
-  if (deviceType === "small") {
+  {/*if (deviceType === "mobile") return <MobileFallback />;*/}
+  if (deviceType === "small" || deviceType === "mobile") {
     return (
       <ProjectsSimple
         categories={categories}

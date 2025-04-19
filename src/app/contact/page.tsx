@@ -69,8 +69,8 @@ export default function ContactPage() {
   }, []);
 
   if (deviceType === null) return null;
-  if (deviceType === "mobile") return <MobileFallback />;
-  if (deviceType === "small") {
+  {/*if (deviceType === "mobile") return <MobileFallback />;*/}
+  if (deviceType === "small" || deviceType === "mobile") {
     return <ContactSimple />;
   }
 

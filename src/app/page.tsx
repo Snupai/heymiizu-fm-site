@@ -50,8 +50,8 @@ export default function HomePage() {
   }, []);
 
   if (deviceType === null) return null;
-  if (deviceType === "mobile") return <MobileFallback />;
-  if (deviceType === "small") {
+  {/*if (deviceType === "mobile") return <MobileFallback />;*/}
+  if (deviceType === "small" || deviceType === "mobile") {
     return <HomeSimple />;
   }
 
