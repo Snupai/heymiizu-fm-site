@@ -5,7 +5,7 @@ export default function HomeSimple() {
   return (
     <main className="relative w-full bg-white overflow-hidden flex flex-col items-center pt-32">
       <div className="w-full max-w-4xl mx-auto px-4 py-4 flex flex-col items-center">
-        <h1 className="text-4xl font-bold mb-2 text-center">Hey, I'm Miizu</h1>
+        <h1 className="text-4xl font-bold mb-2 text-center">{"Hey, I'm Miizu"}</h1>
         <p className="text-lg text-gray-700 mb-6 text-center">
           Welcome! This is the simple version of my homepage.<br />
           Animations and effects are disabled for your device.
@@ -24,7 +24,7 @@ export default function HomeSimple() {
             <div className="p-4 flex flex-col flex-1">
               <h3 className="text-lg font-bold mb-1">Animations</h3>
               <p className="text-gray-600 mb-2 flex-1 text-sm">
-                Animations made with After Effects, Premiere Pro, Photoshop, FIGMA and Blender
+                Animations made with After Effects, Premiere Pro and Photoshop
               </p>
               <Link 
                 href="/projects?category=after-effects"
@@ -47,7 +47,7 @@ export default function HomeSimple() {
             <div className="p-4 flex flex-col flex-1">
               <h3 className="text-lg font-bold mb-1">Photography</h3>
               <p className="text-gray-600 mb-2 flex-1 text-sm">
-                Photos and cinematic video projects I made
+                Photos I made
               </p>
               <Link 
                 href="/projects?category=photography"

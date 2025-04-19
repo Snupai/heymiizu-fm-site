@@ -146,7 +146,7 @@ const projectsData: Category[] = [
   },
   {
     name: "Photography",
-    description: "Photos and cinematic video projects I made",
+    description: "Photos I made",
     icon: "fx3-camera",
     projects: [
       { 

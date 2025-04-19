@@ -230,7 +230,7 @@ export default function HomePage() {
                 <div className="mt-8">
                   <h3 className="text-2xl font-bold mb-3">Animations</h3>
                   <p className="text-gray-600 mb-6">
-                    Animations made with After Effects, Premiere Pro, Photoshop, FIGMA and Blender
+                    Animations made with After Effects, Premiere Pro and Photoshop
                   </p>
                   <Link 
                     href="/projects?category=after-effects"
@@ -262,7 +262,7 @@ export default function HomePage() {
                 <div className="mt-8">
                   <h3 className="text-2xl font-bold mb-3">Photography</h3>
                   <p className="text-gray-600 mb-6">
-                    Photos and cinematic video projects i made
+                    Photos I made
                   </p>
                   <Link 
                     href="/projects?category=photography"
