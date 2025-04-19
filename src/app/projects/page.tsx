@@ -72,11 +72,6 @@ const messageBubbles: MessageBubble[] = [
   },
 ];
 
-const pageVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 }
-};
-
 function VideoPlayer({ src, poster }: { src: string; poster: string }) {
   const [showControls, setShowControls] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -150,7 +145,7 @@ function ProjectCard({
           ease: "easeOut"
         }
       }}
-      className={`rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px] bg-white ${className || ""}`}
+      className={`rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px] bg-white ${className ?? ""}`}
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
         {/* Thumbnail always fills the area, is hidden when video is playing */}
