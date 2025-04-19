@@ -5,10 +5,10 @@ const isMobile = () => {
   const ua = navigator.userAgent;
 
   // iPad Pro/Air detection (user agent always includes 'iPad')
-  const isIPad = /iPad/.test(ua);
+  const isIPad = ua.includes('iPad');
 
   // Surface Pro detection: Windows + Touch + small width
-  const isSurfacePro = /Windows/.test(ua) && 'ontouchstart' in window && window.innerWidth <= 1366;
+  const isSurfacePro = ua.includes('Windows') && 'ontouchstart' in window && window.innerWidth <= 1366;
 
   // General mobile/tablet detection
   const isMobileOrTablet = /Mobi|Android|iPhone|iPod|Windows Phone/i.test(ua);

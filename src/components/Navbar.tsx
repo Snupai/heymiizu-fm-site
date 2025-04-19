@@ -59,7 +59,9 @@ function NavbarContent() {
     visible: { opacity: 1 }
   };
 
-  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {};
+  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
+    // Intentionally left blank for future navigation logic
+  };
 
   return (
     <motion.main 

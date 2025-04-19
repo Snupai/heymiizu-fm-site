@@ -79,11 +79,13 @@ const pageVariants = {
 
 function VideoPlayer({ src, poster }: { src: string; poster: string }) {
   const [showControls, setShowControls] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handlePlay = () => {
     setShowControls(true);
-    void videoRef.current?.play();
+    if (videoRef.current) {
+      void videoRef.current.play();
+    }
   };
 
   return (
@@ -223,7 +225,6 @@ export default function ProjectsPage() {
   const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
   const [activeCategory, setActiveCategory] = useState<string>("Everything");
   const searchParams = useSearchParams();
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setDeviceType(getDeviceType());
@@ -287,7 +288,7 @@ export default function ProjectsPage() {
     window.history.pushState({}, '', url.toString());
   };
 
-  const categories = projectsData as Category[];
+  const categories = projectsData;
   
   // Conditional rendering AFTER all hooks
   if (deviceType === null) return null;
@@ -465,8 +466,8 @@ export default function ProjectsPage() {
       >
         {/* Categories */}
         {categories
-          .filter((category: Category) => activeCategory === "Everything" || category.name === activeCategory)
-          .map((category: Category, categoryIndex: number) => (
+          .filter(category => activeCategory === "Everything" || category.name === activeCategory)
+          .map((category, categoryIndex) => (
             <motion.div
               key={category.name}
               initial={{ opacity: 0, y: 20 }}
@@ -488,11 +489,11 @@ export default function ProjectsPage() {
               </div>
 
               {/* Category Projects */}
-              {category.projects.length === 1 ? (
+              {category.projects.length === 1 && category.projects[0] ? (
                 <div className="flex justify-center">
                   <ProjectCard
-                    key={`${category.projects[0]?.title ?? 'unknown'}-0`}
-                    project={category.projects[0] as Project}
+                    key={`single-project-${category.name}-0`}
+                    project={category.projects[0]}
                     categoryName={category.name}
                   />
                 </div>
@@ -502,7 +503,7 @@ export default function ProjectsPage() {
                   className="flex gap-8"
                   columnClassName="masonry-column w-1/2"
                 >
-                  {[...category.projects].reverse().map((project: Project, _index: number) => {
+                  {[...category.projects].reverse().map((project, idx) => {
                     const aspect = project.aspect;
                     if (
                       typeof project.title === "string" &&
@@ -516,7 +517,7 @@ export default function ProjectsPage() {
                     ) {
                       return (
                         <ProjectCard
-                          key={`${project.title}-${_index}`}
+                          key={`${category.name}-${idx}`}
                           project={project}
                           categoryName={category.name}
                         />

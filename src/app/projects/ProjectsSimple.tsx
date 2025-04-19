@@ -26,8 +26,12 @@ export interface Category {
   projects: Project[];
 }
 
-function isValidCategory(category: any): category is Category {
-  return category && Array.isArray(category.projects);
+function isValidCategory(category: unknown): category is Category {
+  return (
+    typeof category === "object" &&
+    category !== null &&
+    Array.isArray((category as Category).projects)
+  );
 }
 
 // Helper to render icons from string IDs
