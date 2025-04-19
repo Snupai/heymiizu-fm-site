@@ -1,35 +1,69 @@
 "use client";
-
-import { AnimatePresence, useScroll } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import Logo from "./Logo";
 
 function NavbarContent() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    // Animation variants for staggered fade-in
-    const fadeInUp = {
-      hidden: { opacity: 0, y: 20 },
-      visible: { opacity: 1, y: 0 }
-    };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent));
+    }
+  }, []);
 
-    const fadeIn = {
-      hidden: { opacity: 0 },
-      visible: { opacity: 1 }
-    };
+  if (isMobile) {
+    return (
+      <nav className="w-full bg-white shadow-md flex flex-col items-center justify-between px-4 py-3" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}>
+        <div className="flex w-full items-center justify-between">
+          <div />
+          <div className="flex-1 flex justify-center">
+            <Logo />
+          </div>
+          <button
+            aria-label="Open menu"
+            style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', padding: 0 }}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span style={{ fontSize: 28, color: '#a95fa8' }}>
+              &#9776;
+            </span>
+          </button>
+        </div>
+        {menuOpen && (
+          <div className="w-full bg-white border-t border-gray-200 mt-2 flex flex-col items-center animate-fade-in" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
+            <Link href="/" className="block py-2 text-lg w-full text-center" onClick={() => setMenuOpen(false)}>Home</Link>
+            <Link href="/projects" className="block py-2 text-lg w-full text-center" onClick={() => setMenuOpen(false)}>Projects</Link>
+            <Link href="/contact" className="block py-2 text-lg w-full text-center" onClick={() => setMenuOpen(false)}>Contact</Link>
+          </div>
+        )}
+      </nav>
+    );
+  }
 
-      // Handle link click for navigation
-    const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
-      // Disable transition animation for navigation
-      // No need to set isTransitioning or nextPage
-    };
-    
-return (
+  // Desktop navbar as before
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 }
+  };
+
+  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
+    // Intentionally left blank for future navigation logic
+  };
+
+  return (
     <motion.main 
       ref={containerRef}
       className="relative w-full bg-white overflow-hidden"
@@ -74,7 +108,6 @@ return (
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Logo */}
       <motion.div 
         className="fixed top-8 left-[20%] z-60"
@@ -83,7 +116,6 @@ return (
       >
         <Logo />
       </motion.div>
-
       {/* Navigation */}
       <motion.nav 
         className="fixed top-0 left-0 right-0 z-50"
@@ -92,7 +124,6 @@ return (
       >
         {/* Base layer: Full height, no blur */}
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-white/60" />
-        
         {/* Middle blur layer: Overlapping gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/50 to-white/70" style={{
           backdropFilter: 'blur(28px)',
@@ -100,7 +131,6 @@ return (
           maskImage: 'linear-gradient(to top, transparent, white 50%)',
           WebkitMaskImage: 'linear-gradient(to top, transparent, white 50%)'
         }} />
-        
         {/* Top blur layer: Maximum blur with fade */}
         <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/60 to-white/80" style={{
           backdropFilter: 'blur(40px)',
@@ -108,7 +138,6 @@ return (
           maskImage: 'linear-gradient(to top, transparent 30%, white)',
           WebkitMaskImage: 'linear-gradient(to top, transparent 30%, white)'
         }} />
-
         <div className="container mx-auto px-12 py-8 relative">
           <ul className="flex gap-8 text-lg justify-end">
             <li className="inline-flex flex-col items-center">

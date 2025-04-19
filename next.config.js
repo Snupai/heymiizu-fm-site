@@ -13,6 +13,11 @@ const nextConfig = {
         hostname: 'cdn.discordapp.com',
         pathname: '/attachments/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn-prod-ccv.adobe.com',
+        pathname: '/**',
+      },
     ],
   },
   // Configure output options

@@ -1,5 +1,6 @@
 import { Public_Sans } from "next/font/google";
 import "../styles/globals.css";
+import "../styles/special-gradient-outline.css";
 import type { Metadata } from 'next'
 import NavbarContent from "../components/Navbar";
 import FooterContent from "../components/Footer";

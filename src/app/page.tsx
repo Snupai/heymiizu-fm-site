@@ -1,9 +1,13 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getDeviceType } from "../utils/deviceType";
+import HomeSimple from "./HomeSimple";
+
+// Removed unused MobileFallback import
 
 const messageBubbles = [
   { src: "/message_bubbles/Hello.png", position: { x: -42, y: 0 }, side: "left", rotate: -6, scale: 0.8 },
@@ -28,14 +32,27 @@ const fadeIn = {
 };
 
 export default function HomePage() {
+  const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
-
   const macY = useTransform(scrollYProgress, [0, 1], [0, -700]);
   const macScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+
+  useEffect(() => {
+    setDeviceType(getDeviceType());
+    const handleResize = () => setDeviceType(getDeviceType());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (deviceType === null) return null;
+  {/*if (deviceType === "mobile") return <MobileFallback />;*/}
+  if (deviceType === "small" || deviceType === "mobile") {
+    return <HomeSimple />;
+  }
 
   return (
     <motion.main 
@@ -212,7 +229,7 @@ export default function HomePage() {
                 <div className="mt-8">
                   <h3 className="text-2xl font-bold mb-3">Animations</h3>
                   <p className="text-gray-600 mb-6">
-                    Animations made with After Effects, Premiere Pro, Photoshop, FIGMA and Blender
+                    Animations made with After Effects, Premiere Pro and Photoshop
                   </p>
                   <Link 
                     href="/projects?category=after-effects"
@@ -244,7 +261,7 @@ export default function HomePage() {
                 <div className="mt-8">
                   <h3 className="text-2xl font-bold mb-3">Photography</h3>
                   <p className="text-gray-600 mb-6">
-                    Photos and cinematic video projects i made
+                    Photos I made
                   </p>
                   <Link 
                     href="/projects?category=photography"
