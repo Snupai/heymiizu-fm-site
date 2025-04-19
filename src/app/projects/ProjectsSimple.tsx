@@ -1,7 +1,6 @@
 import Image from "next/image";
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useRef } from "react";
 
 // Types copied from page.tsx for self-containment
 export type Media = {
@@ -165,35 +164,27 @@ export default function ProjectsSimple({
   );
 }
 
-function VideoPlayer({ src, poster }: { src: string; poster: string }) {
-  const [showControls, setShowControls] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+function VideoPlayer({ src, poster, autoPlay = false }: { src: string; poster: string; autoPlay?: boolean }) {
+  const [showControls, setShowControls] = useState(autoPlay);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handlePlay = () => {
-    setShowControls(true);
-    void videoRef.current?.play();
-  };
+  // Auto-play when prop is set
+  useEffect(() => {
+    if (autoPlay && videoRef.current) {
+      videoRef.current.play();
+    }
+  }, [autoPlay]);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full object-contain rounded-lg bg-black" style={{ borderRadius: 'inherit', background: '#000' }}>
-      {!showControls && (
-        <button
-          className="absolute inset-0 flex items-center justify-center w-full h-full z-10 cursor-pointer hover:cursor-pointer"
-          onClick={handlePlay}
-          style={{ background: "rgba(0,0,0,0.3)" }}
-          aria-label="Play video"
-        >
-          <svg width="64" height="64" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-      )}
+    <div className="absolute top-0 left-0 w-full h-full object-contain rounded-lg" style={{ borderRadius: 'inherit' }}>
       <video
         ref={videoRef}
         src={src}
-        controls={showControls}
+        controls={true}
         poster={poster}
         className="w-full h-full object-contain rounded-lg"
-        style={{ borderRadius: 'inherit', background: '#000' }}
-        onPlay={() => setShowControls(true)}
+        style={{ borderRadius: 'inherit' }}
+        autoPlay={autoPlay}
       />
     </div>
   );
@@ -216,6 +207,9 @@ function ProjectCard({
 
   const isSpecial = categoryName === "Special";
 
+  // --- NEW: Track if video is playing ---
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const card = (
     <motion.div
       key={project.title}
@@ -234,23 +228,49 @@ function ProjectCard({
       className={`rounded-xl shadow-lg overflow-hidden flex flex-col w-full bg-white transition-all duration-200`}
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
-        {/* Thumbnail always fills the area, is hidden when video is playing */}
+        {/* Video thumbnail and play button overlay */}
         {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
           <>
-            <Image
-              src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-              alt={project.title}
-              fill
-              className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
-              unoptimized={false}
-              priority={true}
-              sizes="100vw"
-              style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
-            />
-            <VideoPlayer
-              src={project.media.src}
-              poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-            />
+            {!isPlaying && (
+              <button
+                className="absolute inset-0 w-full h-full z-20 cursor-pointer group"
+                style={{ padding: 0, border: 'none' }}
+                onClick={() => setIsPlaying(true)}
+                aria-label="Play video"
+              >
+                <Image
+                  src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                  alt={project.title}
+                  fill
+                  className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
+                  unoptimized={false}
+                  priority={true}
+                  sizes="100vw"
+                  style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
+                />
+                <span className="absolute inset-0 flex items-center justify-center z-20">
+                  <svg
+                    width="56"
+                    height="56"
+                    viewBox="0 0 56 56"
+                    style={{ opacity: 0.8, transition: 'opacity 0.2s', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.45))' }}
+                    className="group-hover:opacity-100"
+                  >
+                    <polygon 
+                      points="20,14 44,28 20,42" 
+                      fill="white"
+                    />
+                  </svg>
+                </span>
+              </button>
+            )}
+            {isPlaying && (
+              <VideoPlayer
+                src={project.media.src}
+                poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                autoPlay={true}
+              />
+            )}
           </>
         ) : (
           <Image

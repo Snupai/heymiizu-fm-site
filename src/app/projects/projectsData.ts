@@ -14,6 +14,14 @@ const projectsData: Category[] = [
           src: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/rend/7XVYiHErCru_576.mp4?hdnts=st%3D1745067502%7Eexp%3D1745326702%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3Df1c1e57d299d096d962b63d459ec1da5e8826ab64782e691df18790a5a4e000a",
           thumbnail: "https://cdn-prod-ccv.adobe.com/7XVYiHErCru/image/7XVYiHErCru_poster.jpg?hdnts=st%3D1745067502%7Eexp%3D1745326702%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F7XVYiHErCru%2Frend%2F*%21%2Fi%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Frend%2F*%21%2F7XVYiHErCru%2Fimage%2F*%21%2F7XVYiHErCru%2Fcaptions%2F*%7Ehmac%3Df1c1e57d299d096d962b63d459ec1da5e8826ab64782e691df18790a5a4e000a"
         }
+      },
+      {
+        title: "Portfolio Release Trailer", 
+        description: "Made with love",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/3Ij7Hhoc4wv/rend/3Ij7Hhoc4wv_576.mp4?hdnts=st%3D1745079663%7Eexp%3D1745338863%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F3Ij7Hhoc4wv%2Frend%2F*%21%2Fi%2F3Ij7Hhoc4wv%2Frend%2F*%21%2F3Ij7Hhoc4wv%2Frend%2F*%21%2F3Ij7Hhoc4wv%2Fimage%2F*%21%2F3Ij7Hhoc4wv%2Fcaptions%2F*%7Ehmac%3Dc4d617939259b477fb5d9d0f41a09721cc426dd1e4333050c94170a1cae229d9",
+          thumbnail: "/projects/animations/trailer_portfolio_thumbnail.png"
+        }
       }
     ]
   },
@@ -141,27 +149,45 @@ const projectsData: Category[] = [
     description: "Photos I made",
     icon: "fx3-camera",
     projects: [
+      {
+        title: "Kinoblick",
+        description: "Wintervacation 2023",
+        media: { src: "/projects/photography/Kinoblick.jpg" },
+        aspect: "3:4"
+      },
+      {
+        title: "Hotel",
+        description: "Thailand 2024",
+        media: { src: "/projects/photography/hotel.jpg" },
+        aspect: "3:4"
+      },
+      {
+        title: "FX30",
+        description: "Thailand 2024",
+        media: { src: "/projects/photography/fx30.jpg" },
+        aspect: "3:4"
+      },
       { 
-        title: "Photography Project 1", 
-        description: "A placeholder photography project capturing beautiful moments.",
+        title: "The Cabin", 
+        description: "Wintervacation 2025",
         media: { src: "/projects/photography/superior.jpg" },
         aspect: "3:4"
       },
       { 
-        title: "Photography Project 2", 
-        description: "A placeholder photography project capturing beautiful moments.",
+        title: "Mountain Lift", 
+        description: "Wintervacation 2025",
         media: { src: "/projects/photography/Ski_.jpg" },
         aspect: "3:4"
       },
       {
-        title: "Photography Project 3", 
-        description: "A placeholder photography project capturing beautiful moments.",
+        title: "Peak", 
+        description: "Wintervacation 2025",
         media: { src: "/projects/photography/Mountain.jpg" },
         aspect: "3:4"
       },
       {
-        title: "Photography Project 4", 
-        description: "A placeholder photography project capturing beautiful moments.",
+        title: "Comfort", 
+        description: "Wintervacation 2025",
         media: { src: "/projects/photography/house_at_night.jpg" },
         aspect: "3:4"
       }
