@@ -79,6 +79,47 @@ const projectsData: Category[] = [
         }
       },
       {
+        title: "Song Player",
+        description: "Proof of concept",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/5jNAQjyIe_2/rend/5jNAQjyIe_2_576.mp4?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F5jNAQjyIe_2%2Frend%2F*%21%2Fi%2F5jNAQjyIe_2%2Frend%2F*%21%2F5jNAQjyIe_2%2Frend%2F*%21%2F5jNAQjyIe_2%2Fimage%2F*%21%2F5jNAQjyIe_2%2Fcaptions%2F*%7Ehmac%3Dce671e1a55bee2663b7fe8431ca2371305e99420b9ea76e3e0c98d9a369ac69d",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/5jNAQjyIe_2/image/5jNAQjyIe_2_poster.jpg?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F5jNAQjyIe_2%2Frend%2F*%21%2Fi%2F5jNAQjyIe_2%2Frend%2F*%21%2F5jNAQjyIe_2%2Frend%2F*%21%2F5jNAQjyIe_2%2Fimage%2F*%21%2F5jNAQjyIe_2%2Fcaptions%2F*%7Ehmac%3Dce671e1a55bee2663b7fe8431ca2371305e99420b9ea76e3e0c98d9a369ac69d"
+        }
+      },
+      {
+        title: "Just Bones",
+        description: "Proof of concept",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/FauXeZQ9rHY/rend/FauXeZQ9rHY_576.mp4?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FFauXeZQ9rHY%2Frend%2F*%21%2Fi%2FFauXeZQ9rHY%2Frend%2F*%21%2FFauXeZQ9rHY%2Frend%2F*%21%2FFauXeZQ9rHY%2Fimage%2F*%21%2FFauXeZQ9rHY%2Fcaptions%2F*%7Ehmac%3D3fe21318d11832442db06817498e339ce56f123dd84f7de551ce7ce6aa6dfd2f",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/FauXeZQ9rHY/image/FauXeZQ9rHY_poster.jpg?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FFauXeZQ9rHY%2Frend%2F*%21%2Fi%2FFauXeZQ9rHY%2Frend%2F*%21%2FFauXeZQ9rHY%2Frend%2F*%21%2FFauXeZQ9rHY%2Fimage%2F*%21%2FFauXeZQ9rHY%2Fcaptions%2F*%7Ehmac%3D3fe21318d11832442db06817498e339ce56f123dd84f7de551ce7ce6aa6dfd2f"
+        },
+        aspect: "3:4"
+      },
+      {
+        title: "I Never Stay In Love",
+        description: "AMV Clip",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/-5-vVEvrXs2/rend/-5-vVEvrXs2_576.mp4?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-5-vVEvrXs2%2Frend%2F*%21%2Fi%2F-5-vVEvrXs2%2Frend%2F*%21%2F-5-vVEvrXs2%2Frend%2F*%21%2F-5-vVEvrXs2%2Fimage%2F*%21%2F-5-vVEvrXs2%2Fcaptions%2F*%7Ehmac%3D839a1a7086a139ace14e106e0ff721348f0ff6d96dea275d704c3d9fa3426719",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/-5-vVEvrXs2/image/-5-vVEvrXs2_poster.jpg?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2F-5-vVEvrXs2%2Frend%2F*%21%2Fi%2F-5-vVEvrXs2%2Frend%2F*%21%2F-5-vVEvrXs2%2Frend%2F*%21%2F-5-vVEvrXs2%2Fimage%2F*%21%2F-5-vVEvrXs2%2Fcaptions%2F*%7Ehmac%3D839a1a7086a139ace14e106e0ff721348f0ff6d96dea275d704c3d9fa3426719"
+        }
+      },
+      {
+        title: "NICE TYPE",
+        description: "AMV Clip",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/D3YpTZes4wc/rend/D3YpTZes4wc_576.mp4?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FD3YpTZes4wc%2Frend%2F*%21%2Fi%2FD3YpTZes4wc%2Frend%2F*%21%2FD3YpTZes4wc%2Frend%2F*%21%2FD3YpTZes4wc%2Fimage%2F*%21%2FD3YpTZes4wc%2Fcaptions%2F*%7Ehmac%3D41e954a7617a9b29b43d7804b51d45fa9b7841205ea7e28f5f4964411e91386e",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/D3YpTZes4wc/image/D3YpTZes4wc_poster.jpg?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FD3YpTZes4wc%2Frend%2F*%21%2Fi%2FD3YpTZes4wc%2Frend%2F*%21%2FD3YpTZes4wc%2Frend%2F*%21%2FD3YpTZes4wc%2Fimage%2F*%21%2FD3YpTZes4wc%2Fcaptions%2F*%7Ehmac%3D41e954a7617a9b29b43d7804b51d45fa9b7841205ea7e28f5f4964411e91386e"
+        }
+      },
+      {
+        title: "Mitsu",
+        description: "Youtube Intro",
+        media: {
+          src: "https://cdn-prod-ccv.adobe.com/TxAnvwZ5icx/rend/TxAnvwZ5icx_576.mp4?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FTxAnvwZ5icx%2Frend%2F*%21%2Fi%2FTxAnvwZ5icx%2Frend%2F*%21%2FTxAnvwZ5icx%2Frend%2F*%21%2FTxAnvwZ5icx%2Fimage%2F*%21%2FTxAnvwZ5icx%2Fcaptions%2F*%7Ehmac%3D1761c4896561c5e99139c2567a2a7dd8715f7f9773ec98491128f4c02541e43b",
+          thumbnail: "https://cdn-prod-ccv.adobe.com/TxAnvwZ5icx/image/TxAnvwZ5icx_poster.jpg?hdnts=st%3D1745087733%7Eexp%3D1745346933%7Eacl%3D%2Fshared_assets%2Fimage%2F*%21%2Fz%2FTxAnvwZ5icx%2Frend%2F*%21%2Fi%2FTxAnvwZ5icx%2Frend%2F*%21%2FTxAnvwZ5icx%2Frend%2F*%21%2FTxAnvwZ5icx%2Fimage%2F*%21%2FTxAnvwZ5icx%2Fcaptions%2F*%7Ehmac%3D1761c4896561c5e99139c2567a2a7dd8715f7f9773ec98491128f4c02541e43b"
+        }
+      },
+      {
         title: "Zorro Edit", 
         description: "Proof of concept",
         media: {
