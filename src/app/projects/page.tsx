@@ -64,7 +64,7 @@ const messageBubbles: MessageBubble[] = [
   },
   { 
     src: "/message_bubbles/the_climb.png", 
-    position: { x: 55, y: 3 }, 
+    position: { x: 42, y: 3 }, 
     side: "right", 
     rotate: 9, 
     scale: 0.8,
