@@ -20,16 +20,24 @@ function FooterContent() {
   if (isMobile) {
     return (
       <footer className="w-full bg-[#520066] py-4">
-        <div className="flex justify-center gap-8 items-center">
-          <a href="https://x.com/heymiizu" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-white text-2xl">
-            <FaTwitter />
-          </a>
-          <a href="https://www.instagram.com/miizumelon/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[#E1306C] text-2xl">
-            <FaInstagram />
-          </a>
-          <a href="https://www.youtube.com/@Miizumelon" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-[#FF0000] text-2xl">
-            <FaYoutube />
-          </a>
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex justify-center gap-8 items-center mb-1">
+            <a href="https://x.com/heymiizu" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-white text-2xl">
+              <FaTwitter />
+            </a>
+            <a href="https://www.instagram.com/miizumelon/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[#E1306C] text-2xl">
+              <FaInstagram />
+            </a>
+            <a href="https://www.youtube.com/@Miizumelon" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-[#FF0000] text-2xl">
+              <FaYoutube />
+            </a>
+          </div>
+          <Link 
+            href="/imprint"
+            className="text-white text-xs opacity-80 hover:opacity-100 hover:text-[#fc87f0] transition-colors duration-300 underline"
+          >
+            Imprint
+          </Link>
         </div>
       </footer>
     );
@@ -90,7 +98,7 @@ function FooterContent() {
             </div>
 
             {/* Made with Heart - Centered at Bottom */}
-            <div className="flex justify-center border-t border-white/10 pt-3">
+            <div className="flex flex-col items-center border-t border-white/10 pt-3">
               <div className="text-white text-xs flex items-center space-x-1 opacity-70">
                 <span>Made with</span>
                 <motion.span
@@ -107,14 +115,20 @@ function FooterContent() {
                   ❤️
                 </motion.span>
                 <span>by</span>
-                  <a 
-                    href="https://snupai.me" 
-                    target="_blank" 
-                    className="hover:text-white transition-colors duration-300"
-                  >
-                    Snupai
-                  </a>
+                <a 
+                  href="https://snupai.me" 
+                  target="_blank" 
+                  className="hover:text-white transition-colors duration-300"
+                >
+                  Snupai
+                </a>
               </div>
+              <Link 
+                href="/imprint"
+                className="text-white text-sm mt-2 opacity-80 hover:opacity-100 hover:text-[#fc87f0] transition-colors duration-300 underline"
+              >
+                Imprint
+              </Link>
             </div>
           </div>
         </div>

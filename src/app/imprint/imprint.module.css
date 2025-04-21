@@ -1,0 +1,34 @@
+.imprintMain {
+  padding-top: 7rem;
+  padding-bottom: 3rem;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.imprintH1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: #111;
+}
+.imprintH2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1.2rem;
+  color: #111;
+}
+.imprintAddress {
+  font-style: normal;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+.imprintSection {
+  margin-bottom: 2.5rem;
+}
+.imprintItalic {
+  font-style: italic;
+  margin-bottom: 1rem;
+}
