@@ -2,13 +2,14 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Masonry from "react-masonry-css";
 import { getDeviceType } from "../../utils/deviceType";
-import ProjectsSimple from "./ProjectsSimple";
+import { ProjectsSimple } from "./ProjectsSimple";
 import type { Category } from "./ProjectsSimple";
 import projectsData from "~/app/projects/projectsData";
+
 
 interface MessageBubble {
   src: string;
@@ -69,29 +70,29 @@ const messageBubbles: MessageBubble[] = [
   },
 ];
 
-function VideoPlayer({ src, poster, autoPlay = false }: { src: string; poster: string; autoPlay?: boolean }) {
+// --- INLINE VideoPlayer ---
+const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; poster: string; autoPlay?: boolean }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
   useEffect(() => {
-    if (autoPlay && videoRef.current) {
+    if (props.autoPlay && videoRef.current) {
       void videoRef.current.play();
     }
-  }, [autoPlay]);
-
+  }, [props.autoPlay]);
   return (
     <div className="absolute top-0 left-0 w-full h-full object-contain rounded-lg" style={{ borderRadius: 'inherit' }}>
       <video
         ref={videoRef}
-        src={src}
+        src={props.src}
         controls={true}
-        poster={poster}
+        poster={props.poster}
         className="w-full h-full object-contain rounded-lg"
         style={{ borderRadius: 'inherit' }}
-        autoPlay={autoPlay}
+        autoPlay={props.autoPlay}
+        preload="none"
       />
     </div>
   );
-}
+});
 
 // Card component supporting 16:9, 4:3 and 3:4 aspect ratios
 function ProjectCard({
@@ -136,7 +137,7 @@ function ProjectCard({
       className={`rounded-xl shadow-lg overflow-hidden flex flex-col min-w-[500px] max-w-[500px] bg-white ${className ?? ""}`}
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
-        {/* If video, show thumbnail until playing, then show video */}
+        {/* Video thumbnail and play button overlay */}
         {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
           <>
             {!isPlaying && (
@@ -146,16 +147,18 @@ function ProjectCard({
                 onClick={() => setIsPlaying(true)}
                 aria-label="Play video"
               >
-                <Image
-                  src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-                  alt={project.title}
-                  fill
-                  className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
-                  unoptimized={false}
-                  priority={true}
-                  sizes="100vw"
-                  style={{objectFit: 'cover', transform: 'scale(1.015)'}}
-                />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Image
+                    src={project.media.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                    alt={project.title}
+                    fill
+                    className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
+                    unoptimized={false}
+                    sizes="100vw"
+                    style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
+                    loading="lazy"
+                  />
+                </Suspense>
                 <span className="absolute inset-0 flex items-center justify-center z-20">
                   <svg
                     width="56"
@@ -173,24 +176,26 @@ function ProjectCard({
               </button>
             )}
             {isPlaying && (
-              <VideoPlayer
+              <LazyVideoPlayer
                 src={project.media.src}
-                poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                poster={project.media.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
                 autoPlay={true}
               />
             )}
           </>
         ) : (
-          <Image
-            src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-            alt={project.title}
-            fill
-            className="object-cover w-full h-full"
-            unoptimized={false}
-            priority={true}
-            sizes="100vw"
-            style={{objectFit: 'cover'}}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Image
+              src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+              alt={project.title}
+              fill
+              className="object-cover w-full h-full"
+              unoptimized={false}
+              sizes="100vw"
+              style={{objectFit: 'cover'}}
+              loading="lazy"
+            />
+          </Suspense>
         )}
       </div>
       {/* Card Content */}
@@ -208,7 +213,7 @@ function ProjectCard({
           <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">
             {categoryName === "Photography" && (
               <span className="inline-block w-4 h-4 mr-1">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 01.993.883L13 3v1h2.382a1 1 0 01.894.553l.724 1.447 1.447.724A1 1 0 0120 7.618V10h1a1 1 0 01.993.883L22 11v2a1 1 0 01-.883.993L21 14h-1v2.382a1 1 0 01-.553.894l-1.447.724-.724 1.447A1 1 0 0116.382 20H14v1a1 1 0 01-.883.993L13 22h-2a1 1 0 01-.993-.883L10 21v-1H7.618a1 1 0 01-.894-.553l-.724-1.447-1.447-.724A1 1 0 014 16.382V14H3a1 1 0 01-.993-.883L2 13v-2a1 1 0 01.883-.993L3 10h1V7.618a1 1 0 01.553-.894l1.447-.724.724-1.447A1 1 0 017.618 4H10V3a1 1 0 01.883-.993L11 2h2z" /></svg>
+                {renderCategoryIcon("fx3-camera")}
               </span>
             )}
             {categoryName}
@@ -228,29 +233,38 @@ function ProjectCard({
   ) : card;
 }
 
+// Memoize ProjectCard to avoid unnecessary rerenders
+const MemoizedProjectCard = memo(ProjectCard);
+
 // Helper to render icons from string IDs
 function renderCategoryIcon(icon: string) {
   switch (icon) {
     case "after-effects":
       return (
         <div className="relative w-6 h-6">
-          <Image
-            src="/Adobe_After_Effects_CC_Icon.png"
-            alt="After Effects Icon"
-            fill
-            className="object-contain"
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Image
+              src="/Adobe_After_Effects_CC_Icon.png"
+              alt="After Effects Icon"
+              fill
+              className="object-contain"
+              loading="lazy"
+            />
+          </Suspense>
         </div>
       );
     case "fx3-camera":
       return (
         <div className="relative w-6 h-6">
-          <Image
-            src="/fx3_square.png"
-            alt="FX3 Camera Icon"
-            fill
-            className="object-contain"
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Image
+              src="/fx3_square.png"
+              alt="FX3 Camera Icon"
+              fill
+              className="object-contain"
+              loading="lazy"
+            />
+          </Suspense>
         </div>
       );
     default:
@@ -258,10 +272,149 @@ function renderCategoryIcon(icon: string) {
   }
 }
 
+// Memoize static header and message bubbles so they do not re-render on category change
+const MemoizedHeader = memo(function Header() {
+  return (
+    <div className="w-full flex flex-col items-center relative mb-16">
+      {/* Message bubbles absolutely positioned, stay at top */}
+      <div className="absolute inset-0 overflow-visible pointer-events-none z-20">
+        {messageBubbles.map((bubble, index) => (
+          <motion.div
+            key={bubble.src}
+            className="absolute z-20 select-none"
+            initial={{
+              x: `${bubble.position.x}%`,
+              y: `${bubble.position.y}%`,
+              rotate: bubble.rotate,
+              scale: 0,
+              opacity: 0
+            }}
+            animate={{
+              opacity: 1,
+              scale: bubble.scale,
+              y: [
+                `${bubble.position.y}%`,
+                `${bubble.position.y + 0.3}%`,
+                `${bubble.position.y - 0.5}%`,
+                `${bubble.position.y + 0.8}%`,
+                `${bubble.position.y - 0.2}%`,
+                `${bubble.position.y + 1.1}%`,
+                `${bubble.position.y}%`
+              ],
+              x: [
+                `${bubble.position.x}%`,
+                `${bubble.position.x + 0.8}%`,
+                `${bubble.position.x - 0.4}%`,
+                `${bubble.position.x + 0.2}%`,
+                `${bubble.position.x - 0.9}%`,
+                `${bubble.position.x + 0.5}%`,
+                `${bubble.position.x - 0.3}%`,
+                `${bubble.position.x}%`
+              ],
+              rotate: [
+                bubble.rotate,
+                bubble.rotate + 1.5,
+                bubble.rotate - 0.5,
+                bubble.rotate + 0.8,
+                bubble.rotate - 1.2,
+                bubble.rotate + 0.3,
+                bubble.rotate - 0.8,
+                bubble.rotate
+              ],
+            }}
+            transition={{
+              opacity: { duration: 0.5, delay: 0.2 + (index * 0.1) },
+              scale: { 
+                duration: 0.5,
+                delay: 0.2 + (index * 0.1),
+                ease: "easeOut"
+              },
+              y: { 
+                duration: 8 + Math.random() * 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                times: [0, 0.2, 0.3, 0.45, 0.6, 0.75, 0.9, 1]
+              },
+              x: { 
+                duration: 9 + Math.random() * 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                times: [0, 0.15, 0.35, 0.5, 0.65, 0.8, 0.9, 1]
+              },
+              rotate: { 
+                duration: 10 + Math.random() * 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                times: [0, 0.1, 0.25, 0.4, 0.6, 0.8, 0.9, 1]
+              }
+            }}
+            style={{
+              left: 0,
+              top: 0,
+              transformOrigin: "center",
+            }}
+          >
+            <div className="w-[1000px] h-[440px] relative">
+              <Suspense fallback={<div>Loading...</div>}>
+                <Image
+                  src={bubble.src}
+                  alt={"Message bubble: " + bubble.src}
+                  fill
+                  className="object-contain select-none"
+                  draggable={false}
+                  unoptimized={true}
+                  loading="lazy"
+                />
+              </Suspense>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      {/* Add padding-top to push content down, but not bubbles */}
+      <div className="pt-56 w-full flex flex-col items-center">
+        <motion.div 
+          className="text-7xl font-bold mb-4 text-center relative"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          My Projects
+        </motion.div>
+        <motion.div 
+          className="text-lg mb-4 text-center relative"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          Here are some of my projects, feel free to browse :D
+        </motion.div>
+      </div>
+    </div>
+  );
+});
+
 export default function ProjectsPage() {
   const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
   const [activeCategory, setActiveCategory] = useState<string>("Everything");
   const searchParams = useSearchParams();
+
+  const categories = projectsData;
+
+  // Detect device type and automatically use simple version for small/mobile
+  const isSimpleVersion = deviceType === "small" || deviceType === "mobile";
+
+  // Memoize animation props for category-level motion.div
+  const categoryMotionInitial = useMemo(() => ({ opacity: 0, y: 20 }), []);
+  const categoryMotionAnimate = useMemo(() => ({ opacity: 1, y: 0 }), []);
+  const categoryMotionExit = useMemo(() => ({ opacity: 0, y: 20 }), []);
+  // Precompute reversed projects for all categories at the top level
+  const reversedProjectsMap = useMemo(() => {
+    const map: Record<string, Project[]> = {};
+    categories.forEach((category: Category) => {
+      map[category.name] = [...category.projects].reverse();
+    });
+    return map;
+  }, [categories]);
 
   useEffect(() => {
     setDeviceType(getDeviceType());
@@ -325,10 +478,7 @@ export default function ProjectsPage() {
     window.history.pushState({}, '', url.toString());
   };
 
-  const categories = projectsData;
-  
-  // Conditional rendering AFTER all hooks
-  if (deviceType === null) return null;
+
   {/*if (deviceType === "mobile") return <MobileFallback />;*/}
   if (deviceType === "small" || deviceType === "mobile") {
     return (
@@ -339,9 +489,10 @@ export default function ProjectsPage() {
       />
     );
   }
+  const visibleCategories = categories.filter(cat => activeCategory === "Everything" || cat.name === activeCategory);
 
   return (
-    <motion.main 
+    <motion.div 
       className="flex-1 flex flex-col items-center justify-start w-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -349,120 +500,7 @@ export default function ProjectsPage() {
       transition={{ duration: 0.6 }}
     >
       <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
-        {/* HEADER, SUBTITLE, BUBBLES WRAPPER */}
-        <div className="w-full flex flex-col items-center relative mb-16">
-          {/* Message bubbles absolutely positioned, stay at top */}
-          <div className="absolute inset-0 overflow-visible pointer-events-none z-20">
-            {messageBubbles.map((bubble, index) => (
-              <motion.div
-                key={bubble.src}
-                className="absolute z-20 select-none"
-                initial={{
-                  x: `${bubble.position.x}%`,
-                  y: `${bubble.position.y}%`,
-                  rotate: bubble.rotate,
-                  scale: 0,
-                  opacity: 0
-                }}
-                animate={{
-                  opacity: 1,
-                  scale: bubble.scale,
-                  y: [
-                    `${bubble.position.y}%`,
-                    `${bubble.position.y + 0.3}%`,
-                    `${bubble.position.y - 0.5}%`,
-                    `${bubble.position.y + 0.8}%`,
-                    `${bubble.position.y - 0.2}%`,
-                    `${bubble.position.y + 1.1}%`,
-                    `${bubble.position.y}%`
-                  ],
-                  x: [
-                    `${bubble.position.x}%`,
-                    `${bubble.position.x + 0.8}%`,
-                    `${bubble.position.x - 0.4}%`,
-                    `${bubble.position.x + 0.2}%`,
-                    `${bubble.position.x - 0.9}%`,
-                    `${bubble.position.x + 0.5}%`,
-                    `${bubble.position.x - 0.3}%`,
-                    `${bubble.position.x}%`
-                  ],
-                  rotate: [
-                    bubble.rotate,
-                    bubble.rotate + 1.5,
-                    bubble.rotate - 0.5,
-                    bubble.rotate + 0.8,
-                    bubble.rotate - 1.2,
-                    bubble.rotate + 0.3,
-                    bubble.rotate - 0.8,
-                    bubble.rotate
-                  ],
-                }}
-                transition={{
-                  opacity: { duration: 0.5, delay: 0.2 + (index * 0.1) },
-                  scale: { 
-                    duration: 0.5,
-                    delay: 0.2 + (index * 0.1),
-                    ease: "easeOut"
-                  },
-                  y: { 
-                    duration: 8 + Math.random() * 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    times: [0, 0.2, 0.3, 0.45, 0.6, 0.75, 0.9, 1]
-                  },
-                  x: { 
-                    duration: 9 + Math.random() * 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    times: [0, 0.15, 0.35, 0.5, 0.65, 0.8, 0.9, 1]
-                  },
-                  rotate: { 
-                    duration: 10 + Math.random() * 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    times: [0, 0.1, 0.25, 0.4, 0.6, 0.8, 0.9, 1]
-                  }
-                }}
-                style={{
-                  left: 0,
-                  top: 0,
-                  transformOrigin: "center",
-                }}
-              >
-                <div className="w-[1000px] h-[440px] relative">
-                  <Image
-                    src={bubble.src}
-                    alt="Message Bubble"
-                    fill
-                    className="object-contain select-none"
-                    draggable={false}
-                    priority={true}
-                    unoptimized={true}
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          {/* Add padding-top to push content down, but not bubbles */}
-          <div className="pt-56 w-full flex flex-col items-center">
-            <motion.h1 
-              className="text-7xl font-bold mb-4 text-center relative"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              My Projects
-            </motion.h1>
-            <motion.p 
-              className="text-lg mb-4 text-center relative"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-            >
-              Here are some of my projects, feel free to browse :D
-            </motion.p>
-          </div>
-        </div>
+        <MemoizedHeader />
         {/* CATEGORY FILTERS & PROJECTS WRAPPER */}
         <div className="w-full">
           {/* Category Filters */}
@@ -509,74 +547,100 @@ export default function ProjectsPage() {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             {/* Categories */}
-            {categories
-              .filter(category => activeCategory === "Everything" || category.name === activeCategory)
-              .map((category, categoryIndex) => (
-                <motion.div
-                  key={category.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ 
-                    duration: 0.2,
-                    delay: 0.1 + (categoryIndex * 0.05)
-                  }}
-                  className="mb-20 flex flex-col items-center w-full"
-                >
-                  {/* Category Header */}
-                  <div className="mb-8 w-full">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-2xl">{renderCategoryIcon(category.icon)}</span>
-                      <h3 className="text-3xl font-bold">{category.name}</h3>
-                    </div>
-                    <p className="text-gray-600 text-lg">{category.description}</p>
+            {visibleCategories.map((category, categoryIndex) => (
+              <motion.div
+                key={category.name}
+                initial={categoryMotionInitial}
+                animate={categoryMotionAnimate}
+                exit={categoryMotionExit}
+                transition={{
+                  duration: 0.2,
+                  delay: 0.1 + (categoryIndex * 0.05)
+                }}
+                className="mb-20 flex flex-col items-center w-full"
+              >
+                {/* Category Header */}
+                <div className="mb-8 w-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl">{renderCategoryIcon(category.icon)}</span>
+                    <h3 className="text-3xl font-bold">{category.name}</h3>
                   </div>
-                  {/* Category Projects */}
-                  {category.projects.length === 1 && category.projects[0] ? (
-                    <ProjectCard
-                      key={`single-project-${category.name}-0`}
-                      project={category.projects[0]}
-                      categoryName={category.name}
-                      className="w-[750px] max-w-full mx-auto"
-                    />
-                  ) : (
-                    <Masonry
-                      breakpointCols={{ default: 2, 768: 1 }}
-                      className="flex gap-8 w-full"
-                      columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
-                    >
-                      {[...category.projects].reverse().map((project, idx) => {
-                        const aspect = project.aspect;
-                        if (
-                          typeof project.title === "string" &&
-                          typeof project.description === "string" &&
-                          (
-                            aspect === undefined ||
-                            aspect === "16:9" ||
-                            aspect === "4:3" ||
-                            aspect === "3:4"
-                          )
-                        ) {
-                          return (
-                            <ProjectCard
-                              key={`${category.name}-${idx}`}
-                              project={project}
-                              categoryName={category.name}
-                            />
-                          );
-                        }
-                        return null;
-                      })}
-                      {category.projects.length === 1 && (
-                        <div key="placeholder" className="invisible" aria-hidden="true" />
-                      )}
-                    </Masonry>
-                  )}
-                </motion.div>
-              ))}
+                  <p className="text-gray-600 text-lg">{category.description}</p>
+                </div>
+                {/* Category Projects */}
+                {category.projects.length === 1 && category.projects[0] ? (
+                  <MemoizedProjectCard
+                    key={`single-project-${category.name}-0`}
+                    project={category.projects[0]}
+                    categoryName={category.name}
+                    className="w-[750px] max-w-full mx-auto"
+                  />
+                ) : isSimpleVersion ? (
+                  <div className="flex flex-wrap gap-8 w-full">
+                    {(reversedProjectsMap[category.name] ?? []).map((project, idx) => {
+                      const aspect = project.aspect;
+                      if (
+                        typeof project.title === "string" &&
+                        typeof project.description === "string" &&
+                        (
+                          aspect === undefined ||
+                          aspect === "16:9" ||
+                          aspect === "4:3" ||
+                          aspect === "3:4"
+                        )
+                      ) {
+                        return (
+                          <MemoizedProjectCard
+                            key={`${category.name}-${idx}`}
+                            project={project}
+                            categoryName={category.name}
+                          />
+                        );
+                      }
+                      return null;
+                    })}
+                    {category.projects.length === 1 && (
+                      <div key="placeholder" className="invisible" aria-hidden="true" />
+                    )}
+                  </div>
+                ) : (
+                  <Masonry
+                    breakpointCols={{ default: 2, 768: 1 }}
+                    className="flex gap-8 w-full"
+                    columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
+                  >
+                    {(reversedProjectsMap[category.name] ?? []).map((project, idx) => {
+                      const aspect = project.aspect;
+                      if (
+                        typeof project.title === "string" &&
+                        typeof project.description === "string" &&
+                        (
+                          aspect === undefined ||
+                          aspect === "16:9" ||
+                          aspect === "4:3" ||
+                          aspect === "3:4"
+                        )
+                      ) {
+                        return (
+                          <MemoizedProjectCard
+                            key={`${category.name}-${idx}`}
+                            project={project}
+                            categoryName={category.name}
+                          />
+                        );
+                      }
+                      return null;
+                    })}
+                    {category.projects.length === 1 && (
+                      <div key="placeholder" className="invisible" aria-hidden="true" />
+                    )}
+                  </Masonry>
+                )}
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </div>
-    </motion.main>
+    </motion.div>
   );
 }

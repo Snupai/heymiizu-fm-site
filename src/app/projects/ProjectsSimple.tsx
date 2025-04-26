@@ -1,5 +1,7 @@
+"use client";
+
 import Image from "next/image";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, memo, Suspense, useMemo } from "react";
 import { motion } from "framer-motion";
 
 // Types copied from page.tsx for self-containment
@@ -44,6 +46,7 @@ function renderCategoryIcon(icon: string) {
             alt="After Effects Icon"
             fill
             className="object-contain"
+            loading="lazy"
           />
         </div>
       );
@@ -55,6 +58,7 @@ function renderCategoryIcon(icon: string) {
             alt="FX3 Camera Icon"
             fill
             className="object-contain"
+            loading="lazy"
           />
         </div>
       );
@@ -63,7 +67,7 @@ function renderCategoryIcon(icon: string) {
   }
 }
 
-export default function ProjectsSimple({
+export function ProjectsSimple({
   categories,
   activeCategory: initialActiveCategory,
   onCategoryChange
@@ -86,6 +90,8 @@ export default function ProjectsSimple({
     setSelectedCategory(name);
     if (onCategoryChange) onCategoryChange(name);
   };
+
+  const MemoizedProjectCard = memo(ProjectCard);
 
   return (
     <main className="flex flex-col items-center min-h-screen w-full bg-[#f8f8f8] p-4 mt-20">
@@ -113,40 +119,18 @@ export default function ProjectsSimple({
       {/* Projects Display */}
       <div className="flex flex-col items-center w-full">
         {activeCategory === "Everything"
-          ? safeCategories.map((cat) => (
-              <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
-                <div className="flex items-center gap-2 mb-4">
-                  {renderCategoryIcon(cat.icon)}
-                  <span className="text-xl font-semibold">{cat.name}</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-                  {cat.projects && cat.projects.length > 0 ? (
-                    cat.projects.slice().reverse().map((project, idx) => (
-                      <ProjectCard
-                        key={project.title + '-' + idx}
-                        project={project}
-                        categoryName={cat.name}
-                        aspect={project.aspect}
-                      />
-                    ))
-                  ) : (
-                    <div className="text-gray-400 italic">No projects yet.</div>
-                  )}
-                </div>
-              </div>
-            ))
-          : safeCategories
-              .filter((cat) => cat.name === activeCategory)
-              .map((cat) => (
+          ? safeCategories.map((cat) => {
+              const reversedProjects = useMemo(() => cat.projects.slice().reverse(), [cat.projects]);
+              return (
                 <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
                   <div className="flex items-center gap-2 mb-4">
                     {renderCategoryIcon(cat.icon)}
                     <span className="text-xl font-semibold">{cat.name}</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-                    {cat.projects && cat.projects.length > 0 ? (
-                      cat.projects.slice().reverse().map((project, idx) => (
-                        <ProjectCard
+                    {reversedProjects && reversedProjects.length > 0 ? (
+                      reversedProjects.map((project, idx) => (
+                        <MemoizedProjectCard
                           key={project.title + '-' + idx}
                           project={project}
                           categoryName={cat.name}
@@ -158,38 +142,67 @@ export default function ProjectsSimple({
                     )}
                   </div>
                 </div>
-              ))}
+              );
+            })
+          : safeCategories
+              .filter((cat) => cat.name === activeCategory)
+              .map((cat) => {
+                const reversedProjects = useMemo(() => cat.projects.slice().reverse(), [cat.projects]);
+                return (
+                  <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      {renderCategoryIcon(cat.icon)}
+                      <span className="text-xl font-semibold">{cat.name}</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                      {reversedProjects && reversedProjects.length > 0 ? (
+                        reversedProjects.map((project, idx) => (
+                          <MemoizedProjectCard
+                            key={project.title + '-' + idx}
+                            project={project}
+                            categoryName={cat.name}
+                            aspect={project.aspect}
+                          />
+                        ))
+                      ) : (
+                        <div className="text-gray-400 italic">No projects yet.</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
       </div>
     </main>
   );
 }
 
-function VideoPlayer({ src, poster, autoPlay = false }: { src: string; poster: string; autoPlay?: boolean }) {
+// --- INLINE VideoPlayer ---
+const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; poster: string; autoPlay?: boolean }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Auto-play when prop is set
   useEffect(() => {
-    if (autoPlay && videoRef.current) {
+    if (props.autoPlay && videoRef.current) {
       void videoRef.current.play();
     }
-  }, [autoPlay]);
+  }, [props.autoPlay]);
 
   return (
     <div className="absolute top-0 left-0 w-full h-full object-contain rounded-lg" style={{ borderRadius: 'inherit' }}>
       <video
         ref={videoRef}
-        src={src}
+        src={props.src}
         controls={true}
-        poster={poster}
+        poster={props.poster}
         className="w-full h-full object-contain rounded-lg"
         style={{ borderRadius: 'inherit' }}
-        autoPlay={autoPlay}
+        autoPlay={props.autoPlay}
+        preload="none"
       />
     </div>
   );
-}
+});
 
-function ProjectCard({
+export const ProjectCard = memo(function ProjectCard({
   project,
   categoryName,
   aspect
@@ -209,21 +222,27 @@ function ProjectCard({
   // --- NEW: Track if video is playing ---
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Memoize motion.div props to avoid new object references on each render
+  const motionInitial = useMemo(() => ({ opacity: 0, scale: 0.95 }), []);
+  const motionAnimate = useMemo(() => ({ opacity: 1, scale: 1 }), []);
+  const motionExit = useMemo(() => ({ opacity: 0, scale: 0.95 }), []);
+  const motionTransition = useMemo(() => ({
+    duration: 0.2,
+    delay: 0.1,
+    layout: {
+      duration: 0.2,
+      ease: "easeOut"
+    }
+  }), []);
+
   const card = (
     <motion.div
       key={project.title}
       layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{
-        duration: 0.2,
-        delay: 0.1,
-        layout: {
-          duration: 0.2,
-          ease: "easeOut"
-        }
-      }}
+      initial={motionInitial}
+      animate={motionAnimate}
+      exit={motionExit}
+      transition={motionTransition}
       className={`rounded-xl shadow-lg overflow-hidden flex flex-col w-full bg-white transition-all duration-200`}
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
@@ -237,16 +256,19 @@ function ProjectCard({
                 onClick={() => setIsPlaying(true)}
                 aria-label="Play video"
               >
-                <Image
-                  src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-                  alt={project.title}
-                  fill
-                  className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
-                  unoptimized={false}
-                  priority={true}
-                  sizes="100vw"
-                  style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
-                />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Image
+                    src={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+                    alt={project.title}
+                    fill
+                    className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
+                    unoptimized={false}
+                    priority={false}
+                    sizes="100vw"
+                    style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
+                    loading="lazy"
+                  />
+                </Suspense>
                 <span className="absolute inset-0 flex items-center justify-center z-20">
                   <svg
                     width="56"
@@ -264,7 +286,7 @@ function ProjectCard({
               </button>
             )}
             {isPlaying && (
-              <VideoPlayer
+              <LazyVideoPlayer
                 src={project.media.src}
                 poster={project.media?.thumbnail ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
                 autoPlay={true}
@@ -278,9 +300,10 @@ function ProjectCard({
             fill
             className="object-cover w-full h-full"
             unoptimized={false}
-            priority={true}
+            priority={false}
             sizes="100vw"
             style={{objectFit: 'cover'}}
+            loading="lazy"
           />
         )}
       </div>
@@ -317,4 +340,4 @@ function ProjectCard({
       </div>
     </div>
   ) : card;
-}
+});

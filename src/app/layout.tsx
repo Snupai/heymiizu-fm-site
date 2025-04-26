@@ -1,4 +1,3 @@
-import { Monitoring } from "react-scan/monitoring/next"; // Import this first before React
 import { Public_Sans } from "next/font/google";
 import "../styles/globals.css";
 import "../styles/special-gradient-outline.css";
@@ -7,7 +6,6 @@ import NavbarContent from "../components/Navbar";
 import FooterContent from "../components/Footer";
 import Spinner from "../components/Spinner";
 import React, { Suspense } from "react";
-import Script from "next/script"; 
 const publicSans = Public_Sans({ 
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -62,18 +60,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-      <Script
-          src="https://unpkg.com/react-scan/dist/install-hook.global.js"
-          strategy="beforeInteractive"
-        />
       </head>
       <body className={`${publicSans.variable} font-sans min-h-screen flex flex-col`}>
-      <Monitoring
-          apiKey="lkJ0t4C8MZK0yropS-yQcmWVRQVPNmE-" // Safe to expose publically
-          url="https://monitoring.react-scan.com/api/v1/ingest"
-          commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA} // optional but recommended
-          branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF} // optional but recommended
-        />
         <NavbarContent />
         <div className="flex-1 flex flex-col">
           <Suspense fallback={<Spinner />}>

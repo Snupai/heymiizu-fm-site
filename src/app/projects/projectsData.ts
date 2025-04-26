@@ -182,6 +182,14 @@ const projectsData: Category[] = [
           src: "/projects/animations/videos/GidxivadEiM_576.mp4",
           thumbnail: "/projects/animations/thumbnails/GidxivadEiM_poster.jpg"
         }
+      },
+      {
+        title: "Tutorial Preintro",
+        description: "Clip of a Youtube Tutorial",
+        media: {
+          src: "/projects/animations/videos/sfx_vctut.mp4",
+          thumbnail: "/projects/animations/thumbnails/sfx_vctut_poster.png"
+        }
       }
     ]
   },
