@@ -76,9 +76,21 @@ export function ProjectsSimple({
   activeCategory: string;
   onCategoryChange: (cat: string) => void;
 }) {
-  const safeCategories = Array.isArray(categories)
-    ? categories.filter(isValidCategory)
-    : [];
+  // Memoize safeCategories to ensure stable reference for downstream hooks
+  const safeCategories = useMemo(() => (
+    Array.isArray(categories)
+      ? categories.filter(isValidCategory)
+      : []
+  ), [categories]);
+
+  // Precompute reversed projects for all categories to avoid calling useMemo inside a callback
+  const reversedProjectsByCategory = useMemo(() => {
+    const mapping: Record<string, typeof safeCategories[0]['projects']> = {};
+    safeCategories.forEach((cat) => {
+      mapping[cat.name] = cat.projects.slice().reverse();
+    });
+    return mapping;
+  }, [safeCategories]);
 
   // Local state for category selection (for fallback if parent doesn't update)
   const [selectedCategory, setSelectedCategory] = useState<string>(initialActiveCategory || (safeCategories[0]?.name ?? ""));
@@ -120,7 +132,7 @@ export function ProjectsSimple({
       <div className="flex flex-col items-center w-full">
         {activeCategory === "Everything"
           ? safeCategories.map((cat) => {
-              const reversedProjects = useMemo(() => cat.projects.slice().reverse(), [cat.projects]);
+              const reversedProjects = reversedProjectsByCategory[cat.name];
               return (
                 <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
                   <div className="flex items-center gap-2 mb-4">
@@ -147,7 +159,7 @@ export function ProjectsSimple({
           : safeCategories
               .filter((cat) => cat.name === activeCategory)
               .map((cat) => {
-                const reversedProjects = useMemo(() => cat.projects.slice().reverse(), [cat.projects]);
+                const reversedProjects = reversedProjectsByCategory[cat.name];
                 return (
                   <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
                     <div className="flex items-center gap-2 mb-4">
