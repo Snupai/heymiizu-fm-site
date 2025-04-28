@@ -236,7 +236,7 @@ export default function ContactPage() {
             <div className="flex flex-col gap-1">
               <h2 className="text-3xl">Have a question</h2>
               <h2 className="text-3xl">or want to work together?</h2>
-              <p className="text-3xl">Feel free to reach out via <a href='mailto:hey@miizumelon.de' className='underline text-[#0095FF] hover:text-[#007acc] transition-colors'>email</a> or <a href='tel:+491728484720' className='underline text-[#0095FF] hover:text-[#007acc] transition-colors'>phone</a>.</p>
+              <p className="text-3xl">Feel free to reach out via <a href='mailto:hey@miizumelon.de' className='underline text-[#0095FF] hover:text-[#007acc] transition-colors'>email</a>.</p>
               <p className="text-3xl">or through social media.</p>
             </div>
           </motion.div>
