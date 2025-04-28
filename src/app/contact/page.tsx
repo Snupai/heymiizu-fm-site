@@ -182,7 +182,7 @@ export default function ContactPage() {
               <h1 className="text-8xl font-bold mb-4 whitespace-nowrap">On Instagram!</h1>
             </div>
             <p className="text-4xl mb-8">Simply DM me :D</p>
-            <div className="flex justify-start w-[800px] ml-[10%] mb-16">
+            <div className="flex flex-col md:flex-row gap-4 justify-start w-[800px] ml-[10%] mb-16">
               <a 
                 href="https://www.instagram.com/miizumelon/" 
                 target="_blank" 
@@ -226,7 +226,7 @@ export default function ContactPage() {
             </div>
           </motion.div>
 
-          {/* Additional Info */}
+          {/* Minimalist contact info below */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -236,7 +236,7 @@ export default function ContactPage() {
             <div className="flex flex-col gap-1">
               <h2 className="text-3xl">Have a question</h2>
               <h2 className="text-3xl">or want to work together?</h2>
-              <p className="text-3xl">Feel free to reach out via email</p>
+              <p className="text-3xl">Feel free to reach out via <a href='mailto:hey@miizumelon.de' className='underline text-[#0095FF] hover:text-[#007acc] transition-colors'>email</a> or <a href='tel:+491728484720' className='underline text-[#0095FF] hover:text-[#007acc] transition-colors'>phone</a>.</p>
               <p className="text-3xl">or through social media.</p>
             </div>
           </motion.div>
