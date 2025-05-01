@@ -42,6 +42,12 @@ export default function ContactSimple() {
             <div className="flex flex-col gap-1 items-center mt-2">
               <h2 className="text-base font-semibold">Have a question or want to work together?</h2>
               <p className="text-base">Feel free to reach out via email or through social media.</p>
+              <a
+                href="mailto:your@email.com"
+                className="mt-2 bg-[#0095FF] hover:bg-[#007acc] text-white text-base font-semibold px-6 py-2 rounded-full transition-colors duration-300 shadow"
+              >
+                Contact via Email
+              </a>
             </div>
           </div>
         </div>
