@@ -187,7 +187,7 @@ const projectsData: Category[] = [
         title: "Tutorial Preintro",
         description: "Clip of a Youtube Tutorial",
         media: {
-          src: "/projects/animations/videos/sfx_vctut.mp4",
+          src: "/projects/animations/videos/sfx_vctut_1440.mp4",
           thumbnail: "/projects/animations/thumbnails/sfx_vctut_poster.png"
         }
       }
@@ -291,6 +291,15 @@ const projectsData: Category[] = [
           thumbnail: "/projects/commissions/thumbnails/2-RgLp9Uv46_poster.jpg"
         },
         link: "https://youtube.com/@nils.schlieper"
+      },
+      {
+        title: "@Seltix",
+        description: "Adobe Advertisement",
+        media: {
+          src: "/projects/commissions/videos/Seltix_Adobe_Advertisement_1440p.mp4",
+          thumbnail: "/projects/commissions/thumbnails/Seltix_Adobe_Advertisement_poster.png"
+        },
+        link: "https://youtube.com/@SELTIXX"
       }
     ]
   }
