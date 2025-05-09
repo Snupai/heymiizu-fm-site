@@ -1,8 +1,10 @@
 "use client";
 
+import "../../styles/special-gradient-outline-simple.css";
 import Image from "next/image";
 import React, { useState, useRef, useEffect, memo, Suspense, useMemo } from "react";
 import { motion } from "framer-motion";
+import Masonry from "react-masonry-css";
 
 // Types copied from page.tsx for self-containment
 export type Media = {
@@ -139,7 +141,11 @@ export function ProjectsSimple({
                     {renderCategoryIcon(cat.icon)}
                     <span className="text-xl font-semibold">{cat.name}</span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                  <Masonry
+                    breakpointCols={{ default: 2, 768: 1 }}
+                    className="flex gap-8 w-full"
+                    columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
+                  >
                     {reversedProjects && reversedProjects.length > 0 ? (
                       reversedProjects.map((project, idx) => (
                         <MemoizedProjectCard
@@ -152,7 +158,7 @@ export function ProjectsSimple({
                     ) : (
                       <div className="text-gray-400 italic">No projects yet.</div>
                     )}
-                  </div>
+                  </Masonry>
                 </div>
               );
             })
@@ -166,7 +172,11 @@ export function ProjectsSimple({
                       {renderCategoryIcon(cat.icon)}
                       <span className="text-xl font-semibold">{cat.name}</span>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                    <Masonry
+                      breakpointCols={{ default: 2, 768: 1 }}
+                      className="flex gap-8 w-full"
+                      columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
+                    >
                       {reversedProjects && reversedProjects.length > 0 ? (
                         reversedProjects.map((project, idx) => (
                           <MemoizedProjectCard
@@ -179,7 +189,7 @@ export function ProjectsSimple({
                       ) : (
                         <div className="text-gray-400 italic">No projects yet.</div>
                       )}
-                    </div>
+                    </Masonry>
                   </div>
                 );
               })}
@@ -255,7 +265,7 @@ export const ProjectCard = memo(function ProjectCard({
       animate={motionAnimate}
       exit={motionExit}
       transition={motionTransition}
-      className={`rounded-xl shadow-lg overflow-hidden flex flex-col w-full bg-white transition-all duration-200`}
+      className={`rounded-xl shadow-lg overflow-hidden flex flex-col ${isSpecial ? 'min-w-[500px] max-w-[500px]' : 'w-full'} bg-white transition-all duration-200`}
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
         {/* Video thumbnail and play button overlay */}
@@ -306,17 +316,19 @@ export const ProjectCard = memo(function ProjectCard({
             )}
           </>
         ) : (
-          <Image
-            src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
-            alt={project.title}
-            fill
-            className="object-cover w-full h-full"
-            unoptimized={false}
-            priority={false}
-            sizes="100vw"
-            style={{objectFit: 'cover'}}
-            loading="lazy"
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Image
+              src={project.media?.src ?? "/dd8ushtKAafNiPreGQQfuOm10U.jpg"}
+              alt={project.title}
+              fill
+              className="object-cover w-full h-full"
+              unoptimized={false}
+              priority={false}
+              sizes="100vw"
+              style={{objectFit: 'cover'}}
+              loading="lazy"
+            />
+          </Suspense>
         )}
       </div>
       {/* Card Content */}
@@ -346,8 +358,8 @@ export const ProjectCard = memo(function ProjectCard({
   );
 
   return isSpecial ? (
-    <div className="special-gradient-outline-wrapper">
-      <div className="special-gradient-outline-inner">
+    <div className="special-gradient-outline-simple-wrapper">
+      <div className="special-gradient-outline-simple-inner">
         {card}
       </div>
     </div>

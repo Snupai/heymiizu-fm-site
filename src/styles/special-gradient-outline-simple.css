@@ -1,0 +1,27 @@
+/* Thinner, smaller animated gradient outline for special cards */
+.special-gradient-outline-simple-wrapper {
+  padding: 10px;
+  border-radius: 24px; /* outer_radius = inner_radius (12px) + padding (10px) + 2px gap */
+  background: linear-gradient(270deg, #1e90ff, #00cfff, #1e90ff, #005bea, #1e90ff);
+  background-size: 400% 400%;
+  animation: gradient-border-simple 6s ease infinite;
+  display: inline-block;
+}
+
+@keyframes gradient-border-simple {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.special-gradient-outline-simple-inner {
+  border-radius: 12px; /* matches rounded-lg, 12px */
+  background: white;
+  overflow: hidden;
+}
