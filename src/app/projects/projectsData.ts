@@ -300,6 +300,15 @@ const projectsData: Category[] = [
           thumbnail: "/projects/commissions/thumbnails/Seltix_Adobe_Advertisement_poster.png"
         },
         link: "https://youtube.com/@SELTIXX"
+      },
+      {
+        title: "@Nils Schlieper",
+        description: "Youtube Preintro (Auto Sammlung)",
+        media: {
+          src: "/projects/commissions/videos/Nils_Schlieper_Autos_Preintro_VOLLVER_1440p.mp4",
+          thumbnail: "/projects/commissions/thumbnails/Nils_Schlieper_Autos_Preintro_VOLLVER_1440p_poster.png"
+        },
+        link: "https://youtube.com/@nils.schlieper"
       }
     ]
   }
