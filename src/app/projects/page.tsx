@@ -74,8 +74,11 @@ const messageBubbles: MessageBubble[] = [
 const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; poster: string; autoPlay?: boolean }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   useEffect(() => {
-    if (props.autoPlay && videoRef.current) {
-      void videoRef.current.play();
+    if (videoRef.current) {
+      videoRef.current.volume = 0.42;
+      if (props.autoPlay) {
+        void videoRef.current.play();
+      }
     }
   }, [props.autoPlay]);
   return (
