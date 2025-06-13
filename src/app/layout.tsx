@@ -6,6 +6,7 @@ import NavbarContent from "../components/Navbar";
 import FooterContent from "../components/Footer";
 import Spinner from "../components/Spinner";
 import React, { Suspense } from "react";
+import Script from "next/script";
 const publicSans = Public_Sans({ 
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -70,6 +71,7 @@ export default function RootLayout({
         </div>
         <FooterContent />
       </body>
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js"  />
     </html>
   );
 }
