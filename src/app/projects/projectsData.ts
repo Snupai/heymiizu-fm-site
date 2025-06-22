@@ -190,6 +190,14 @@ const projectsData: Category[] = [
           src: "/projects/animations/videos/sfx_vctut_1440.mp4",
           thumbnail: "/projects/animations/thumbnails/sfx_vctut_poster.png"
         }
+      },
+      {
+        title: "Tutorial Preintro",
+        description: "Clip of a Youtube Tutorial",
+        media: {
+          src: "/projects/animations/videos/pluh_1080p.mp4",
+          thumbnail: "/projects/animations/thumbnails/pluh_poster.png"
+        }
       }
     ]
   },
@@ -319,6 +327,15 @@ const projectsData: Category[] = [
         },
         link: "https://youtube.com/@nils.schlieper"
       },
+      {
+        title: "@Nils Schlieper",
+        description: "Youtube Preintro - Diese 4 Dinge hätte ich mit 18 gerne gewusst!",
+        media: {
+          src: "/projects/commissions/videos/TOTAL_1080p.mp4",
+          thumbnail: "/projects/commissions/thumbnails/TOTAL_poster.png"
+        },
+        link: "https://youtube.com/@nils.schlieper"
+      }
     ]
   }
 ];
