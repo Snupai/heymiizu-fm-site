@@ -198,6 +198,14 @@ const projectsData: Category[] = [
           src: "/projects/animations/videos/pluh_1080p.mp4",
           thumbnail: "/projects/animations/thumbnails/pluh_poster.png"
         }
+      },
+      {
+        title: "New Universal Intro",
+        description: "New Universal Youtube Intro",
+        media: {
+          src: "/projects/animations/videos/Miizu_Intro_Preview.mp4",
+          thumbnail: "/projects/animations/thumbnails/Miizu_Intro_Preview_poster.png"
+        }
       }
     ]
   },
@@ -335,6 +343,15 @@ const projectsData: Category[] = [
           thumbnail: "/projects/commissions/thumbnails/TOTAL_poster.png"
         },
         link: "https://youtube.com/@nils.schlieper"
+      },
+      {
+        title: "@Seltix",
+        description: "Airalo Advertisement",
+        media: {
+          src: "/projects/commissions/videos/Seltix_Airalo_Advertisement_1440p.mp4",
+          thumbnail: "/projects/commissions/thumbnails/Seltix_Airalo_Advertisement_poster.png"
+        },
+        link: "https://youtube.com/@SELTIXX"
       }
     ]
   }
