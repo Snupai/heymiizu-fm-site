@@ -18,15 +18,6 @@ export async function POST(req: NextRequest) {
     name, email, telephone, company, projectType, sequenceLength, deadline, assets, description
   } = data;
 
-  // TEMP DEBUG: Print env vars
-  console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
-  console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
-  console.log('EMAIL_SECURE:', process.env.EMAIL_SECURE);
-  console.log('EMAIL_USER:', process.env.EMAIL_USER);
-  console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
-  console.log('EMAIL_FROM:', process.env.EMAIL_FROM);
-  console.log('EMAIL_TO:', process.env.EMAIL_TO);
-
   if (!name || !email || !projectType || !sequenceLength || !deadline || !assets || !description) {
     return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
   }
