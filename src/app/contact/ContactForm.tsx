@@ -28,6 +28,8 @@ export default function ContactForm() {
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [deadlineError, setDeadlineError] = useState('');
+  const [flashFields, setFlashFields] = useState<string[]>([]);
+  const [missingFields, setMissingFields] = useState<string[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -42,6 +44,8 @@ export default function ContactForm() {
     } else {
       setForm({ ...form, [name]: value });
     }
+    setMissingFields(prev => prev.filter(f => f !== name));
+    setFlashFields(prev => prev.filter(f => f !== name));
   };
 
   const validateEmail = (email: string) => {
@@ -79,10 +83,28 @@ export default function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Validate required fields
+    const missingFields = [];
+    if (!form.name) missingFields.push('name');
+    if (!form.email) missingFields.push('email');
+    if (!form.projectType) missingFields.push('projectType');
+    if (!form.sequenceLength) missingFields.push('sequenceLength');
+    if (!form.deadline) missingFields.push('deadline');
+    if (!form.assets) missingFields.push('assets');
+    if (!form.description) missingFields.push('description');
+    if (missingFields.length > 0) {
+      setMissingFields(missingFields);
+      setFlashFields(missingFields);
+      setTimeout(() => setFlashFields([]), 5000);
+      return;
+    }
     
     // Validate email format
     if (!validateEmail(form.email)) {
       setError('Please enter a valid email address.');
+      setEmailError('Please enter a valid email address.');
+      setFlashFields(['email']);
+      setTimeout(() => setFlashFields([]), 15000);
       return;
     }
     
@@ -100,6 +122,7 @@ export default function ContactForm() {
       if (res.ok) {
         setSuccess(true);
         setForm(initialState);
+        setTimeout(() => setSuccess(false), 5000);
       } else {
         const data = await res.json() as { error?: string };
         setError(data.error ?? 'Failed to send.');
@@ -108,92 +131,172 @@ export default function ContactForm() {
       setError('Failed to send.');
     } finally {
       setSubmitting(false);
+      setTimeout(() => setFlashFields([]), 15000);
     }
   };
 
   return (
     <div className="relative w-full flex flex-col items-center px-4 md:px-8 lg:px-0 pb-8">
       <div className="w-full max-w-5xl mx-auto">
-        <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 px-4 md:px-8 lg:px-0">
+        <form onSubmit={handleSubmit} noValidate className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 px-4 md:px-8 lg:px-0">
           {/* Name */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Name</label>
-            <input name="name" value={form.name} onChange={handleChange} required maxLength={50} className="w-full border-4 [border-color:#0088ff] rounded-lg px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all" placeholder="Your name" />
-            {form.name.length >= 40 && <div className="text-sm text-gray-500 mt-1">{form.name.length}/50</div>}
+            <div className="relative">
+              <input 
+                name="name" 
+                value={form.name} 
+                onChange={handleChange} 
+                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'name'))}
+                required 
+                maxLength={50} 
+                className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
+                  flashFields.includes('name') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                }`} 
+                placeholder="Your name" 
+              />
+              {form.name.length >= 40 && <div className="text-sm text-gray-500 mt-1">{form.name.length}/50</div>}
+              {missingFields.includes('name') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Email */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">E-Mail</label>
-            <input 
-              name="email" 
-              type="email" 
-              value={form.email} 
-              onChange={handleChange} 
-              onBlur={handleEmailBlur}
-              required 
-              maxLength={100} 
-              className={`w-full border-4 rounded-lg px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
-                emailError ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
-              }`} 
-              placeholder="Your E-Mail address" 
-            />
-            {emailError && <div className="text-sm text-red-500 mt-1">{emailError}</div>}
-            {form.email.length >= 80 && !emailError && <div className="text-sm text-gray-500 mt-1">{form.email.length}/100</div>}
+            <div className="relative">
+              <input 
+                name="email" 
+                type="email" 
+                value={form.email} 
+                onChange={handleChange} 
+                onBlur={e => { handleEmailBlur(); setFlashFields(prev => prev.filter(f => f !== 'email')); }}
+                required 
+                maxLength={100} 
+                className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
+                  flashFields.includes('email') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                }`} 
+                placeholder="Your E-Mail address" 
+              />
+              {emailError && <div className="text-sm text-red-500 mt-1">{emailError}</div>}
+              {form.email.length >= 80 && !emailError && <div className="text-sm text-gray-500 mt-1">{form.email.length}/100</div>}
+              {missingFields.includes('email') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Telephone (optional) */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Telephone</label>
-            <input name="telephone" value={form.telephone} onChange={handleChange} maxLength={20} className="w-full border-4 [border-color:#a3a3a3] rounded-lg px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Your contact phonenumber" />
-            {form.telephone.length >= 16 && <div className="text-sm text-gray-500 mt-1">{form.telephone.length}/20</div>}
+            <div className="relative">
+              <input name="telephone" value={form.telephone} onChange={handleChange} maxLength={20} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Your contact phonenumber" />
+              {form.telephone.length >= 16 && <div className="text-sm text-gray-500 mt-1">{form.telephone.length}/20</div>}
+              {missingFields.includes('telephone') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Company (optional) */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Company</label>
-            <input name="company" value={form.company} onChange={handleChange} maxLength={100} className="w-full border-4 [border-color:#a3a3a3] rounded-lg px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Commissioned by ..." />
-            {form.company.length >= 80 && <div className="text-sm text-gray-500 mt-1">{form.company.length}/100</div>}
+            <div className="relative">
+              <input name="company" value={form.company} onChange={handleChange} maxLength={100} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Commissioned by ..." />
+              {form.company.length >= 80 && <div className="text-sm text-gray-500 mt-1">{form.company.length}/100</div>}
+              {missingFields.includes('company') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Project Type */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Project Type</label>
-            <select name="projectType" value={form.projectType} onChange={handleChange} required className="w-full border-4 [border-color:#0088ff] rounded-lg px-4 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all">
-              <option value="" disabled className="text-gray-400 italic">Please select a project type...</option>
-              {PROJECT_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
-            </select>
+            <div className="relative w-full">
+              <select
+                name="projectType"
+                value={form.projectType}
+                onChange={handleChange}
+                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'projectType'))}
+                required
+                className={`w-full border-4 rounded-2xl px-4 pr-12 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all appearance-none ${
+                  flashFields.includes('projectType') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                } ${form.projectType ? 'text-black' : 'text-gray-400'}`}
+              >
+                <option value="" disabled className="text-gray-400 italic">Please select a project type...</option>
+                {PROJECT_TYPES.map((type) => <option key={type} value={type} className="text-black">{type}</option>)}
+              </select>
+              <span className="pointer-events-none absolute right-6 top-1/2 transform -translate-y-1/2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 8L10 12L14 8" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              {missingFields.includes('projectType') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Sequence Length */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Sequence length</label>
-            <select name="sequenceLength" value={form.sequenceLength} onChange={handleChange} required className="w-full border-4 [border-color:#0088ff] rounded-lg px-4 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all">
-              <option value="" disabled className="text-gray-400 italic">Please select sequence length...</option>
-              {SEQUENCE_LENGTHS.map((len) => <option key={len} value={len}>{len}</option>)}
-            </select>
+            <div className="relative w-full">
+              <select
+                name="sequenceLength"
+                value={form.sequenceLength}
+                onChange={handleChange}
+                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'))}
+                required
+                className={`w-full border-4 rounded-2xl px-4 pr-12 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all appearance-none ${
+                  flashFields.includes('sequenceLength') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                } ${form.sequenceLength ? 'text-black' : 'text-gray-400'}`}
+              >
+                <option value="" disabled className="text-gray-400 italic">Please select sequence length...</option>
+                {SEQUENCE_LENGTHS.map((len) => <option key={len} value={len} className="text-black">{len}</option>)}
+              </select>
+              <span className="pointer-events-none absolute right-6 top-1/2 transform -translate-y-1/2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 8L10 12L14 8" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              {missingFields.includes('sequenceLength') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Deadline */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Deadline</label>
-            <input
-              name="deadline"
-              type="date"
-              value={form.deadline}
-              onChange={handleChange}
-              onBlur={handleDeadlineBlur}
-              min={(function() {
-                const minDate = new Date();
-                minDate.setDate(minDate.getDate() + 12);
-                return minDate.toISOString().split('T')[0];
-              })()}
-              required
-              className="w-full border-4 [border-color:#0088ff] rounded-lg px-4 py-3 text-lg focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all"
-            />
-            {deadlineError && <div className="text-sm text-red-500 mt-1">{deadlineError}</div>}
+            <div className="relative">
+              <input
+                name="deadline"
+                type="date"
+                value={form.deadline}
+                onChange={handleChange}
+                onBlur={e => { handleDeadlineBlur(); setFlashFields(prev => prev.filter(f => f !== 'deadline')); }}
+                min={(function() {
+                  const minDate = new Date();
+                  minDate.setDate(minDate.getDate() + 12);
+                  return minDate.toISOString().split('T')[0];
+                })()}
+                required
+                className={`w-full border-4 rounded-2xl px-4 py-3 text-lg focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all ${
+                  flashFields.includes('deadline') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                } ${form.deadline ? 'text-black' : 'text-gray-400'}`}
+              />
+              {deadlineError && <div className="text-sm text-red-500 mt-1">{deadlineError}</div>}
+              {missingFields.includes('deadline') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Any Assets */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Any Assets?</label>
-            <select name="assets" value={form.assets} onChange={handleChange} required className="w-full border-4 [border-color:#0088ff] rounded-lg px-4 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all">
-              <option value="" disabled className="text-gray-400 italic">Please select yes or no...</option>
-              {ASSETS_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
+            <div className="relative w-full">
+              <select
+                name="assets"
+                value={form.assets}
+                onChange={handleChange}
+                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'assets'))}
+                required
+                className={`w-full border-4 rounded-2xl px-4 pr-12 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all appearance-none ${
+                  flashFields.includes('assets') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                } ${form.assets ? 'text-black' : 'text-gray-400'}`}
+              >
+                <option value="" disabled className="text-gray-400 italic">Please select yes or no...</option>
+                {ASSETS_OPTIONS.map((opt) => <option key={opt} value={opt} className="text-black">{opt}</option>)}
+              </select>
+              <span className="pointer-events-none absolute right-6 top-1/2 transform -translate-y-1/2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 8L10 12L14 8" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              {missingFields.includes('assets') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            </div>
           </div>
           {/* Project Description */}
           <div className="col-span-1 md:col-span-2 flex flex-col items-center">
@@ -204,9 +307,12 @@ export default function ContactForm() {
                   name="description" 
                   value={form.description} 
                   onChange={handleChange} 
+                  onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'description'))}
                   required 
                   maxLength={2000} 
-                  className="w-full border-4 [border-color:#0088ff] rounded-lg px-4 py-3 text-lg min-h-[120px] placeholder-transparent focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all resize-y bg-transparent" 
+                  className={`w-full border-4 rounded-2xl px-4 py-3 text-lg min-h-[120px] placeholder-transparent focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all resize-y bg-transparent ${
+                    flashFields.includes('description') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                  }`} 
                   placeholder="A detailed description about your project" 
                   id="project-description-textarea"
                 />
@@ -216,7 +322,10 @@ export default function ContactForm() {
                   </span>
                 )}
               </div>
-              <div className="text-sm text-gray-500 mt-1">{form.description.length}/2000</div>
+              <div className="flex items-center justify-between mt-1">
+                <div className="text-sm text-gray-500">{form.description.length}/2000</div>
+                {missingFields.includes('description') && <div className="text-red-600 font-bold text-xs ml-2">This field is required.</div>}
+              </div>
             </div>
           </div>
           {/* Submit Button & Confirmation */}
