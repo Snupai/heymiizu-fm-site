@@ -47,7 +47,21 @@ export async function POST(req: NextRequest) {
     from: process.env.EMAIL_FROM ?? process.env.EMAIL_USER,
     to: process.env.EMAIL_TO ?? process.env.EMAIL_USER,
     subject: `New Project Request from ${name}`,
-    text: `**Name:** ${name}\n**Email:** ${email}\n**Telephone:** ${telephone ?? 'N/A'}\n**Company:** ${company ?? 'N/A'}\n**Project Type:** ${projectType}\n**Sequence Length:** ${sequenceLength}\n**Deadline:** ${deadline}\n**Any Assets:** ${assets}\n\n**Description:**\n${description}`,
+    text: `Name: ${name}\nEmail: ${email}\nTelephone: ${telephone ?? 'N/A'}\nCompany: ${company ?? 'N/A'}\nProject Type: ${projectType}\nSequence Length: ${sequenceLength}\nDeadline: ${deadline}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
+    html: `
+<h2>New Project Request</h2>
+<p><strong>Name:</strong> ${name}</p>
+<p><strong>Email:</strong> ${email}</p>
+<p><strong>Telephone:</strong> ${telephone ?? 'N/A'}</p>
+<p><strong>Company:</strong> ${company ?? 'N/A'}</p>
+<p><strong>Project Type:</strong> ${projectType}</p>
+<p><strong>Sequence Length:</strong> ${sequenceLength}</p>
+<p><strong>Deadline:</strong> ${deadline}</p>
+<p><strong>Any Assets:</strong> ${assets}</p>
+<br>
+<p><strong>Description:</strong></p>
+<p>${description.replace(/\n/g, '<br>')}</p>
+    `,
     replyTo: email,
   };
 
