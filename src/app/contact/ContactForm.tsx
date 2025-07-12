@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import CustomSelect from '../../components/CustomSelect';
 
 const PROJECT_TYPES = [
-  'Commercial Spot',
-  'Intro/Preintro',
-  'Overlay',
+  { value: 'Commercial Spot', label: 'Commercial Spot' },
+  { value: 'Intro/Preintro', label: 'Intro/Preintro' },
+  { value: 'Overlay', label: 'Overlay' },
+  { value: 'Social Media Content', label: 'Social Media Content' },
 ];
-const SEQUENCE_LENGTHS = ['<45s', '1-2min', '>2min'];
-const ASSETS_OPTIONS = ['Yes', 'No'];
+const SEQUENCE_LENGTHS = [
+  { value: '<45s', label: '<45s' },
+  { value: '1-2min', label: '1-2min' },
+  { value: '>2min', label: '>2min' },
+];
+const ASSETS_OPTIONS = [
+  { value: 'Yes', label: 'Yes' },
+  { value: 'No', label: 'No' },
+];
 
 const initialState = {
   name: '',
@@ -168,7 +177,7 @@ export default function ContactForm() {
                 type="email" 
                 value={form.email} 
                 onChange={handleChange} 
-                onBlur={e => { handleEmailBlur(); setFlashFields(prev => prev.filter(f => f !== 'email')); }}
+                onBlur={() => { handleEmailBlur(); setFlashFields(prev => prev.filter(f => f !== 'email')); }}
                 required 
                 maxLength={100} 
                 className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
@@ -203,24 +212,16 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Project Type</label>
             <div className="relative w-full">
-              <select
+              <CustomSelect
                 name="projectType"
                 value={form.projectType}
                 onChange={handleChange}
                 onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'projectType'))}
+                options={PROJECT_TYPES}
+                placeholder="Please select a project type..."
                 required
-                className={`w-full border-4 rounded-2xl px-4 pr-12 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all appearance-none ${
-                  flashFields.includes('projectType') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
-                } ${form.projectType ? 'text-black' : 'text-gray-400'}`}
-              >
-                <option value="" disabled className="text-gray-400 italic">Please select a project type...</option>
-                {PROJECT_TYPES.map((type) => <option key={type} value={type} className="text-black">{type}</option>)}
-              </select>
-              <span className="pointer-events-none absolute right-6 top-1/2 transform -translate-y-1/2">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 8L10 12L14 8" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
+                error={flashFields.includes('projectType')}
+              />
               {missingFields.includes('projectType') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
           </div>
@@ -228,24 +229,16 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Sequence length</label>
             <div className="relative w-full">
-              <select
+              <CustomSelect
                 name="sequenceLength"
                 value={form.sequenceLength}
                 onChange={handleChange}
                 onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'))}
+                options={SEQUENCE_LENGTHS}
+                placeholder="Please select sequence length..."
                 required
-                className={`w-full border-4 rounded-2xl px-4 pr-12 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all appearance-none ${
-                  flashFields.includes('sequenceLength') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
-                } ${form.sequenceLength ? 'text-black' : 'text-gray-400'}`}
-              >
-                <option value="" disabled className="text-gray-400 italic">Please select sequence length...</option>
-                {SEQUENCE_LENGTHS.map((len) => <option key={len} value={len} className="text-black">{len}</option>)}
-              </select>
-              <span className="pointer-events-none absolute right-6 top-1/2 transform -translate-y-1/2">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 8L10 12L14 8" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
+                error={flashFields.includes('sequenceLength')}
+              />
               {missingFields.includes('sequenceLength') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
           </div>
@@ -258,7 +251,7 @@ export default function ContactForm() {
                 type="date"
                 value={form.deadline}
                 onChange={handleChange}
-                onBlur={e => { handleDeadlineBlur(); setFlashFields(prev => prev.filter(f => f !== 'deadline')); }}
+                onBlur={() => { handleDeadlineBlur(); setFlashFields(prev => prev.filter(f => f !== 'deadline')); }}
                 min={(function() {
                   const minDate = new Date();
                   minDate.setDate(minDate.getDate() + 12);
@@ -277,24 +270,16 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg">Any Assets?</label>
             <div className="relative w-full">
-              <select
+              <CustomSelect
                 name="assets"
                 value={form.assets}
                 onChange={handleChange}
                 onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'assets'))}
+                options={ASSETS_OPTIONS}
+                placeholder="Please select yes or no..."
                 required
-                className={`w-full border-4 rounded-2xl px-4 pr-12 py-3 text-lg bg-white focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all appearance-none ${
-                  flashFields.includes('assets') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
-                } ${form.assets ? 'text-black' : 'text-gray-400'}`}
-              >
-                <option value="" disabled className="text-gray-400 italic">Please select yes or no...</option>
-                {ASSETS_OPTIONS.map((opt) => <option key={opt} value={opt} className="text-black">{opt}</option>)}
-              </select>
-              <span className="pointer-events-none absolute right-6 top-1/2 transform -translate-y-1/2">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 8L10 12L14 8" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
+                error={flashFields.includes('assets')}
+              />
               {missingFields.includes('assets') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
           </div>
