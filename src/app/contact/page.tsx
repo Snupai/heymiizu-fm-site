@@ -1,10 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
-import { FaXTwitter } from "react-icons/fa6";
-import { FaInstagram } from "react-icons/fa";
-import { FaYoutube } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { getDeviceType } from "../../utils/deviceType";
 import ContactSimple from "./ContactSimple";
@@ -92,9 +88,11 @@ export default function ContactPage() {
             transition: "transform 2s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
-          <img
+          <Image
             src={bubble.src}
             alt="Message Bubble"
+            width={300}
+            height={300}
             style={{
               width: "300px",
               height: "auto",

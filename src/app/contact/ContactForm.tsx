@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 
 const PROJECT_TYPES = [
   'Commercial Spot',
@@ -102,10 +101,10 @@ export default function ContactForm() {
         setSuccess(true);
         setForm(initialState);
       } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to send.');
+        const data = await res.json() as { error?: string };
+        setError(data.error ?? 'Failed to send.');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to send.');
     } finally {
       setSubmitting(false);
