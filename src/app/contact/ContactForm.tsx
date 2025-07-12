@@ -150,7 +150,7 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit} noValidate className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 px-4 md:px-8 lg:px-0">
           {/* Name */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Name</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Name</label>
             <div className="relative">
               <input 
                 name="name" 
@@ -170,7 +170,7 @@ export default function ContactForm() {
           </div>
           {/* Email */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">E-Mail</label>
+            <label className="block font-bold mb-1 text-lg pl-4">E-Mail</label>
             <div className="relative">
               <input 
                 name="email" 
@@ -192,7 +192,7 @@ export default function ContactForm() {
           </div>
           {/* Telephone (optional) */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Telephone</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Telephone</label>
             <div className="relative">
               <input name="telephone" value={form.telephone} onChange={handleChange} maxLength={20} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Your contact phonenumber" />
               {form.telephone.length >= 16 && <div className="text-sm text-gray-500 mt-1">{form.telephone.length}/20</div>}
@@ -201,7 +201,7 @@ export default function ContactForm() {
           </div>
           {/* Company (optional) */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Company</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Company</label>
             <div className="relative">
               <input name="company" value={form.company} onChange={handleChange} maxLength={100} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Commissioned by ..." />
               {form.company.length >= 80 && <div className="text-sm text-gray-500 mt-1">{form.company.length}/100</div>}
@@ -210,7 +210,7 @@ export default function ContactForm() {
           </div>
           {/* Project Type */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Project Type</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Project Type</label>
             <div className="relative w-full">
               <CustomSelect
                 name="projectType"
@@ -227,7 +227,7 @@ export default function ContactForm() {
           </div>
           {/* Sequence Length */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Sequence length</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Sequence length</label>
             <div className="relative w-full">
               <CustomSelect
                 name="sequenceLength"
@@ -244,7 +244,7 @@ export default function ContactForm() {
           </div>
           {/* Deadline */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Deadline</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Deadline</label>
             <div className="relative">
               <input
                 name="deadline"
@@ -268,7 +268,7 @@ export default function ContactForm() {
           </div>
           {/* Any Assets */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg">Any Assets?</label>
+            <label className="block font-bold mb-1 text-lg pl-4">Any Assets?</label>
             <div className="relative w-full">
               <CustomSelect
                 name="assets"
@@ -286,7 +286,7 @@ export default function ContactForm() {
           {/* Project Description */}
           <div className="col-span-1 md:col-span-2 flex flex-col items-center">
             <div className="w-full max-w-md relative">
-              <label className="block font-bold mb-1 text-lg">Project description</label>
+              <label className="block font-bold mb-1 text-lg pl-4">Project description</label>
               <div className="relative w-full">
                 <textarea 
                   name="description" 
