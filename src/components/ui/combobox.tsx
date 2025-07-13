@@ -9,7 +9,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "./command"
@@ -73,7 +72,6 @@ export function Combobox({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 bg-white border-4 border-gray-200 rounded-2xl shadow-lg" align="start">
         <Command>
-          <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
             <CommandGroup>

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { ChevronsUpDown } from 'lucide-react';
 import { Combobox } from '../../components/ui/combobox';
 import { DatePicker } from '../../components/ui/date-picker';
+import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
+import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from '../../components/ui/command';
 
 const PROJECT_TYPES = [
   { value: 'Commercial Spot', label: 'Commercial Spot' },
@@ -13,6 +16,7 @@ const SEQUENCE_LENGTHS = [
   { value: '<45s', label: '<45s' },
   { value: '1-2min', label: '1-2min' },
   { value: '>2min', label: '>2min' },
+  { value: 'custom', label: 'Custom...' },
 ];
 const ASSETS_OPTIONS = [
   { value: 'Yes', label: 'Yes' },
@@ -52,6 +56,9 @@ export default function ContactForm() {
   const [flashFields, setFlashFields] = useState<string[]>([]);
   const [missingFields, setMissingFields] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [customSequenceLength, setCustomSequenceLength] = useState('');
+  const [showCustomSequenceInput, setShowCustomSequenceInput] = useState(false);
+  const [customDropdownOpen, setCustomDropdownOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -72,7 +79,18 @@ export default function ContactForm() {
   };
 
   const handleComboboxChange = (name: string, value: string) => {
-    setForm({ ...form, [name]: value });
+    if (name === 'sequenceLength' && value === 'custom') {
+      setShowCustomSequenceInput(true);
+      // Restore previous custom value if any
+      setForm({ ...form, [name]: customSequenceLength });
+    } else {
+      setForm({ ...form, [name]: value });
+      if (name === 'sequenceLength') {
+        setShowCustomSequenceInput(false);
+        // Only clear customSequenceLength if a non-custom option is chosen
+        if (value !== 'custom') setCustomSequenceLength('');
+      }
+    }
     setMissingFields(prev => prev.filter(f => f !== name));
     setFlashFields(prev => prev.filter(f => f !== name));
   };
@@ -100,6 +118,14 @@ export default function ContactForm() {
     } else {
       setEmailError('');
     }
+  };
+
+  const handleCustomSequenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomSequenceLength(value);
+    setForm({ ...form, sequenceLength: value });
+    setMissingFields(prev => prev.filter(f => f !== 'sequenceLength'));
+    setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'));
   };
 
 
@@ -242,13 +268,77 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Sequence length</label>
             <div className="relative w-full">
-              <Combobox
-                options={SEQUENCE_LENGTHS}
-                value={form.sequenceLength}
-                onValueChange={(value) => handleComboboxChange('sequenceLength', value)}
-                placeholder="Please select sequence length..."
-                error={flashFields.includes('sequenceLength')}
-              />
+              {!showCustomSequenceInput ? (
+                <Combobox
+                  options={SEQUENCE_LENGTHS}
+                  value={form.sequenceLength}
+                  onValueChange={(value) => handleComboboxChange('sequenceLength', value)}
+                  placeholder="Please select sequence length..."
+                  error={flashFields.includes('sequenceLength')}
+                />
+              ) : (
+                <div className="w-full">
+                  <Popover open={customDropdownOpen} onOpenChange={setCustomDropdownOpen}>
+                    <PopoverTrigger asChild>
+                      <div className="relative w-full">
+                        <input
+                          name="customSequenceLength"
+                          value={customSequenceLength}
+                          onChange={handleCustomSequenceChange}
+                          onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'))}
+                          required
+                          maxLength={10}
+                          className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all pr-12 ${
+                            flashFields.includes('sequenceLength') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                          }`}
+                          placeholder="Enter custom sequence length..."
+                          onClick={e => e.stopPropagation()}
+                        />
+                        {customSequenceLength.length >= 7 && (
+                          <div className={`text-sm mt-1 pl-2 ${customSequenceLength.length === 10 ? 'text-red-500' : 'text-gray-500'}`}>{customSequenceLength.length}/10</div>
+                        )}
+                        <button
+                          type="button"
+                          className="absolute right-6 top-1/2 transform -translate-y-1/2 h-4 w-4 shrink-0 z-10"
+                          tabIndex={-1}
+                          onClick={e => { e.stopPropagation(); setCustomDropdownOpen(v => !v); }}
+                        >
+                          <ChevronsUpDown
+                            className={`h-4 w-4 ${customSequenceLength.length > 0 ? 'opacity-50' : 'opacity-20'}`}
+                          />
+                        </button>
+                        {/* Overlay a transparent div over the icon area to act as PopoverTrigger, but only the icon click toggles */}
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0 bg-white border-4 border-gray-200 rounded-2xl shadow-lg z-50" align="start">
+                      <Command>
+                        <CommandList>
+                          <CommandEmpty>No option found.</CommandEmpty>
+                          <CommandGroup>
+                            {SEQUENCE_LENGTHS.map((option) => {
+                              const isCustomOption = option.value === 'custom';
+                              const isSelected = isCustomOption ? showCustomSequenceInput : form.sequenceLength === option.value;
+                              return (
+                                <CommandItem
+                                  key={option.value}
+                                  value={option.value}
+                                  onSelect={(currentValue) => {
+                                    setCustomDropdownOpen(false);
+                                    handleComboboxChange('sequenceLength', currentValue);
+                                  }}
+                                  className={`cursor-pointer transition-colors hover:bg-gray-50${isSelected ? ' bg-blue-50 text-blue-600' : ''}`}
+                                >
+                                  {option.label}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
               {missingFields.includes('sequenceLength') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
           </div>
