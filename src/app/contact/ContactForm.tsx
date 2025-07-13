@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import CustomSelect from '../../components/CustomSelect';
+import { Combobox } from '../../components/ui/combobox';
+import { DatePicker } from '../../components/ui/date-picker';
 
 const PROJECT_TYPES = [
   { value: 'Commercial Spot', label: 'Commercial Spot' },
@@ -18,7 +19,19 @@ const ASSETS_OPTIONS = [
   { value: 'No', label: 'No' },
 ];
 
-const initialState = {
+interface FormState {
+  name: string;
+  email: string;
+  telephone: string;
+  company: string;
+  projectType: string;
+  sequenceLength: string;
+  deadline: string;
+  assets: string;
+  description: string;
+}
+
+const initialState: FormState = {
   name: '',
   email: '',
   telephone: '',
@@ -31,30 +44,49 @@ const initialState = {
 };
 
 export default function ContactForm() {
-  const [form, setForm] = useState(initialState);
+  const [form, setForm] = useState<FormState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [deadlineError, setDeadlineError] = useState('');
   const [flashFields, setFlashFields] = useState<string[]>([]);
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    const stringValue = String(value || '');
     
     // Special validation for telephone field
     if (name === 'telephone') {
       // Only allow numbers, +, -, and /
       const phoneRegex = /^[0-9+\-/]*$/;
-      if (value === '' || phoneRegex.test(value)) {
-        setForm({ ...form, [name]: value });
+      if (stringValue === '' || phoneRegex.test(stringValue)) {
+        setForm({ ...form, [name]: stringValue });
       }
     } else {
-      setForm({ ...form, [name]: value });
+      setForm({ ...form, [name]: stringValue });
     }
     setMissingFields(prev => prev.filter(f => f !== name));
     setFlashFields(prev => prev.filter(f => f !== name));
+  };
+
+  const handleComboboxChange = (name: string, value: string) => {
+    setForm({ ...form, [name]: value });
+    setMissingFields(prev => prev.filter(f => f !== name));
+    setFlashFields(prev => prev.filter(f => f !== name));
+  };
+
+  const handleDateChange = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date) {
+      const dateString = date.toISOString().split('T')[0] ?? '';
+      setForm({ ...form, deadline: dateString });
+    } else {
+      setForm({ ...form, deadline: '' });
+    }
+    setMissingFields(prev => prev.filter(f => f !== 'deadline'));
+    setFlashFields(prev => prev.filter(f => f !== 'deadline'));
   };
 
   const validateEmail = (email: string) => {
@@ -70,25 +102,9 @@ export default function ContactForm() {
     }
   };
 
-  const validateDeadline = (deadline: string) => {
-    if (!deadline) return false;
-    const selectedDate = new Date(deadline);
-    const today = new Date();
-    const minDate = new Date();
-    minDate.setDate(today.getDate() + 12);
-    selectedDate.setHours(0, 0, 0, 0);
-    minDate.setHours(0, 0, 0, 0);
-    return selectedDate >= minDate;
-  };
 
-  const handleDeadlineBlur = () => {
-    if (form.deadline && !validateDeadline(form.deadline)) {
-      setDeadlineError('Deadline must be at least 12 days in the future.');
-      setForm({ ...form, deadline: '' });
-    } else {
-      setDeadlineError('');
-    }
-  };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,14 +228,11 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Project Type</label>
             <div className="relative w-full">
-              <CustomSelect
-                name="projectType"
-                value={form.projectType}
-                onChange={handleChange}
-                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'projectType'))}
+              <Combobox
                 options={PROJECT_TYPES}
+                value={form.projectType}
+                onValueChange={(value) => handleComboboxChange('projectType', value)}
                 placeholder="Please select a project type..."
-                required
                 error={flashFields.includes('projectType')}
               />
               {missingFields.includes('projectType') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
@@ -229,14 +242,11 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Sequence length</label>
             <div className="relative w-full">
-              <CustomSelect
-                name="sequenceLength"
-                value={form.sequenceLength}
-                onChange={handleChange}
-                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'))}
+              <Combobox
                 options={SEQUENCE_LENGTHS}
+                value={form.sequenceLength}
+                onValueChange={(value) => handleComboboxChange('sequenceLength', value)}
                 placeholder="Please select sequence length..."
-                required
                 error={flashFields.includes('sequenceLength')}
               />
               {missingFields.includes('sequenceLength') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
@@ -246,23 +256,18 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Deadline</label>
             <div className="relative">
-              <input
-                name="deadline"
-                type="date"
-                value={form.deadline}
-                onChange={handleChange}
-                onBlur={() => { handleDeadlineBlur(); setFlashFields(prev => prev.filter(f => f !== 'deadline')); }}
-                min={(function() {
+              <DatePicker
+                date={selectedDate}
+                onDateChange={handleDateChange}
+                placeholder="Select deadline..."
+                error={flashFields.includes('deadline')}
+                minDate={(function() {
                   const minDate = new Date();
                   minDate.setDate(minDate.getDate() + 12);
-                  return minDate.toISOString().split('T')[0];
+                  return minDate;
                 })()}
-                required
-                className={`w-full border-4 rounded-2xl px-4 py-3 text-lg focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all ${
-                  flashFields.includes('deadline') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
-                } ${form.deadline ? 'text-black' : 'text-gray-400'}`}
               />
-              {deadlineError && <div className="text-sm text-red-500 mt-1">{deadlineError}</div>}
+
               {missingFields.includes('deadline') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
           </div>
@@ -270,14 +275,11 @@ export default function ContactForm() {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Any Assets?</label>
             <div className="relative w-full">
-              <CustomSelect
-                name="assets"
-                value={form.assets}
-                onChange={handleChange}
-                onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'assets'))}
+              <Combobox
                 options={ASSETS_OPTIONS}
+                value={form.assets}
+                onValueChange={(value) => handleComboboxChange('assets', value)}
                 placeholder="Please select yes or no..."
-                required
                 error={flashFields.includes('assets')}
               />
               {missingFields.includes('assets') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}

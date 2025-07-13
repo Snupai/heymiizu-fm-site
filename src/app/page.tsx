@@ -88,7 +88,7 @@ export default function HomePage() {
 
         {/* Main Content */}
         <motion.div 
-          className="relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto pt-54"
+          className="relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto pt-80"
           variants={fadeInUp}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
