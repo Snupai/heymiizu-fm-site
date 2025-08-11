@@ -355,7 +355,7 @@ const projectsData: Category[] = [
       },
       {
         title: "@Seltix",
-        description: "Formel Skin Advertisemnet",
+        description: "Formel Skin Advertisement",
         media: {
           src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQoj6rKI4FetOibRzoLvsElaXjy9nCWN6IZ3Mq",
           thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQmfYmhXaWwKavAiXez1TL53bSfqJEgR0jQsHx"
