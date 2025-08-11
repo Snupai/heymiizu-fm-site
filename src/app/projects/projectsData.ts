@@ -352,6 +352,15 @@ const projectsData: Category[] = [
           thumbnail: "/projects/commissions/thumbnails/Seltix_Airalo_Advertisement_poster.png"
         },
         link: "https://youtube.com/@SELTIXX"
+      },
+      {
+        title: "@Seltix",
+        description: "Formel Skin Advertisemnet",
+        media: {
+          src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQoj6rKI4FetOibRzoLvsElaXjy9nCWN6IZ3Mq",
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQmfYmhXaWwKavAiXez1TL53bSfqJEgR0jQsHx"
+        },
+        link: "https://youtube.com/@SELTIXX"
       }
     ]
   }

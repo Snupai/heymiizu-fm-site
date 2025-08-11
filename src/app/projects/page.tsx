@@ -38,6 +38,39 @@ interface Project {
   link?: string;
 }
 
+// Helpers for UploadThing/UTFS URLs and media type inference
+function isExternalUrl(url?: string): boolean {
+  return !!url && /^https?:\/\//i.test(url);
+}
+
+function isUploadThingHost(url?: string): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return /(?:^|\.)utfs\.io$/i.test(u.hostname) || /(?:^|\.)ufs\.sh$/i.test(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function hasImageExtension(url?: string): boolean {
+  if (!url) return false;
+  return /\.(?:avif|webp|png|jpe?g|gif|svg)(?:\?.*)?$/i.test(url);
+}
+
+function hasVideoExtension(url?: string): boolean {
+  if (!url) return false;
+  return /\.(?:mp4|webm|ogg)(?:\?.*)?$/i.test(url);
+}
+
+function isLikelyVideoUrl(url?: string): boolean {
+  if (!url) return false;
+  if (hasVideoExtension(url)) return true;
+  // Heuristic: UploadThing/UTFS often omits extensions; treat as video when not image-like
+  if (isUploadThingHost(url) && !hasImageExtension(url)) return true;
+  return false;
+}
+
 // Create more natural, random-looking patterns
 const createRandomPattern = () => {
   const baseAmplitude = 0.8;
@@ -141,7 +174,7 @@ function ProjectCard({
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
         {/* Video thumbnail and play button overlay */}
-        {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
+        {project.media?.src && isLikelyVideoUrl(project.media.src) ? (
           <>
             {!isPlaying && (
               <button
@@ -156,7 +189,8 @@ function ProjectCard({
                     alt={project.title}
                     fill
                     className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
-                    unoptimized={false}
+                    /* Avoid optimizer for UploadThing/UTFS to prevent upstream timeouts */
+                    unoptimized={isExternalUrl(project.media.thumbnail) && isUploadThingHost(project.media.thumbnail)}
                     sizes="100vw"
                     style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
                     loading="lazy"
@@ -193,7 +227,8 @@ function ProjectCard({
               alt={project.title}
               fill
               className="object-cover w-full h-full"
-              unoptimized={false}
+              /* Bypass optimizer for UploadThing/UTFS to avoid 500s on /_next/image */
+              unoptimized={isExternalUrl(project.media?.src) && isUploadThingHost(project.media?.src)}
               sizes="100vw"
               style={{objectFit: 'cover'}}
               loading="lazy"

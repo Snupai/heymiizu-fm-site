@@ -69,6 +69,39 @@ function renderCategoryIcon(icon: string) {
   }
 }
 
+// Helpers for UploadThing/UTFS URLs and media type inference
+function isExternalUrl(url?: string): boolean {
+  return !!url && /^https?:\/\//i.test(url);
+}
+
+function isUploadThingHost(url?: string): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return /(?:^|\.)utfs\.io$/i.test(u.hostname) || /(?:^|\.)ufs\.sh$/i.test(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function hasImageExtension(url?: string): boolean {
+  if (!url) return false;
+  return /\.(?:avif|webp|png|jpe?g|gif|svg)(?:\?.*)?$/i.test(url);
+}
+
+function hasVideoExtension(url?: string): boolean {
+  if (!url) return false;
+  return /\.(?:mp4|webm|ogg)(?:\?.*)?$/i.test(url);
+}
+
+function isLikelyVideoUrl(url?: string): boolean {
+  if (!url) return false;
+  if (hasVideoExtension(url)) return true;
+  // Heuristic: UploadThing/UTFS often omits extensions; treat as video when not image-like
+  if (isUploadThingHost(url) && !hasImageExtension(url)) return true;
+  return false;
+}
+
 export function ProjectsSimple({
   categories,
   activeCategory: initialActiveCategory,
@@ -272,7 +305,7 @@ export const ProjectCard = memo(function ProjectCard({
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
         {/* Video thumbnail and play button overlay */}
-        {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
+        {project.media?.src && isLikelyVideoUrl(project.media.src) ? (
           <>
             {!isPlaying && (
               <button
@@ -287,7 +320,8 @@ export const ProjectCard = memo(function ProjectCard({
                     alt={project.title}
                     fill
                     className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
-                    unoptimized={false}
+                    // Avoid Next/Image optimizer for UploadThing hosts to prevent upstream timeouts
+                    unoptimized={isExternalUrl(project.media?.thumbnail) && isUploadThingHost(project.media?.thumbnail)}
                     priority={false}
                     sizes="100vw"
                     style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
@@ -325,7 +359,8 @@ export const ProjectCard = memo(function ProjectCard({
               alt={project.title}
               fill
               className="object-cover w-full h-full"
-              unoptimized={false}
+              // Bypass optimizer for UploadThing/UTFS to prevent 500 timeouts on /_next/image proxy
+              unoptimized={isExternalUrl(project.media?.src) && isUploadThingHost(project.media?.src)}
               priority={false}
               sizes="100vw"
               style={{objectFit: 'cover'}}

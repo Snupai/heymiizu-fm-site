@@ -18,6 +18,27 @@ const nextConfig = {
         hostname: 'cdn-prod-ccv.adobe.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'rlawubu0ke.ufs.sh',
+        pathname: '/**',
+      },
+      // UploadThing/UTFS common hosts
+      {
+        protocol: 'https',
+        hostname: 'utfs.io',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.utfs.io',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ufs.sh',
+        pathname: '/**',
+      },
     ],
   },
   // Configure output options
