@@ -203,10 +203,10 @@ export default function ContactPage() {
           >
             <div className="bg-white border-4 border-[#0095FF] rounded-full px-8 py-4">
               <div className="flex items-center justify-center gap-6">
-                <a href="https://x.com/heymiizu" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#0095FF] transition-colors duration-300">
+                <a href="https://x.com/FromNuvia" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#0095FF] transition-colors duration-300">
                   <FaXTwitter className="w-8 h-8" />
                 </a>
-                <a href="https://www.instagram.com/miizumelon/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#0095FF] transition-colors duration-300">
+                <a href="https://www.instagram.com/fromnuvia" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#0095FF] transition-colors duration-300">
                   <FaInstagram className="w-8 h-8" />
                 </a>
                 <a href="https://www.youtube.com/@Miizumelon" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#0095FF] transition-colors duration-300">
