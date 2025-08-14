@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import NavbarContent from "../components/Navbar";
 import FooterContent from "../components/Footer";
 import Spinner from "../components/Spinner";
+import RebrandBanner from "../components/RebrandBanner";
 import React, { Suspense } from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next"
@@ -64,6 +65,7 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`${publicSans.variable} font-sans min-h-screen flex flex-col`}>
+        <RebrandBanner />
         <NavbarContent />
         <div className="flex-1 flex flex-col">
           <Suspense fallback={<Spinner />}>
