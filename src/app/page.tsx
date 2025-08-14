@@ -112,7 +112,7 @@ export default function HomePage() {
           >
             <Link 
               href="/projects"
-              className="bg-[#0095FF] text-white px-8 py-3 rounded-full text-lg hover:bg-[#0077CC] transition-colors z-150 relative"
+              className="bg-brand hover:bg-brand-dark text-white px-8 py-3 rounded-full text-lg transition-colors z-150 relative"
             >
               Projects
             </Link>
@@ -206,7 +206,7 @@ export default function HomePage() {
       </div>
 
       {/* New Section with Cards */}
-      <div className="w-full bg-[#fff5f7] min-h-screen flex items-center justify-center py-20 pt-80">
+      <div className="w-full bg-gradient-to-b from-white via-white to-brand-light min-h-screen flex items-center justify-center py-20 pt-80">
         <div className="w-full max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Animations Card */}
@@ -233,7 +233,7 @@ export default function HomePage() {
                   </p>
                   <Link 
                     href="/projects?category=after-effects"
-                    className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
+                    className="inline-block bg-brand hover:bg-brand-dark text-white px-6 py-2 rounded-full text-sm transition-colors"
                   >
                     See
                   </Link>
@@ -265,7 +265,7 @@ export default function HomePage() {
                   </p>
                   <Link 
                     href="/projects?category=photography"
-                    className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
+                    className="inline-block bg-brand hover:bg-brand-dark text-white px-6 py-2 rounded-full text-sm transition-colors"
                   >
                     See
                   </Link>
@@ -284,7 +284,7 @@ export default function HomePage() {
           >
             <Link 
               href="/projects?category=everything"
-              className="bg-[#0095FF] text-white px-10 py-4 rounded-full text-lg font-medium hover:bg-[#0077CC] transition-colors shadow-lg hover:shadow-xl"
+              className="bg-brand hover:bg-brand-dark text-white px-10 py-4 rounded-full text-lg font-medium transition-colors shadow-lg hover:shadow-xl"
             >
               Projects
             </Link>

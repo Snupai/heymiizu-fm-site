@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
-import { ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpCircle } from 'lucide-react';
 import { Combobox } from '../../components/ui/combobox';
 import { DatePicker } from '../../components/ui/date-picker';
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
@@ -202,7 +201,7 @@ export default function ContactForm() {
                 required 
                 maxLength={50} 
                 className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
-                  flashFields.includes('name') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                  flashFields.includes('name') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                 }`} 
                 placeholder="Your name" 
               />
@@ -223,7 +222,7 @@ export default function ContactForm() {
                 required 
                 maxLength={100} 
                 className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
-                  flashFields.includes('email') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                  flashFields.includes('email') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                 }`} 
                 placeholder="Your E-Mail address" 
               />
@@ -289,7 +288,7 @@ export default function ContactForm() {
                           required
                           maxLength={10}
                           className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all pr-12 ${
-                            flashFields.includes('sequenceLength') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                            flashFields.includes('sequenceLength') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                           }`}
                           placeholder="Enter custom sequence length..."
                           onClick={e => e.stopPropagation()}
@@ -326,7 +325,7 @@ export default function ContactForm() {
                                     setCustomDropdownOpen(false);
                                     handleComboboxChange('sequenceLength', currentValue);
                                   }}
-                                  className={`cursor-pointer transition-colors hover:bg-gray-50${isSelected ? ' bg-blue-50 text-blue-600' : ''}`}
+                                  className={`cursor-pointer transition-colors hover:bg-gray-50${isSelected ? ' bg-brand-light text-brand-dark' : ''}`}
                                 >
                                   {option.label}
                                 </CommandItem>
@@ -387,8 +386,8 @@ export default function ContactForm() {
                   onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'description'))}
                   required 
                   maxLength={2000} 
-                  className={`w-full border-4 rounded-2xl px-4 py-3 text-lg min-h-[120px] placeholder-transparent focus:outline-none focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff] transition-all resize-y bg-transparent ${
-                    flashFields.includes('description') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0088ff] focus:[border-color:#0088ff] focus:[box-shadow:0_0_0_2px_#0088ff]'
+                  className={`w-full border-4 rounded-2xl px-4 py-3 text-lg min-h-[120px] placeholder-transparent focus:outline-none focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff] transition-all resize-y bg-transparent ${
+                    flashFields.includes('description') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                   }`} 
                   placeholder="A detailed description about your project" 
                   id="project-description-textarea"
@@ -410,8 +409,13 @@ export default function ContactForm() {
             <p className="text-2xl font-black mb-0 leading-tight">All set?</p>
             <p className="text-2xl font-black -mt-2 mb-0.5 leading-tight">Let´s bring your project to life</p>
             <div className="text-sm text-gray-500 mt-2">Send it off!</div>
-            <button type="submit" disabled={submitting} className="w-20 h-20 flex items-center justify-center transition-all mb-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-none bg-transparent border-none p-0">
-              <Image src="/contact/circle-arrow-up.png" alt="Send" width={56} height={56} />
+            <button
+              type="submit"
+              aria-label="Send message"
+              disabled={submitting}
+              className="w-20 h-20 flex items-center justify-center transition-colors mb-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-none bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-brand/40 rounded-full"
+            >
+              <ArrowUpCircle size={56} strokeWidth={2.5} className="text-brand hover:text-brand-dark" />
             </button>
             {success && <div className="mt-4 text-green-600 font-bold text-xl">Email sent successfully!</div>}
             {error && <div className="mt-4 text-red-600 font-bold text-xl">{error}</div>}

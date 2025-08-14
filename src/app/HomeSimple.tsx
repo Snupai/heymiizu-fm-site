@@ -28,7 +28,7 @@ export default function HomeSimple() {
               </p>
               <Link 
                 href="/projects?category=after-effects"
-                className="inline-block bg-[#0095FF] text-white px-4 py-1 rounded-full text-xs hover:bg-[#0077CC] transition-colors text-center"
+                className="inline-block bg-brand hover:bg-brand-dark text-white px-4 py-1 rounded-full text-xs transition-colors text-center"
               >
                 See
               </Link>
@@ -51,7 +51,7 @@ export default function HomeSimple() {
               </p>
               <Link 
                 href="/projects?category=photography"
-                className="inline-block bg-[#0095FF] text-white px-4 py-1 rounded-full text-xs hover:bg-[#0077CC] transition-colors text-center"
+                className="inline-block bg-brand hover:bg-brand-dark text-white px-4 py-1 rounded-full text-xs transition-colors text-center"
               >
                 See
               </Link>
@@ -62,7 +62,7 @@ export default function HomeSimple() {
         <div className="flex justify-center mt-4 w-full">
           <Link 
             href="/projects?category=everything"
-            className="bg-[#0095FF] text-white px-6 py-2 rounded-full text-base font-medium hover:bg-[#0077CC] transition-colors shadow-lg hover:shadow-xl text-center"
+            className="bg-brand hover:bg-brand-dark text-white px-6 py-2 rounded-full text-base font-medium transition-colors shadow-lg hover:shadow-xl text-center"
           >
             Projects
           </Link>

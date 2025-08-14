@@ -14,8 +14,7 @@ export default function NotFound() {
       transition={{ duration: 0.5 }}
     >
       <motion.h1
-        className="text-7xl font-extrabold mb-4 drop-shadow-lg"
-        style={{ color: '#0189ff' }}
+        className="text-7xl font-extrabold mb-4 drop-shadow-lg text-brand"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -23,8 +22,7 @@ export default function NotFound() {
         404
       </motion.h1>
       <motion.h2
-        className="text-3xl font-bold mb-2"
-        style={{ color: '#222' }}
+        className="text-3xl font-bold mb-2 text-ink"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -37,7 +35,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="bg-[#0095FF] text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-[#0077CC] transition-colors shadow-lg hover:shadow-xl"
+        className="bg-brand hover:bg-brand-dark text-white px-8 py-3 rounded-full text-lg font-medium transition-colors shadow-lg hover:shadow-xl"
       >
         Go Home
       </Link>
