@@ -230,13 +230,14 @@ export default function ContactPage() {
                 if (v) {
                   // Ensure autoplay works across browsers
                   v.muted = true;
-                  const playPromise = v.play();
-                  if (playPromise) {
-                    playPromise.catch(() => {
-                      // As a fallback, attempt to play again shortly
-                      setTimeout(() => v.play().catch(() => {}), 200);
-                    });
-                  }
+                  // Intentionally ignore the Promise result to satisfy lint rules
+                  void v.play().catch(() => {
+                    // As a fallback, attempt to play again shortly
+                    setTimeout(() => {
+                      // Ignore the Promise again; add comment to avoid no-empty-function
+                      void v.play().catch(() => { /* ignore autoplay rejection retry */ });
+                    }, 200);
+                  });
                 }
               }, 50);
             }, 600); // match fade duration below
