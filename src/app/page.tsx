@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Popup from "../components/Popup";
 import { getDeviceType } from "../utils/deviceType";
 import HomeSimple from "./HomeSimple";
 
@@ -33,6 +34,8 @@ const fadeIn = {
 
 export default function HomePage() {
   const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [anchor, setAnchor] = useState<null | { top: number; left: number; width: number; height: number }>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -75,10 +78,31 @@ export default function HomePage() {
           variants={fadeIn}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh]">
-            <a href="https://nuvia.de" target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150]" style={{color: '#0189ff'}}>
+          <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh] text-center">
+            <button
+              type="button"
+              onClick={(e) => {
+                const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                setAnchor({ top: r.top, left: r.left, width: r.width, height: r.height });
+                setShowPopup(true);
+              }}
+              className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150] text-[#0189ff] underline-offset-2 hover:underline"
+            >
               Miizumelon.de presented by Nuvia
-            </a>
+            </button>
+            {showPopup && (
+              <Popup onClose={() => setShowPopup(false)} anchor={anchor ?? undefined} offsetY={0}>
+                <div className="space-y-4">
+                  <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Nuvia</h3>
+                  <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
+                    A new online identity created solely to distinguish Miizu’s work as a motion designer.
+                  </p>
+                  <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
+                    While Miizu continues as a content creator, Nuvia represents the motion design side exclusively.
+                  </p>
+                </div>
+              </Popup>
+            )}
             <Image
               src="/mac.png"
               alt="Mac Display"
