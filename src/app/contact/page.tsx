@@ -279,13 +279,13 @@ export default function ContactPage() {
             >
               <Link
                 href="/"
-                className="px-6 py-3 rounded-xl font-bold text-black border-2 border-black hover:bg-black hover:text-white transition-colors"
+                className="px-6 py-3 rounded-xl font-bold text-white bg-brand hover:bg-brand-dark transition-colors focus:outline-none focus:ring-2 focus:ring-brand/40"
               >
                 Return to home
               </Link>
               <Link
-                href="/projects"
-                className="px-6 py-3 rounded-xl font-bold text-black border-2 border-black hover:bg-black hover:text-white transition-colors"
+                href="/projects?category=commissions"
+                className="px-6 py-3 rounded-xl font-bold text-brand border-2 border-brand hover:bg-brand-light transition-colors focus:outline-none focus:ring-2 focus:ring-brand/40"
               >
                 See commissioned projects
               </Link>
