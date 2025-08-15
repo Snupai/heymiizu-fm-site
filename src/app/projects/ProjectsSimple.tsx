@@ -69,6 +69,39 @@ function renderCategoryIcon(icon: string) {
   }
 }
 
+// Helpers for UploadThing/UTFS URLs and media type inference
+function isExternalUrl(url?: string): boolean {
+  return !!url && /^https?:\/\//i.test(url);
+}
+
+function isUploadThingHost(url?: string): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return /(?:^|\.)utfs\.io$/i.test(u.hostname) || /(?:^|\.)ufs\.sh$/i.test(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function hasImageExtension(url?: string): boolean {
+  if (!url) return false;
+  return /\.(?:avif|webp|png|jpe?g|gif|svg)(?:\?.*)?$/i.test(url);
+}
+
+function hasVideoExtension(url?: string): boolean {
+  if (!url) return false;
+  return /\.(?:mp4|webm|ogg)(?:\?.*)?$/i.test(url);
+}
+
+function isLikelyVideoUrl(url?: string): boolean {
+  if (!url) return false;
+  if (hasVideoExtension(url)) return true;
+  // Heuristic: UploadThing/UTFS often omits extensions; treat as video when not image-like
+  if (isUploadThingHost(url) && !hasImageExtension(url)) return true;
+  return false;
+}
+
 export function ProjectsSimple({
   categories,
   activeCategory: initialActiveCategory,
@@ -272,7 +305,7 @@ export const ProjectCard = memo(function ProjectCard({
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
         {/* Video thumbnail and play button overlay */}
-        {project.media?.src && /\.(mp4|webm|ogg)(\?.*)?$/i.exec(project.media.src) ? (
+        {project.media?.src && isLikelyVideoUrl(project.media.src) ? (
           <>
             {!isPlaying && (
               <button
@@ -287,7 +320,8 @@ export const ProjectCard = memo(function ProjectCard({
                     alt={project.title}
                     fill
                     className="object-cover w-full h-full absolute inset-0 z-10 rounded-xl"
-                    unoptimized={false}
+                    // Avoid Next/Image optimizer for UploadThing hosts to prevent upstream timeouts
+                    unoptimized={isExternalUrl(project.media?.thumbnail) && isUploadThingHost(project.media?.thumbnail)}
                     priority={false}
                     sizes="100vw"
                     style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
@@ -325,7 +359,8 @@ export const ProjectCard = memo(function ProjectCard({
               alt={project.title}
               fill
               className="object-cover w-full h-full"
-              unoptimized={false}
+              // Bypass optimizer for UploadThing/UTFS to prevent 500 timeouts on /_next/image proxy
+              unoptimized={isExternalUrl(project.media?.src) && isUploadThingHost(project.media?.src)}
               priority={false}
               sizes="100vw"
               style={{objectFit: 'cover'}}
@@ -346,14 +381,7 @@ export const ProjectCard = memo(function ProjectCard({
               project.title
             )}
           </span>
-          <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">
-            {categoryName === "Photography" && (
-              <span className="inline-block w-4 h-4 mr-1">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-5a1 1 0 01.993.883L13 3v1h2.382a1 1 0 01.894.553l.724 1.447 1.447.724A1 1 0 0120 7.618V10h1a1 1 0 01.993.883L22 11v2a1 1 0 01-.883.993L21 14h-1v2.382a1 1 0 01-.553.894l-1.447.724-.724 1.447A1 1 0 0116.382 20H14v1a1 1 0 01-.883.993L13 22h-2a1 1 0 01-.993-.883L10 21v-1H7.618a1 1 0 01-.894-.553l-.724-1.447-1.447-.724A1 1 0 014 16.382V14H3a1 1 0 01-.993-.883L2 13v-2a1 1 0 01.883-.993L3 10h1V7.618a1 1 0 01.553-.894l1.447-.724.724-1.447A1 1 0 017.618 4H10V3a1 1 0 01.883-.993L11 2h2z" /></svg>
-              </span>
-            )}
-            {categoryName}
-          </span>
+          <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">{categoryName}</span>
         </div>
         <p className="text-gray-600 text-base">{project.description}</p>
       </div>

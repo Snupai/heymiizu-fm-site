@@ -210,55 +210,6 @@ const projectsData: Category[] = [
     ]
   },
   {
-    name: "Photography",
-    description: "Photos I made",
-    icon: "fx3-camera",
-    projects: [
-      {
-        title: "Kinoblick",
-        description: "Wintervacation 2023",
-        media: { src: "/projects/photography/Kinoblick.jpg" },
-        aspect: "3:4"
-      },
-      {
-        title: "Hotel",
-        description: "Thailand 2024",
-        media: { src: "/projects/photography/hotel.jpg" },
-        aspect: "3:4"
-      },
-      {
-        title: "FX30",
-        description: "Thailand 2024",
-        media: { src: "/projects/photography/fx30.jpg" },
-        aspect: "3:4"
-      },
-      { 
-        title: "The Cabin", 
-        description: "Wintervacation 2025",
-        media: { src: "/projects/photography/superior.jpg" },
-        aspect: "3:4"
-      },
-      { 
-        title: "Mountain Lift", 
-        description: "Wintervacation 2025",
-        media: { src: "/projects/photography/Ski_.jpg" },
-        aspect: "3:4"
-      },
-      {
-        title: "Peak", 
-        description: "Wintervacation 2025",
-        media: { src: "/projects/photography/Mountain.jpg" },
-        aspect: "3:4"
-      },
-      {
-        title: "Comfort", 
-        description: "Wintervacation 2025",
-        media: { src: "/projects/photography/house_at_night.jpg" },
-        aspect: "3:4"
-      }
-    ]
-  },
-  {
     name: "Commissions",
     description: "Commissioned projects",
     icon: "💼",
@@ -350,6 +301,15 @@ const projectsData: Category[] = [
         media: {
           src: "/projects/commissions/videos/Seltix_Airalo_Advertisement_1440p.mp4",
           thumbnail: "/projects/commissions/thumbnails/Seltix_Airalo_Advertisement_poster.png"
+        },
+        link: "https://youtube.com/@SELTIXX"
+      },
+      {
+        title: "@Seltix",
+        description: "Formel Skin Advertisement",
+        media: {
+          src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQoj6rKI4FetOibRzoLvsElaXjy9nCWN6IZ3Mq",
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQmfYmhXaWwKavAiXez1TL53bSfqJEgR0jQsHx"
         },
         link: "https://youtube.com/@SELTIXX"
       }

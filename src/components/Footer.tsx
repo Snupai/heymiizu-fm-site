@@ -70,7 +70,7 @@ function FooterContent() {
               {/* Right Side: Social Links */}
               <div className="flex space-x-6">
                 <a 
-                  href="https://x.com/heymiizu" 
+                  href="https://x.com/FromNuvia" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-ink text-base hover:text-brand transition-colors duration-300"
@@ -78,7 +78,7 @@ function FooterContent() {
                   Twitter
                 </a>
                 <a 
-                  href="https://www.instagram.com/miizumelon/" 
+                  href="https://www.instagram.com/fromnuvia/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-ink text-base hover:text-brand transition-colors duration-300"

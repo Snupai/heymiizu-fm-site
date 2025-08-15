@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Popup from "../components/Popup";
 import { getDeviceType } from "../utils/deviceType";
 import HomeSimple from "./HomeSimple";
 
@@ -33,6 +34,8 @@ const fadeIn = {
 
 export default function HomePage() {
   const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [anchor, setAnchor] = useState<null | { top: number; left: number; width: number; height: number }>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -75,12 +78,37 @@ export default function HomePage() {
           variants={fadeIn}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh]">
+          <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh] text-center">
+            <button
+              type="button"
+              onClick={(e) => {
+                const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+                setAnchor({ top: r.top, left: r.left, width: r.width, height: r.height });
+                setShowPopup(true);
+              }}
+              className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150] gradient-text-hover focus:outline-none"
+              data-text="Miizumelon.de presented by Nuvia"
+            >
+              Miizumelon.de presented by Nuvia
+            </button>
+            {showPopup && (
+              <Popup onClose={() => setShowPopup(false)} anchor={anchor ?? undefined} offsetY={0}>
+                <div className="space-y-4">
+                  <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Nuvia</h3>
+                  <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
+                    A new online identity created solely to distinguish Miizu’s work as a motion designer.
+                  </p>
+                  <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
+                    While Miizu continues as a content creator, Nuvia represents the motion design side exclusively.
+                  </p>
+                </div>
+              </Popup>
+            )}
             <Image
               src="/mac.png"
               alt="Mac Display"
               fill
-              className="object-contain"
+              className="object-contain pointer-events-none"
               priority
             />
           </div>
@@ -241,7 +269,7 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Photography Card */}
+            {/* Commissions Card (renamed from Photography) */}
             <motion.div 
               className="bg-[#ffffff] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
               initial={{ opacity: 0, y: 50 }}
@@ -252,20 +280,20 @@ export default function HomePage() {
               <div className="p-8">
                 <div className="relative h-64 w-full">
                   <Image
-                    src="/fx3.png"
-                    alt="Photography"
+                    src="/Commissions-card.png"
+                    alt="Commissions"
                     fill
                     className="object-contain"
                   />
                 </div>
                 <div className="mt-8">
-                  <h3 className="text-2xl font-bold mb-3">Photography</h3>
+                  <h3 className="text-2xl font-bold mb-3">Commissions</h3>
                   <p className="text-gray-600 mb-6">
-                    Photos I made
+                    Commissioned projects
                   </p>
                   <Link 
-                    href="/projects?category=photography"
-                    className="inline-block bg-brand hover:bg-brand-dark text-white px-6 py-2 rounded-full text-sm transition-colors"
+                    href="/projects?category=commissions"
+                    className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
                   >
                     See
                   </Link>
