@@ -32,7 +32,7 @@ function NavbarContent() {
             style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', padding: 0 }}
             onClick={() => setMenuOpen((open) => !open)}
           >
-            <span style={{ fontSize: 28, color: '#a95fa8' }}>
+            <span style={{ fontSize: 28, color: '#0189ff' }}>
               &#9776;
             </span>
           </button>
@@ -108,14 +108,6 @@ function NavbarContent() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Logo */}
-      <motion.div 
-        className="fixed top-8 left-[20%] z-60"
-        variants={fadeInUp}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <Logo />
-      </motion.div>
       {/* Navigation */}
       <motion.nav 
         className="fixed top-0 left-0 right-0 z-50"
@@ -123,23 +115,28 @@ function NavbarContent() {
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         {/* Base layer: Full height, no blur */}
-        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-white/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-white/60 pointer-events-none" />
         {/* Middle blur layer: Overlapping gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/50 to-white/70" style={{
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/50 to-white/70 pointer-events-none" style={{
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
           maskImage: 'linear-gradient(to top, transparent, white 50%)',
           WebkitMaskImage: 'linear-gradient(to top, transparent, white 50%)'
         }} />
         {/* Top blur layer: Maximum blur with fade */}
-        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/60 to-white/80" style={{
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/60 to-white/80 pointer-events-none" style={{
           backdropFilter: 'blur(40px)',
           WebkitBackdropFilter: 'blur(40px)',
           maskImage: 'linear-gradient(to top, transparent 30%, white)',
           WebkitMaskImage: 'linear-gradient(to top, transparent 30%, white)'
         }} />
-        <div className="container mx-auto px-12 py-8 relative">
-          <ul className="flex gap-8 text-lg justify-end">
+        <div className="container mx-auto px-12 py-8 relative z-10 flex items-center justify-between">
+          {/* Left: Logo */}
+          <div className="flex items-center">
+            <Logo />
+          </div>
+          {/* Right: Links */}
+          <ul className="flex gap-8 text-lg items-center">
             <li className="inline-flex flex-col items-center">
               <motion.div
                 initial="initial"
@@ -148,11 +145,11 @@ function NavbarContent() {
                 className="relative group"
               >
                 <Link href="/" className="relative block group" onClick={(e) => handleLinkClick(e, "/")}>  
-                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/" ? "text-[#a95fa8]" : ""}`}
+                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/" ? "text-brand" : ""}`}
                         style={{ transformOrigin: 'center' }}>
                     Home
                     <motion.span
-                      className="block h-[2px] bg-[#319aef] absolute left-0 bottom-0"
+                      className="block h-[2px] bg-brand absolute left-0 bottom-0"
                       style={{ width: '100%' }}
                       initial={{ scaleX: 0, originX: 0 }}
                       variants={{
@@ -172,11 +169,11 @@ function NavbarContent() {
                 className="relative group"
               >
                 <Link href="/projects" className="relative block group" onClick={(e) => handleLinkClick(e, "/projects")}>  
-                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/projects" ? "text-[#a95fa8]" : ""}`}
+                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/projects" ? "text-brand" : ""}`}
                         style={{ transformOrigin: 'center' }}>
                     Projects
                     <motion.span
-                      className="block h-[2px] bg-[#319aef] absolute left-0 bottom-0"
+                      className="block h-[2px] bg-brand absolute left-0 bottom-0"
                       style={{ width: '100%' }}
                       initial={{ scaleX: 0, originX: 0 }}
                       variants={{
@@ -196,11 +193,11 @@ function NavbarContent() {
                 className="relative group"
               >
                 <Link href="/contact" className="relative block group" onClick={(e) => handleLinkClick(e, "/contact")}>  
-                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/contact" ? "text-[#a95fa8]" : ""}`}
+                  <span className={`relative z-10 transition-colors duration-200 ${pathname === "/contact" ? "text-brand" : ""}`}
                         style={{ transformOrigin: 'center' }}>
                     Contact Me
                     <motion.span
-                      className="block h-[2px] bg-[#319aef] absolute left-0 bottom-0"
+                      className="block h-[2px] bg-brand absolute left-0 bottom-0"
                       style={{ width: '100%' }}
                       initial={{ scaleX: 0, originX: 0 }}
                       variants={{

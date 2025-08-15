@@ -10,7 +10,18 @@ export default {
       fontFamily: {
         sans: ['SF Pro Display', 'var(--font-public-sans)'],
       },
+      colors: {
+        brand: {
+          DEFAULT: '#0189ff',
+          dark: '#006fd1',
+          light: '#e6f3ff',
+        },
+        ink: {
+          DEFAULT: '#0b0c0f',
+          muted: '#6b7280',
+        },
+      },
     },
   },
   plugins: [],
-} 
+}

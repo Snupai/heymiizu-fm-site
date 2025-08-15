@@ -1,4 +1,8 @@
-@import "tailwindcss";
+@import "tw-animate-css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* SF Pro Display font family definition */
 @font-face {
@@ -53,6 +57,7 @@
 
 :root {
   --font-sans: 'SF Pro Display', var(--font-public-sans);
+  --radius: 0.625rem;
 }
 
 /* Custom scrollbar styling for a more polished look */
@@ -79,6 +84,12 @@ html, body {
 }
 
 /* Removed broken import for missing specialCardOutline.css */
+
+@layer base {
+  body {
+    @apply bg-white text-black;
+  }
+}
 
 /* Gradient text hover effect: crossfade from solid to animated gradient */
 .gradient-text-hover {

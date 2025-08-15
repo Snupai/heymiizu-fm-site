@@ -141,13 +141,13 @@ export function ProjectsSimple({
   const MemoizedProjectCard = memo(ProjectCard);
 
   return (
-    <main className="flex flex-col items-center min-h-screen w-full bg-[#f8f8f8] p-4 mt-20">
+    <main className="flex flex-col items-center min-h-screen w-full bg-white p-4 mt-20">
       {/* Category Tabs */}
       <div className="flex gap-4 mb-8 flex-wrap justify-center">
         {/* Everything Button */}
         <button
           key="Everything"
-          className={`flex items-center gap-2 px-6 py-2 rounded-full border text-lg font-semibold transition-colors ${activeCategory === "Everything" ? 'bg-[#0095FF] text-white border-[#0095FF]' : 'bg-white text-[#0095FF] border-[#0095FF] hover:bg-[#e6f0fa]'}`}
+          className={`flex items-center gap-2 px-6 py-2 rounded-full border text-lg font-semibold transition-colors ${activeCategory === "Everything" ? 'bg-brand text-white border-brand' : 'bg-white text-brand border-brand hover:bg-brand-light'}`}
           onClick={() => handleCategoryClick("Everything")}
         >
           <span className="flex items-center text-lg">Everything</span>
@@ -155,7 +155,7 @@ export function ProjectsSimple({
         {safeCategories.map((category: Category) => (
           <button
             key={category.name}
-            className={`flex items-center gap-2 px-6 py-2 rounded-full border text-lg font-semibold transition-colors ${activeCategory === category.name ? 'bg-[#0095FF] text-white border-[#0095FF]' : 'bg-white text-[#0095FF] border-[#0095FF] hover:bg-[#e6f0fa]'}`}
+            className={`flex items-center gap-2 px-6 py-2 rounded-full border text-lg font-semibold transition-colors ${activeCategory === category.name ? 'bg-brand text-white border-brand' : 'bg-white text-brand border-brand hover:bg-brand-light'}`}
             onClick={() => handleCategoryClick(category.name)}
           >
             <span className="flex items-center text-lg">{renderCategoryIcon(category.icon)}</span>
