@@ -241,7 +241,7 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Photography Card */}
+            {/* Commissions Card (renamed from Photography) */}
             <motion.div 
               className="bg-[#ffffff] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
               initial={{ opacity: 0, y: 50 }}
@@ -252,19 +252,19 @@ export default function HomePage() {
               <div className="p-8">
                 <div className="relative h-64 w-full">
                   <Image
-                    src="/fx3.png"
-                    alt="Photography"
+                    src="/Commissions-card.png"
+                    alt="Commissions"
                     fill
                     className="object-contain"
                   />
                 </div>
                 <div className="mt-8">
-                  <h3 className="text-2xl font-bold mb-3">Photography</h3>
+                  <h3 className="text-2xl font-bold mb-3">Commissions</h3>
                   <p className="text-gray-600 mb-6">
-                    Photos I made
+                    Commissioned projects
                   </p>
                   <Link 
-                    href="/projects?category=photography"
+                    href="/projects?category=commissions"
                     className="inline-block bg-[#0095FF] text-white px-6 py-2 rounded-full text-sm hover:bg-[#0077CC] transition-colors"
                   >
                     See

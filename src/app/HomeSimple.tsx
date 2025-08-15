@@ -34,23 +34,23 @@ export default function HomeSimple() {
               </Link>
             </div>
           </div>
-          {/* Photography Card */}
+          {/* Commissions Card (renamed from Photography) */}
           <div className="bg-[#ffffff] rounded-2xl overflow-hidden shadow-lg flex flex-col">
             <div className="relative h-40 w-full">
               <Image
                 src="/fx3.png"
-                alt="Photography"
+                alt="Commissions"
                 fill
                 className="object-contain"
               />
             </div>
             <div className="p-4 flex flex-col flex-1">
-              <h3 className="text-lg font-bold mb-1">Photography</h3>
+              <h3 className="text-lg font-bold mb-1">Commissions</h3>
               <p className="text-gray-600 mb-2 flex-1 text-sm">
-                Photos I made
+                Commissioned projects
               </p>
               <Link 
-                href="/projects?category=photography"
+                href="/projects?category=commissions"
                 className="inline-block bg-[#0095FF] text-white px-4 py-1 rounded-full text-xs hover:bg-[#0077CC] transition-colors text-center"
               >
                 See

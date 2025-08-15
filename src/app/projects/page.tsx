@@ -248,14 +248,7 @@ function ProjectCard({
               project.title
             )}
           </span>
-          <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">
-            {categoryName === "Photography" && (
-              <span className="inline-block w-4 h-4 mr-1">
-                {renderCategoryIcon("fx3-camera")}
-              </span>
-            )}
-            {categoryName}
-          </span>
+          <span className="ml-auto px-3 py-1 rounded-full bg-pink-100 text-pink-600 text-xs font-semibold flex items-center gap-1">{categoryName}</span>
         </div>
         <p className="text-gray-600 text-base">{project.description}</p>
       </div>
@@ -473,8 +466,6 @@ export default function ProjectsPage() {
       
       if (categoryParam === "after-effects") {
         categoryName = "Animations";
-      } else if (categoryParam === "photography") {
-        categoryName = "Photography";
       } else if (categoryParam === "special") {
         categoryName = "Special";
       } else if (categoryParam === "commissions") {
@@ -502,8 +493,6 @@ export default function ProjectsPage() {
     
     if (categoryName === "Animations") {
       categoryParam = "after-effects";
-    } else if (categoryName === "Photography") {
-      categoryParam = "photography";
     } else if (categoryName === "Special") {
       categoryParam = "special";
     } else if (categoryName === "Commissions") {
