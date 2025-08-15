@@ -70,7 +70,7 @@ export default function HomePage() {
       <div className="sticky top-0 min-h-screen">
         {/* Background Mac */}
         <motion.div
-          className="absolute inset-0 opacity-90 flex items-center z-100 justify-center"
+          className="absolute inset-0 opacity-90 flex items-center z-50 justify-center"
           style={{
             y: macY,
             scale: macScale,
@@ -121,14 +121,14 @@ export default function HomePage() {
           transition={{ duration: 0.6, delay: 0.5 }}
         >
           <motion.h1 
-            className="text-8xl font-bold mb-4 text-center z-150 relative"
+            className="text-8xl font-bold mb-4 text-center z-[150] relative"
             variants={fadeInUp}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
             {"Hey, I'm Miizu"}
           </motion.h1>
           <motion.p 
-            className="text-xl mb-8 text-center z-150 relative"
+            className="text-xl mb-8 text-center z-[150] relative"
             variants={fadeInUp}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
@@ -140,7 +140,7 @@ export default function HomePage() {
           >
             <Link 
               href="/projects"
-              className="bg-brand hover:bg-brand-dark text-white px-8 py-3 rounded-full text-lg transition-colors z-150 relative"
+              className="bg-brand hover:bg-brand-dark text-white px-8 py-3 rounded-full text-lg transition-colors z-[150] relative"
             >
               Projects
             </Link>

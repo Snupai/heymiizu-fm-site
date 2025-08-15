@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 
 type AnchorRect = { top: number; left: number; width: number; height: number };
 
@@ -60,7 +61,7 @@ export default function Popup({ onClose, children, className = "", anchor, offse
               onClick={onClose}
               className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
             >
-              <img src="/close_circle_icon.svg" alt="" aria-hidden="true" className="h-8 w-8 invert" />
+              <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
             </button>
             {children}
           </div>
@@ -81,7 +82,7 @@ export default function Popup({ onClose, children, className = "", anchor, offse
             onClick={onClose}
             className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
           >
-            <img src="/close_circle_icon.svg" alt="" aria-hidden="true" className="h-8 w-8 invert" />
+            <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
           </button>
           {children}
         </div>
@@ -89,5 +90,6 @@ export default function Popup({ onClose, children, className = "", anchor, offse
     </div>
   );
 
-  return createPortal(overlay, typeof window !== "undefined" ? document.body : ({} as any));
+  if (typeof window === "undefined") return null;
+  return createPortal(overlay, document.body);
 }

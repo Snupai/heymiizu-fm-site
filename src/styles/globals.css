@@ -85,13 +85,12 @@ html, body {
 
 /* Removed broken import for missing specialCardOutline.css */
 
-.dark {
-}
-
 @layer base {
   body {
     @apply bg-white text-black;
-    
+  }
+}
+
 /* Gradient text hover effect: crossfade from solid to animated gradient */
 .gradient-text-hover {
   position: relative;
