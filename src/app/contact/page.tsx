@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { getDeviceType } from "../../utils/deviceType";
 import ContactSimple from "./ContactSimple";
 import ContactForm from "./ContactForm";
@@ -57,6 +58,10 @@ const messageBubbles: MessageBubble[] = [
 
 export default function ContactPage() {
   const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
+  // Overlay flow state: hidden -> fading -> video -> buttons
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [overlayPhase, setOverlayPhase] = useState<"fade" | "video" | "buttons" | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     setDeviceType(getDeviceType());
@@ -211,8 +216,82 @@ export default function ContactPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.6, ease: "easeOut" }}
       >
-        <ContactForm />
+        <ContactForm
+          onSuccess={() => {
+            // Start overlay fade sequence
+            setOverlayVisible(true);
+            setOverlayPhase("fade");
+            // After fade completes, start video
+            setTimeout(() => {
+              setOverlayPhase("video");
+              // give the DOM a tick to render the video before trying to play
+              setTimeout(() => {
+                const v = videoRef.current;
+                if (v) {
+                  // Ensure autoplay works across browsers
+                  v.muted = true;
+                  const playPromise = v.play();
+                  if (playPromise) {
+                    playPromise.catch(() => {
+                      // As a fallback, attempt to play again shortly
+                      setTimeout(() => v.play().catch(() => {}), 200);
+                    });
+                  }
+                }
+              }, 50);
+            }, 600); // match fade duration below
+          }}
+        />
       </motion.div>
+      {overlayVisible && (
+        <motion.div
+          className="fixed inset-0 z-[100] flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          style={{ backgroundColor: "#ffffff" }}
+        >
+          {overlayPhase === "video" && (
+            <motion.div
+              className="w-full h-full flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <video
+                ref={videoRef}
+                src="/contact/time.mp4"
+                className="w-full h-full object-contain"
+                playsInline
+                muted
+                autoPlay
+                onEnded={() => setOverlayPhase("buttons")}
+              />
+            </motion.div>
+          )}
+          {overlayPhase === "buttons" && (
+            <motion.div
+              className="flex flex-col gap-4 items-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Link
+                href="/"
+                className="px-6 py-3 rounded-xl font-bold text-black border-2 border-black hover:bg-black hover:text-white transition-colors"
+              >
+                Return to home
+              </Link>
+              <Link
+                href="/projects"
+                className="px-6 py-3 rounded-xl font-bold text-black border-2 border-black hover:bg-black hover:text-white transition-colors"
+              >
+                See commissioned projects
+              </Link>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
     </motion.main>
   );
-} 
+}

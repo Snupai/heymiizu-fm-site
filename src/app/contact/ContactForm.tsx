@@ -11,12 +11,14 @@ const PROJECT_TYPES = [
   { value: 'Overlay', label: 'Overlay' },
   { value: 'Social Media Content', label: 'Social Media Content' },
 ];
+
 const SEQUENCE_LENGTHS = [
   { value: '<45s', label: '<45s' },
   { value: '1-2min', label: '1-2min' },
   { value: '>2min', label: '>2min' },
   { value: 'custom', label: 'Custom...' },
 ];
+
 const ASSETS_OPTIONS = [
   { value: 'Yes', label: 'Yes' },
   { value: 'No', label: 'No' },
@@ -34,6 +36,10 @@ interface FormState {
   description: string;
 }
 
+interface ContactFormProps {
+  onSuccess?: () => void;
+}
+
 const initialState: FormState = {
   name: '',
   email: '',
@@ -46,7 +52,7 @@ const initialState: FormState = {
   description: '',
 };
 
-export default function ContactForm() {
+export default function ContactForm({ onSuccess }: ContactFormProps) {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -127,10 +133,6 @@ export default function ContactForm() {
     setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'));
   };
 
-
-
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Validate required fields
@@ -172,6 +174,10 @@ export default function ContactForm() {
       if (res.ok) {
         setSuccess(true);
         setForm(initialState);
+        // Trigger parent overlay/video flow immediately on success
+        if (typeof onSuccess === 'function') {
+          onSuccess();
+        }
         setTimeout(() => setSuccess(false), 5000);
       } else {
         const data = await res.json() as { error?: string };
