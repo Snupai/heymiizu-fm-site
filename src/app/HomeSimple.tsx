@@ -38,7 +38,7 @@ export default function HomeSimple() {
           <div className="bg-[#ffffff] rounded-2xl overflow-hidden shadow-lg flex flex-col">
             <div className="relative h-40 w-full">
               <Image
-                src="/fx3.png"
+                src="/Commissions-card.png"
                 alt="Commissions"
                 fill
                 className="object-contain"
