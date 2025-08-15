@@ -76,11 +76,14 @@ export default function HomePage() {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh]">
+            <a href="https://nuvia.de" target="_blank" rel="noopener noreferrer" className="block w-full text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150]" style={{color: '#0189ff'}}>
+              Miizumelon.de presented by Nuvia
+            </a>
             <Image
               src="/mac.png"
               alt="Mac Display"
               fill
-              className="object-contain"
+              className="object-contain pointer-events-none"
               priority
             />
           </div>
