@@ -86,7 +86,8 @@ export default function HomePage() {
                 setAnchor({ top: r.top, left: r.left, width: r.width, height: r.height });
                 setShowPopup(true);
               }}
-              className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150] text-[#0189ff] underline-offset-2 hover:underline"
+              className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150] gradient-text-hover focus:outline-none"
+              data-text="Miizumelon.de presented by Nuvia"
             >
               Miizumelon.de presented by Nuvia
             </button>

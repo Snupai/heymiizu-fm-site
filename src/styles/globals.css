@@ -79,3 +79,45 @@ html, body {
 }
 
 /* Removed broken import for missing specialCardOutline.css */
+
+/* Gradient text hover effect: crossfade from solid to animated gradient */
+.gradient-text-hover {
+  position: relative;
+  color: #0189ff; /* idle solid color */
+  text-decoration-color: #0189ff;
+}
+
+.gradient-text-hover::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(270deg, #00e5ff, #005bea, #00e5ff, #002766, #00e5ff);
+  background-size: 400% 400%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  opacity: 0; /* hidden until hover */
+  transition: opacity 600ms ease;
+  pointer-events: none;
+}
+
+.gradient-text-hover:hover::after,
+.gradient-text-hover:focus-visible::after {
+  opacity: 1; /* smooth fade-in */
+  animation: gradient-text-move 6s ease infinite;
+}
+
+@keyframes gradient-text-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text-hover:hover,
+  .gradient-text-hover:focus-visible {
+    animation: none;
+  }
+}
