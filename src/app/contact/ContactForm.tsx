@@ -24,6 +24,17 @@ const ASSETS_OPTIONS = [
   { value: 'No', label: 'No' },
 ];
 
+const COOPERATION_OPTIONS = [
+  { value: 'Long-term cooperation', label: 'Long-term coop' },
+  { value: 'One-off assignment', label: 'One-off assignment' },
+];
+
+const DEADLINE_PRESETS = [
+  { value: 'none', label: 'No deadline' },
+  { value: '2weeks', label: 'In 2 weeks' },
+  { value: '1month', label: 'In 1 month' },
+];
+
 interface FormState {
   name: string;
   email: string;
@@ -33,6 +44,7 @@ interface FormState {
   sequenceLength: string;
   deadline: string;
   assets: string;
+  cooperation: string;
   description: string;
 }
 
@@ -49,6 +61,7 @@ const initialState: FormState = {
   sequenceLength: '',
   deadline: '',
   assets: '',
+  cooperation: '',
   description: '',
 };
 
@@ -64,6 +77,15 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
   const [customSequenceLength, setCustomSequenceLength] = useState('');
   const [showCustomSequenceInput, setShowCustomSequenceInput] = useState(false);
   const [customDropdownOpen, setCustomDropdownOpen] = useState(false);
+  const [deadlinePreset, setDeadlinePreset] = useState<string>('custom');
+  const [deadlineOpen, setDeadlineOpen] = useState(false);
+
+  const formatDateEU = (date: Date) => {
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}.${m}.${y}`;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -112,6 +134,49 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
     setFlashFields(prev => prev.filter(f => f !== 'deadline'));
   };
 
+  const computePresetDate = (preset: string): Date | undefined => {
+    const now = new Date();
+    switch (preset) {
+      case '2weeks': {
+        const d = new Date(now);
+        d.setDate(d.getDate() + 14);
+        return d;
+      }
+      case '1month': {
+        const d = new Date(now);
+        d.setMonth(d.getMonth() + 1);
+        return d;
+      }
+      case '3months': {
+        const d = new Date(now);
+        d.setMonth(d.getMonth() + 3);
+        return d;
+      }
+      case 'none':
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const handleDeadlinePresetChange = (value: string) => {
+    setDeadlinePreset(value);
+    if (value === 'custom') {
+      // keep current selectedDate as-is; require user to pick if empty
+      return;
+    }
+    const d = computePresetDate(value);
+    setSelectedDate(d);
+    if (d) {
+      const dateString = d.toISOString().split('T')[0] ?? '';
+      setForm({ ...form, deadline: dateString });
+    } else {
+      setForm({ ...form, deadline: '' });
+    }
+    setMissingFields(prev => prev.filter(f => f !== 'deadline'));
+    setFlashFields(prev => prev.filter(f => f !== 'deadline'));
+  };
+
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -141,7 +206,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
     if (!form.email) missingFields.push('email');
     if (!form.projectType) missingFields.push('projectType');
     if (!form.sequenceLength) missingFields.push('sequenceLength');
-    if (!form.deadline) missingFields.push('deadline');
+    if (deadlinePreset === 'custom' && !form.deadline) missingFields.push('deadline');
     if (!form.assets) missingFields.push('assets');
     if (!form.description) missingFields.push('description');
     if (missingFields.length > 0) {
@@ -174,6 +239,8 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
       if (res.ok) {
         setSuccess(true);
         setForm(initialState);
+        setSelectedDate(undefined);
+        setDeadlinePreset('custom');
         // Trigger parent overlay/video flow immediately on success
         if (typeof onSuccess === 'function') {
           onSuccess();
@@ -350,34 +417,108 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
           {/* Deadline */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Deadline</label>
-            <div className="relative">
-              <DatePicker
-                date={selectedDate}
-                onDateChange={handleDateChange}
-                placeholder="Select deadline..."
-                error={flashFields.includes('deadline')}
-                minDate={(function() {
-                  const minDate = new Date();
-                  minDate.setDate(minDate.getDate() + 12);
-                  return minDate;
-                })()}
-              />
-
-              {missingFields.includes('deadline') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            <div className="relative w-full">
+              <Popover open={deadlineOpen} onOpenChange={setDeadlineOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={`w-full text-left border-4 rounded-2xl px-4 py-3 text-lg focus:outline-none transition-all flex items-center justify-between ${
+                      flashFields.includes('deadline') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
+                    }`}
+                  >
+                    <span className={`truncate ${!form.deadline && deadlinePreset !== 'none' ? 'text-gray-400' : ''}`}>
+                      {deadlinePreset === 'none' && 'No deadline'}
+                      {deadlinePreset !== 'none' && selectedDate && formatDateEU(selectedDate)}
+                      {deadlinePreset === 'custom' && !selectedDate && 'Select deadline...'}
+                      {deadlinePreset !== 'custom' && deadlinePreset !== 'none' && !selectedDate && 'Select deadline...'}
+                    </span>
+                    <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0 bg-white border-4 border-gray-200 rounded-2xl shadow-lg z-50" align="start">
+                  <div className="p-2">
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>No option found.</CommandEmpty>
+                        <CommandGroup>
+                          {DEADLINE_PRESETS.map((option) => (
+                            <CommandItem
+                              key={option.value}
+                              value={option.value}
+                              onSelect={(currentValue) => {
+                                if (currentValue === 'custom') {
+                                  setDeadlinePreset('custom');
+                                  // Don't close; let user pick a date below
+                                  return;
+                                }
+                                handleDeadlinePresetChange(currentValue);
+                                setDeadlineOpen(false);
+                              }}
+                              className={`cursor-pointer transition-colors hover:bg-gray-50${deadlinePreset === option.value ? ' bg-brand-light text-brand-dark' : ''}`}
+                            >
+                              {option.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                    <div className="px-2 pt-2 pb-3">
+                      <div className="text-xs text-gray-500 mb-2 pl-1">Or pick a custom date</div>
+                      <DatePicker
+                        date={selectedDate}
+                        onDateChange={(d) => {
+                          setDeadlinePreset('custom');
+                          handleDateChange(d);
+                          // Close if a date is chosen
+                          if (d) setDeadlineOpen(false);
+                        }}
+                        placeholder="Custom deadline..."
+                        error={flashFields.includes('deadline')}
+                        minDate={(function() {
+                          const minDate = new Date();
+                          minDate.setDate(minDate.getDate() + 12);
+                          return minDate;
+                        })()}
+                      />
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              {deadlinePreset === 'custom' && missingFields.includes('deadline') && (
+                <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>
+              )}
             </div>
           </div>
-          {/* Any Assets */}
+          {/* Any Assets / Commission type */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
-            <label className="block font-bold mb-1 text-lg pl-4">Any Assets?</label>
-            <div className="relative w-full">
-              <Combobox
-                options={ASSETS_OPTIONS}
-                value={form.assets}
-                onValueChange={(value) => handleComboboxChange('assets', value)}
-                placeholder="Please select yes or no..."
-                error={flashFields.includes('assets')}
-              />
-              {missingFields.includes('assets') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col">
+                <label className="block font-bold mb-1 text-lg pl-4">Assets?</label>
+                <div className="relative w-full">
+                  <Combobox
+                    options={ASSETS_OPTIONS}
+                    value={form.assets}
+                    onValueChange={(value) => handleComboboxChange('assets', value)}
+                    placeholder="Select yes/no"
+                    error={flashFields.includes('assets')}
+                  />
+                  {missingFields.includes('assets') && (
+                    <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label className="block font-bold mb-1 text-lg pl-4">Commission type</label>
+                <div className="relative w-full">
+                  <Combobox
+                    options={COOPERATION_OPTIONS}
+                    value={form.cooperation}
+                    onValueChange={(value) => handleComboboxChange('cooperation', value)}
+                    placeholder="Select type"
+                    error={flashFields.includes('cooperation')}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           {/* Project Description */}
