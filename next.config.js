@@ -43,6 +43,45 @@ const nextConfig = {
   },
   // Configure output options
   output: 'standalone',
+  // Add headers for video files to support range requests and proper MIME types
+  async headers() {
+    return [
+      {
+        source: '/projects/:path*\\.mp4',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'video/mp4',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/projects/:path*\\.webm',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'video/webm',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 export default nextConfig

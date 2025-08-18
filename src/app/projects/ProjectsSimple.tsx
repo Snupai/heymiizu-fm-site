@@ -234,15 +234,63 @@ export function ProjectsSimple({
 // --- INLINE VideoPlayer ---
 const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; poster: string; autoPlay?: boolean }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.volume = 0.42;
-      if (props.autoPlay) {
-        void videoRef.current.play();
-      }
+      const video = videoRef.current;
+      video.volume = 0.42;
+      
+      const handleError = (e: Event) => {
+        const target = e.target as HTMLVideoElement;
+        const errorMessage = target.error ? 
+          `Video error (${target.error.code}): ${target.error.message}` : 
+          'Unknown video error';
+        console.error('Video playback error:', errorMessage);
+        setVideoError(errorMessage);
+      };
+
+      const handleCanPlay = () => {
+        setVideoError(null);
+        if (props.autoPlay) {
+          video.play().catch(err => {
+            console.error('Auto-play failed:', err);
+            setVideoError('Auto-play failed: ' + err.message);
+          });
+        }
+      };
+
+      video.addEventListener('error', handleError);
+      video.addEventListener('canplay', handleCanPlay);
+
+      return () => {
+        video.removeEventListener('error', handleError);
+        video.removeEventListener('canplay', handleCanPlay);
+      };
     }
   }, [props.autoPlay]);
+
+  if (videoError) {
+    return (
+      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+        <div className="text-center p-4">
+          <div className="text-red-500 mb-2">Video Error</div>
+          <div className="text-sm text-gray-600">{videoError}</div>
+          <button 
+            onClick={() => {
+              setVideoError(null);
+              if (videoRef.current) {
+                videoRef.current.load();
+              }
+            }}
+            className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute top-0 left-0 w-full h-full object-contain rounded-lg" style={{ borderRadius: 'inherit' }}>
@@ -253,8 +301,21 @@ const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; p
         poster={props.poster}
         className="w-full h-full object-contain rounded-lg"
         style={{ borderRadius: 'inherit' }}
-        autoPlay={props.autoPlay}
-        preload="none"
+        preload="metadata"
+        playsInline
+        webkit-playsinline={true}
+        muted={false}
+        onError={(e) => {
+          const target = e.currentTarget;
+          const errorMessage = target.error ? 
+            `Video error (${target.error.code}): ${target.error.message}` : 
+            'Unknown video error';
+          console.error('Video element error:', errorMessage);
+          setVideoError(errorMessage);
+        }}
+        onLoadStart={() => console.log('Video load started:', props.src)}
+        onCanPlay={() => console.log('Video can play:', props.src)}
+        onLoadedData={() => console.log('Video loaded data:', props.src)}
       />
     </div>
   );
