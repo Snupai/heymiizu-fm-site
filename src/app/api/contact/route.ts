@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     company?: string;
     projectType: string;
     sequenceLength: string;
-    deadline: string;
+    deadline?: string;
     assets: string;
     description: string;
   };
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     name, email, telephone, company, projectType, sequenceLength, deadline, assets, description
   } = data;
 
-  if (!name || !email || !projectType || !sequenceLength || !deadline || !assets || !description) {
+  if (!name || !email || !projectType || !sequenceLength || !assets || !description) {
     return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
   }
 
@@ -43,11 +43,13 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  const deadlineDisplay = (deadline && deadline.trim().length > 0) ? deadline : 'No deadline';
+
   const mailOptions = {
     from: process.env.EMAIL_FROM ?? process.env.EMAIL_USER,
     to: process.env.EMAIL_TO ?? process.env.EMAIL_USER,
     subject: `New Project Request from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\nTelephone: ${telephone ?? 'N/A'}\nCompany: ${company ?? 'N/A'}\nProject Type: ${projectType}\nSequence Length: ${sequenceLength}\nDeadline: ${deadline}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
+    text: `Name: ${name}\nEmail: ${email}\nTelephone: ${telephone ?? 'N/A'}\nCompany: ${company ?? 'N/A'}\nProject Type: ${projectType}\nSequence Length: ${sequenceLength}\nDeadline: ${deadlineDisplay}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
     html: `
 <h2>New Project Request</h2>
 <p><strong>Name:</strong> ${name}</p>
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
 <p><strong>Company:</strong> ${company ?? 'N/A'}</p>
 <p><strong>Project Type:</strong> ${projectType}</p>
 <p><strong>Sequence Length:</strong> ${sequenceLength}</p>
-<p><strong>Deadline:</strong> ${deadline}</p>
+<p><strong>Deadline:</strong> ${deadlineDisplay}</p>
 <p><strong>Any Assets:</strong> ${assets}</p>
 <br>
 <p><strong>Description:</strong></p>
