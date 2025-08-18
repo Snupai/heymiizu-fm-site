@@ -125,9 +125,10 @@ const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; p
       const handleCanPlay = () => {
         setVideoError(null);
         if (props.autoPlay) {
-          video.play().catch(err => {
+          video.play().catch((err: unknown) => {
+            const message = err instanceof Error ? err.message : String(err);
             console.error('Auto-play failed:', err);
-            setVideoError('Auto-play failed: ' + err.message);
+            setVideoError('Auto-play failed: ' + message);
           });
         }
       };

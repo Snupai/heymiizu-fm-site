@@ -3,7 +3,8 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   // Handle video files
-  if (request.nextUrl.pathname.match(/\.(mp4|webm|ogg)$/)) {
+  const videoExtRe = /\.(mp4|webm|ogg)$/;
+  if (videoExtRe.exec(request.nextUrl.pathname)) {
     const response = NextResponse.next();
     
     // Add CORS headers
