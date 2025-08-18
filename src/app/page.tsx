@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -91,19 +91,21 @@ export default function HomePage() {
             >
               Miizumelon.de presented by Nuvia
             </button>
-            {showPopup && (
-              <Popup onClose={() => setShowPopup(false)} anchor={anchor ?? undefined} offsetY={0}>
-                <div className="space-y-4">
-                  <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Nuvia</h3>
-                  <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
-                    A new online identity created solely to distinguish Miizu’s work as a motion designer.
-                  </p>
-                  <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
-                    While Miizu continues as a content creator, Nuvia represents the motion design side exclusively.
-                  </p>
-                </div>
-              </Popup>
-            )}
+            <AnimatePresence>
+              {showPopup && (
+                <Popup onClose={() => setShowPopup(false)} anchor={anchor ?? undefined} offsetY={0}>
+                  <div className="space-y-4">
+                    <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Nuvia</h3>
+                    <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
+                      A new online identity created solely to distinguish Miizu’s work as a motion designer.
+                    </p>
+                    <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
+                      While Miizu continues as a content creator, Nuvia represents the motion design side exclusively.
+                    </p>
+                  </div>
+                </Popup>
+              )}
+            </AnimatePresence>
             <Image
               src="/mac.png"
               alt="Mac Display"

@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 type AnchorRect = { top: number; left: number; width: number; height: number };
 
@@ -28,18 +29,36 @@ export default function Popup({ onClose, children, className = "", anchor, offse
         position: "fixed",
         // Vertically center over the anchor element and allow small offset
         top: Math.max(12, anchor.top + anchor.height / 2 + (offsetY ?? 0)) + "px",
-        left: anchor.left + anchor.width / 2 + "px",
-        transform: "translateX(-50%) translateY(-50%)",
+        // Horizontally center to viewport
+        left: "50%",
+        transform: "translate(-50%, -50%)",
       }
     : undefined;
 
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  } as const;
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.98 },
+    visible: { opacity: 1, scale: 1 },
+  } as const;
+
   const overlay = (
-    <div className="fixed inset-0 z-[9999]">
+    <motion.div
+      className="fixed inset-0 z-[9999]"
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+    >
       {/* Backdrop with slight blue tint and darkening */}
-      <button
+      <motion.button
         aria-label="Close popup"
         className="absolute inset-0"
         onClick={onClose}
+        variants={backdropVariants}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         style={{
           background:
             "linear-gradient(rgba(0,0,0,0.68), rgba(0,0,0,0.68)), rgba(10,132,255,0.22)",
@@ -50,10 +69,12 @@ export default function Popup({ onClose, children, className = "", anchor, offse
       {/* Centered fallback if no anchor provided */}
       {!anchor && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div
+          <motion.div
             className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed ${className}`}
             role="dialog"
             aria-modal="true"
+            variants={cardVariants}
+            transition={{ duration: 0.25, ease: "easeOut" }}
           >
             <button
               type="button"
@@ -64,30 +85,31 @@ export default function Popup({ onClose, children, className = "", anchor, offse
               <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
             </button>
             {children}
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* Anchored card */}
       {anchor && (
-        <div
-          className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed ${className}`}
-          role="dialog"
-          aria-modal="true"
-          style={cardStyle}
-        >
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-            className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
+        <div role="dialog" aria-modal="true" style={cardStyle}>
+          <motion.div
+            className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed ${className}`}
+            variants={cardVariants}
+            transition={{ duration: 0.25, ease: "easeOut" }}
           >
-            <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
-          </button>
-          {children}
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+              className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
+            >
+              <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
+            </button>
+            {children}
+          </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 
   if (typeof window === "undefined") return null;
