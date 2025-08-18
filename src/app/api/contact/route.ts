@@ -34,10 +34,11 @@ export async function POST(req: NextRequest) {
     sequenceLength: string;
     deadline?: string;
     assets: string;
+    cooperation?: string;
     description: string;
   };
   const {
-    name, email, telephone, company, projectType, sequenceLength, deadline, assets, description
+    name, email, telephone, company, projectType, sequenceLength, deadline, assets, cooperation, description
   } = data;
 
   if (!name || !email || !projectType || !sequenceLength || !assets || !description) {
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     from: process.env.EMAIL_FROM ?? process.env.EMAIL_USER,
     to: process.env.EMAIL_TO ?? process.env.EMAIL_USER,
     subject: `New Project Request from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\nTelephone: ${telephone ?? 'N/A'}\nCompany: ${company ?? 'N/A'}\nProject Type: ${projectType}\nSequence Length: ${sequenceLength}\nDeadline: ${deadlineDisplay}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
+    text: `Name: ${name}\nEmail: ${email}\nTelephone: ${telephone ?? 'N/A'}\nCompany: ${company ?? 'N/A'}\nProject Type: ${projectType}\nCommission Type: ${cooperation ?? 'N/A'}\nSequence Length: ${sequenceLength}\nDeadline: ${deadlineDisplay}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
     html: `
 <!doctype html>
 <html lang="en">
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
       .label { color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:.06em; margin:0 0 4px; }
       .value { margin:0 0 16px; font-size:14px; color:#0b0c0f; }
       .divider { height:1px; background:#e6e6e6; margin:8px 0 20px; }
-      .badge { display:inline-block; padding:4px 8px; border-radius:999px; background:#e6f3ff; color:#0189ff; font-size:12px; font-weight:600; }
+      .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:#e6f3ff; color:#0189ff; font-size:14px; font-weight:700; }
       .muted { color:#6b7280; font-size:12px; }
       .cta { display:inline-block; margin-top:12px; background:#0189ff; color:#ffffff !important; text-decoration:none; padding:10px 14px; border-radius:10px; font-weight:600; }
       @media (prefers-color-scheme: dark) {
@@ -127,6 +128,9 @@ export async function POST(req: NextRequest) {
 
                   <p class="label">Company</p>
                   <p class="value">${esc(company ?? 'N/A')}</p>
+
+                  <p class="label">Commission Type</p>
+                  <p class="value">${esc(cooperation ?? 'N/A')}</p>
 
                   <p class="label">Sequence Length</p>
                   <p class="value">${esc(sequenceLength)}</p>
