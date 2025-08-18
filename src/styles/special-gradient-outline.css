@@ -1,11 +1,24 @@
 /* Animated blue gradient outline for special cards - as a wrapper */
 .special-gradient-outline-wrapper {
-  padding: 12px;
-  border-radius: 28px; /* outer_radius = inner_radius (16px) + padding (12px) */
+  position: relative;
+  border-radius: 28px; /* outer visual radius (inner 16px + 12px outline) */
+  display: inline-block; /* match card's intrinsic width so Masonry measures equally */
+  vertical-align: top;
+  overflow: visible; /* allow the outline to extend beyond layout box */
+  isolation: isolate; /* keep ::before behind inner safely */
+}
+
+/* Visual outline that does not affect layout (sticks out) */
+.special-gradient-outline-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -12px; /* thickness of the outline around the card */
+  border-radius: inherit;
   background: linear-gradient(270deg, #1e90ff, #00cfff, #1e90ff, #005bea, #1e90ff);
   background-size: 400% 400%;
   animation: gradient-border 6s ease infinite;
-  display: inline-block;
+  z-index: -1; /* sit behind the inner white card */
+  pointer-events: none;
 }
 
 @keyframes gradient-border {

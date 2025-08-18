@@ -43,10 +43,18 @@ export default function HomePage() {
   });
   const macY = useTransform(scrollYProgress, [0, 1], [0, -700]);
   const macScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  const [isShortViewport, setIsShortViewport] = useState(false);
 
   useEffect(() => {
+    // Initial measurements
     setDeviceType(getDeviceType());
-    const handleResize = () => setDeviceType(getDeviceType());
+    setIsShortViewport(window.innerHeight < 1000);
+
+    const handleResize = () => {
+      setDeviceType(getDeviceType());
+      setIsShortViewport(window.innerHeight < 1000);
+    };
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -118,7 +126,7 @@ export default function HomePage() {
 
         {/* Main Content */}
         <motion.div 
-          className="relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto pt-80"
+          className={`relative flex flex-col items-center justify-start min-h-screen max-w-7xl mx-auto ${isShortViewport ? "pt-48" : "pt-80"}`}
           variants={fadeInUp}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
