@@ -48,7 +48,7 @@ export function DatePicker({
           )}
           disabled={disabled}
         >
-          {date ? format(date, "PPP") : <span>{placeholder}</span>}
+          {date ? format(date, "dd.MM.yyyy") : <span>{placeholder}</span>}
           <CalendarIcon className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
