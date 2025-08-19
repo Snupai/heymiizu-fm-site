@@ -186,6 +186,7 @@ export function ProjectsSimple({
                           project={project}
                           categoryName={cat.name}
                           aspect={project.aspect}
+                          gold={cat.name === 'Special' && idx === 0}
                         />
                       ))
                     ) : (
@@ -217,6 +218,7 @@ export function ProjectsSimple({
                             project={project}
                             categoryName={cat.name}
                             aspect={project.aspect}
+                            gold={cat.name === 'Special' && idx === 0}
                           />
                         ))
                       ) : (
@@ -325,11 +327,13 @@ const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; p
 export const ProjectCard = memo(function ProjectCard({
   project,
   categoryName,
-  aspect
+  aspect,
+  gold
 }: {
   project: Project;
   categoryName: string;
   aspect?: "16:9" | "4:3" | "3:4";
+  gold?: boolean;
 }) {
   const cardAspect = project.aspect ?? aspect ?? "16:9";
   let aspectClass = "aspect-video";
@@ -451,7 +455,7 @@ export const ProjectCard = memo(function ProjectCard({
   );
 
   return isSpecial ? (
-    <div className="special-gradient-outline-simple-wrapper">
+    <div className={`special-gradient-outline-simple-wrapper${gold ? ' special-gradient-outline-simple-wrapper--gold' : ''}`}>
       <div className="special-gradient-outline-simple-inner">
         {card}
       </div>

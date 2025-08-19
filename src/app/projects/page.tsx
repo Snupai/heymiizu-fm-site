@@ -200,11 +200,13 @@ function ProjectCard({
   categoryName,
   aspect,
   className,
+  gold,
 }: {
   project: Project;
   categoryName: string;
   aspect?: "16:9" | "4:3" | "3:4";
   className?: string;
+  gold?: boolean;
 }) {
   // Use project.aspect if provided, else prop aspect, else default to 16:9
   const cardAspect = project.aspect ?? aspect ?? "16:9";
@@ -320,7 +322,7 @@ function ProjectCard({
   );
 
   return isSpecial ? (
-    <div className="special-gradient-outline-wrapper">
+    <div className={`special-gradient-outline-wrapper${gold ? ' special-gradient-outline-wrapper--gold' : ''}`}>
       <div className="special-gradient-outline-inner">
         {card}
       </div>
@@ -665,6 +667,7 @@ export default function ProjectsPage() {
                     project={category.projects[0]}
                     categoryName={category.name}
                     className="w-[750px] max-w-full mx-auto"
+                    gold={category.name === "Special"}
                   />
                 ) : isSimpleVersion ? (
                   <div className="flex flex-wrap gap-8 w-full">
@@ -685,6 +688,7 @@ export default function ProjectsPage() {
                             key={`${category.name}-${idx}`}
                             project={project}
                             categoryName={category.name}
+                            gold={category.name === "Special" && idx === 0}
                           />
                         );
                       }
@@ -717,6 +721,7 @@ export default function ProjectsPage() {
                             key={`${category.name}-${idx}`}
                             project={project}
                             categoryName={category.name}
+                            gold={category.name === "Special" && idx === 0}
                           />
                         );
                       }

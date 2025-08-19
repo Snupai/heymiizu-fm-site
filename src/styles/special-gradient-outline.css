@@ -1,4 +1,9 @@
 /* Animated blue gradient outline for special cards - as a wrapper */
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 132deg;
+  inherits: false;
+}
 .special-gradient-outline-wrapper {
   position: relative;
   border-radius: 28px; /* outer visual radius (inner 16px + 12px outline) */
@@ -14,10 +19,24 @@
   position: absolute;
   inset: -12px; /* thickness of the outline around the card */
   border-radius: inherit;
+  /* Default: Blue gradient */
   background: linear-gradient(270deg, #1e90ff, #00cfff, #1e90ff, #005bea, #1e90ff);
   background-size: 400% 400%;
   animation: gradient-border 6s ease infinite;
   z-index: -1; /* sit behind the inner white card */
+  pointer-events: none;
+}
+
+/* Gold variant for latest special */
+.special-gradient-outline-wrapper--gold::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: inherit;
+  /* Rotating golden gradient with toned-down brights */
+  background-image: linear-gradient(var(--rotate), #BF953F, #F1E28A, #B38728, #E8D77A, #AA771C);
+  animation: spin 60s linear infinite;
+  z-index: -1;
   pointer-events: none;
 }
 
@@ -31,6 +50,11 @@
   100% {
     background-position: 0% 50%;
   }
+}
+
+@keyframes spin {
+  0% { --rotate: 0deg; }
+  100% { --rotate: 360deg; }
 }
 
 .special-gradient-outline-inner {
