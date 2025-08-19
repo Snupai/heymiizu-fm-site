@@ -35,7 +35,6 @@ const fadeIn = {
 export default function HomePage() {
   const [deviceType, setDeviceType] = useState<null | "mobile" | "small" | "desktop">(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [anchor, setAnchor] = useState<null | { top: number; left: number; width: number; height: number }>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -49,11 +48,11 @@ export default function HomePage() {
   useEffect(() => {
     // Initial measurements
     setDeviceType(getDeviceType());
-    setIsShortViewport(window.innerHeight < 1000);
+    setIsShortViewport(window.innerHeight < 600);
 
     const handleResize = () => {
       setDeviceType(getDeviceType());
-      setIsShortViewport(window.innerHeight < 1000);
+      setIsShortViewport(window.innerHeight < 600);
     };
 
     window.addEventListener("resize", handleResize);
@@ -87,12 +86,10 @@ export default function HomePage() {
           variants={fadeIn}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="relative w-[88%] max-w-[1600px] aspect-[16/10] text-center">
+          <div className="relative w-[88%] max-w-[1900px] aspect-[16/10] text-center">
             <button
               type="button"
-              onClick={(e) => {
-                const r = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-                setAnchor({ top: r.top, left: r.left, width: r.width, height: r.height });
+              onClick={() => {
                 setShowPopup(true);
               }}
               className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[999] gradient-text-hover focus:outline-none"
@@ -102,7 +99,7 @@ export default function HomePage() {
             </button>
             <AnimatePresence>
               {showPopup && (
-                <Popup onClose={() => setShowPopup(false)} anchor={anchor ?? undefined} offsetY={0}>
+                <Popup onClose={() => setShowPopup(false)}>
                   <div className="space-y-4">
                     <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Nuvia</h3>
                     <p className="text-white/95 text-[22px] md:text-[28px] leading-7">
@@ -245,7 +242,7 @@ export default function HomePage() {
       </div>
 
       {/* New Section with Cards */}
-      <div className="w-full bg-gradient-to-b from-white via-white to-brand-light min-h-screen flex items-center justify-center py-20 pt-80  -z-10">
+      <div className="w-full bg-gradient-to-b from-white via-white to-brand-light min-h-screen flex items-center justify-center py-20 pt-80 -z-10">
         <div className="w-full max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Animations Card */}

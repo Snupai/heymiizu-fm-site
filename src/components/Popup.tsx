@@ -68,13 +68,14 @@ export default function Popup({ onClose, children, className = "", anchor, offse
 
       {/* Centered fallback if no anchor provided */}
       {!anchor && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <motion.div
-            className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed ${className}`}
+            className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed pointer-events-auto ${className}`}
             role="dialog"
             aria-modal="true"
             variants={cardVariants}
             transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
@@ -96,6 +97,7 @@ export default function Popup({ onClose, children, className = "", anchor, offse
             className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed ${className}`}
             variants={cardVariants}
             transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
