@@ -86,7 +86,7 @@ export default function HomePage() {
           variants={fadeIn}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="relative w-[88%] aspect-[16/10] translate-y-[54vh] text-center">
+          <div className="relative w-[88%] max-w-[1400px] aspect-[16/10] translate-y-[54vh] text-center">
             <button
               type="button"
               onClick={(e) => {
