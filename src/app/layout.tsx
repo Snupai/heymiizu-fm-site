@@ -8,6 +8,7 @@ import Spinner from "../components/Spinner";
 import React, { Suspense } from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next"
+import ChromeGate from "../components/ChromeGate";
 const publicSans = Public_Sans({ 
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -64,13 +65,17 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`${publicSans.variable} font-sans min-h-screen flex flex-col`}>
-        <NavbarContent />
+        <ChromeGate>
+          <NavbarContent />
+        </ChromeGate>
         <div className="flex-1 flex flex-col">
           <Suspense fallback={<Spinner />}>
             {children}
           </Suspense>
         </div>
-        <FooterContent />
+        <ChromeGate>
+          <FooterContent />
+        </ChromeGate>
       </body>
       <Script src="https://scripts.simpleanalyticscdn.com/latest.js"  />
       <Analytics />
