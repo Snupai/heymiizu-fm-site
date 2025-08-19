@@ -48,11 +48,11 @@ export default function HomePage() {
   useEffect(() => {
     // Initial measurements
     setDeviceType(getDeviceType());
-    setIsShortViewport(window.innerHeight < 600);
+    setIsShortViewport(window.innerHeight < 840 );
 
     const handleResize = () => {
       setDeviceType(getDeviceType());
-      setIsShortViewport(window.innerHeight < 600);
+      setIsShortViewport(window.innerHeight < 840);
     };
 
     window.addEventListener("resize", handleResize);
