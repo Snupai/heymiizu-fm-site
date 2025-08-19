@@ -22,6 +22,14 @@ const projectsData: Category[] = [
           src: "/projects/special/videos/3Ij7Hhoc4wv_576.mp4",
           thumbnail: "/projects/special/thumbnails/3Ij7Hhoc4wv_poster.png"
         }
+      },
+      {
+        title: "Showreel 2025",
+        description: "The Motion Design Showreel of 2025",
+        media: {
+          src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQ0LbABitDSAM8dOVhuXqQLcenJKZbY92PmFCj",
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQ0n54DSAM8dOVhuXqQLcenJKZbY92PmFCjpGl"
+        }
       }
     ]
   },
