@@ -42,7 +42,7 @@ export default function HomePage() {
   });
   const macScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
   // Start at 560px from top and move down 200px as you scroll to avoid header/button overlap
-  const macYOffset = useTransform(scrollYProgress, [0, 1], [687, -200]);
+  const macYOffset = useTransform(scrollYProgress, [0, 1], [787, -200]);
   const [isShortViewport, setIsShortViewport] = useState(false);
 
   useEffect(() => {
