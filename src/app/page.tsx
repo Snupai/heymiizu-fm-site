@@ -41,8 +41,9 @@ export default function HomePage() {
     target: containerRef,
     offset: ["start start", "end start"]
   });
-  const macY = useTransform(scrollYProgress, [0, 1], [0, -700]);
   const macScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  // Start at 560px from top and move down 200px as you scroll to avoid header/button overlap
+  const macYOffset = useTransform(scrollYProgress, [0, 1], [687, -200]);
   const [isShortViewport, setIsShortViewport] = useState(false);
 
   useEffect(() => {
@@ -68,25 +69,25 @@ export default function HomePage() {
   return (
     <motion.main 
       ref={containerRef}
-      className="relative min-h-[200vh] w-full bg-white overflow-hidden"
+      className="relative min-h-[200vh] w-full bg-white overflow-visible"
       initial="hidden"
       animate="visible"
       variants={fadeIn}
       transition={{ duration: 0.5 }}
     >
       {/* Main Content Section */}
-      <div className="sticky top-0 min-h-screen">
+      <div className="sticky top-0 min-h-screen z-[1000]">
         {/* Background Mac */}
         <motion.div
-          className="absolute inset-0 opacity-90 flex items-center z-50 justify-center"
+          className="absolute inset-0 opacity-90 flex items-center z-[998] justify-center"
           style={{
-            y: macY,
+            y: macYOffset,
             scale: macScale,
           }}
           variants={fadeIn}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="relative w-[88%] max-w-[1400px] aspect-[16/10] translate-y-[54vh] text-center">
+          <div className="relative w-[88%] max-w-[1600px] aspect-[16/10] text-center">
             <button
               type="button"
               onClick={(e) => {
@@ -94,7 +95,7 @@ export default function HomePage() {
                 setAnchor({ top: r.top, left: r.left, width: r.width, height: r.height });
                 setShowPopup(true);
               }}
-              className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[150] gradient-text-hover focus:outline-none"
+              className="inline-block mx-auto text-center text-xl mb-0 p-0 translate-y-[1.5vh] relative z-[999] gradient-text-hover focus:outline-none"
               data-text="Miizumelon.de presented by Nuvia"
             >
               Miizumelon.de presented by Nuvia
@@ -244,7 +245,7 @@ export default function HomePage() {
       </div>
 
       {/* New Section with Cards */}
-      <div className="w-full bg-gradient-to-b from-white via-white to-brand-light min-h-screen flex items-center justify-center py-20 pt-80">
+      <div className="w-full bg-gradient-to-b from-white via-white to-brand-light min-h-screen flex items-center justify-center py-20 pt-80  -z-10">
         <div className="w-full max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Animations Card */}
@@ -261,7 +262,7 @@ export default function HomePage() {
                     src="/mac.png"
                     alt="Animations"
                     fill
-                    className="object-contain"
+                    className="object-contain z-[20]"
                   />
                 </div>
                 <div className="mt-8">
@@ -293,7 +294,7 @@ export default function HomePage() {
                     src="/Commissions-card.png"
                     alt="Commissions"
                     fill
-                    className="object-contain"
+                    className="object-contain z-[0]"
                   />
                 </div>
                 <div className="mt-8">

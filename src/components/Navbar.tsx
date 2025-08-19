@@ -21,7 +21,7 @@ function NavbarContent() {
 
   if (isMobile) {
     return (
-      <nav className="w-full bg-white shadow-md flex flex-col items-center justify-between px-4 py-3" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}>
+      <nav className="w-full bg-white shadow-md flex flex-col items-center justify-between px-4 py-3" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 3000 }}>
         <div className="flex w-full items-center justify-between">
           <div />
           <div className="flex-1 flex justify-center">
@@ -110,7 +110,7 @@ function NavbarContent() {
       </AnimatePresence>
       {/* Navigation */}
       <motion.nav 
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-[2000]"
         variants={fadeInUp}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
