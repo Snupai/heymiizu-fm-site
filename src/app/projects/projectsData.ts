@@ -320,6 +320,15 @@ const projectsData: Category[] = [
           thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQmfYmhXaWwKavAiXez1TL53bSfqJEgR0jQsHx"
         },
         link: "https://youtube.com/@SELTIXX"
+      },
+      {
+        title: "@Seltix",
+        description: "Revolut Advertisement",
+        media: {
+          src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQ37jEBogxXwhQ7jgsFaHdEmZp5V9vA2b8PSUI",
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQA1riMYeK6Di0RzBCOSjJxVfPUht1YwekTZou"
+        },
+        link: "https://youtube.com/@SELTIXX"
       }
     ]
   }
