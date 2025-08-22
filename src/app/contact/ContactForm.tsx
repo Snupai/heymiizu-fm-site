@@ -266,17 +266,17 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Name</label>
             <div className="relative">
-              <input 
-                name="name" 
-                value={form.name} 
-                onChange={handleChange} 
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
                 onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'name'))}
-                required 
-                maxLength={50} 
-                className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
+                required
+                                maxLength={50}
+                className={`w-full border-4 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg placeholder-gray-400 focus:outline-none transition-all ${
                   flashFields.includes('name') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                 }`} 
-                placeholder="Your name" 
+                placeholder="Name" 
               />
               {form.name.length >= 40 && <div className="text-sm text-gray-500 mt-1">{form.name.length}/50</div>}
               {missingFields.includes('name') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
@@ -286,18 +286,18 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">E-Mail</label>
             <div className="relative">
-              <input 
-                name="email" 
-                type="email" 
-                value={form.email} 
-                onChange={handleChange} 
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
                 onBlur={() => { handleEmailBlur(); setFlashFields(prev => prev.filter(f => f !== 'email')); }}
-                required 
-                maxLength={100} 
-                className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all ${
+                required
+                                maxLength={100}
+                className={`w-full border-4 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg placeholder-gray-400 focus:outline-none transition-all ${
                   flashFields.includes('email') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                 }`} 
-                placeholder="Your E-Mail address" 
+                placeholder="Email" 
               />
               {emailError && <div className="text-sm text-red-500 mt-1">{emailError}</div>}
               {form.email.length >= 80 && !emailError && <div className="text-sm text-gray-500 mt-1">{form.email.length}/100</div>}
@@ -308,7 +308,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Telephone</label>
             <div className="relative">
-              <input name="telephone" value={form.telephone} onChange={handleChange} maxLength={20} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Your contact phonenumber" />
+              <input name="telephone" value={form.telephone} onChange={handleChange} maxLength={20} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="Phone (optional)" />
               {form.telephone.length >= 16 && <div className="text-sm text-gray-500 mt-1">{form.telephone.length}/20</div>}
               {missingFields.includes('telephone') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
@@ -317,7 +317,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Company</label>
             <div className="relative">
-              <input name="company" value={form.company} onChange={handleChange} maxLength={100} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="OPTIONAL - Commissioned by ..." />
+              <input name="company" value={form.company} onChange={handleChange} maxLength={100} className="w-full border-4 [border-color:#a3a3a3] rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg placeholder-gray-400 focus:outline-none focus:[border-color:#a3a3a3] focus:[box-shadow:0_0_0_2px_#a3a3a3] transition-all" placeholder="Company (optional)" />
               {form.company.length >= 80 && <div className="text-sm text-gray-500 mt-1">{form.company.length}/100</div>}
               {missingFields.includes('company') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
             </div>
@@ -330,7 +330,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                 options={PROJECT_TYPES}
                 value={form.projectType}
                 onValueChange={(value) => handleComboboxChange('projectType', value)}
-                placeholder="Please select a project type..."
+                                    placeholder="Project type"
                 error={flashFields.includes('projectType')}
               />
               {missingFields.includes('projectType') && <div className="text-red-600 font-bold text-xs absolute -bottom-5 right-2">This field is required.</div>}
@@ -345,7 +345,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                   options={SEQUENCE_LENGTHS}
                   value={form.sequenceLength}
                   onValueChange={(value) => handleComboboxChange('sequenceLength', value)}
-                  placeholder="Please select sequence length..."
+                  placeholder="Sequence length"
                   error={flashFields.includes('sequenceLength')}
                 />
               ) : (
@@ -360,10 +360,10 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                           onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'sequenceLength'))}
                           required
                           maxLength={10}
-                          className={`w-full border-4 rounded-2xl px-4 py-3 text-lg placeholder-gray-400 focus:outline-none transition-all pr-12 ${
+                          className={`w-full border-4 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg placeholder-gray-400 focus:outline-none transition-all pr-12 ${
                             flashFields.includes('sequenceLength') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                           }`}
-                          placeholder="Enter custom sequence length..."
+                          placeholder="Custom length"
                           onClick={e => e.stopPropagation()}
                         />
                         {customSequenceLength.length >= 7 && (
@@ -429,8 +429,8 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                     <span className={`truncate ${!form.deadline && deadlinePreset !== 'none' ? 'text-gray-400' : ''}`}>
                       {deadlinePreset === 'none' && 'No deadline'}
                       {deadlinePreset !== 'none' && selectedDate && formatDateEU(selectedDate)}
-                      {deadlinePreset === 'custom' && !selectedDate && 'Select deadline...'}
-                      {deadlinePreset !== 'custom' && deadlinePreset !== 'none' && !selectedDate && 'Select deadline...'}
+                      {deadlinePreset === 'custom' && !selectedDate && 'Deadline'}
+                      {deadlinePreset !== 'custom' && deadlinePreset !== 'none' && !selectedDate && 'Deadline'}
                     </span>
                     <ChevronsUpDown className="h-4 w-4 opacity-50" />
                   </button>
@@ -472,7 +472,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                           // Close if a date is chosen
                           if (d) setDeadlineOpen(false);
                         }}
-                        placeholder="Custom deadline..."
+                        placeholder="Deadline"
                         error={flashFields.includes('deadline')}
                         minDate={(function() {
                           const minDate = new Date();
@@ -499,7 +499,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                     options={ASSETS_OPTIONS}
                     value={form.assets}
                     onValueChange={(value) => handleComboboxChange('assets', value)}
-                    placeholder="Select yes/no"
+                    placeholder="Yes/No"
                     error={flashFields.includes('assets')}
                   />
                   {missingFields.includes('assets') && (
@@ -514,7 +514,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                     options={COOPERATION_OPTIONS}
                     value={form.cooperation}
                     onValueChange={(value) => handleComboboxChange('cooperation', value)}
-                    placeholder="Select type"
+                    placeholder="Type"
                     error={flashFields.includes('cooperation')}
                   />
                 </div>
@@ -533,15 +533,15 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                   onBlur={() => setFlashFields(prev => prev.filter(f => f !== 'description'))}
                   required 
                   maxLength={2000} 
-                  className={`w-full border-4 rounded-2xl px-4 py-3 text-lg min-h-[120px] placeholder-transparent focus:outline-none focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff] transition-all resize-y bg-transparent ${
+                  className={`w-full border-4 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg min-h-[120px] placeholder-transparent focus:outline-none focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff] transition-all resize-y bg-transparent ${
                     flashFields.includes('description') ? '[border-color:#f87171] focus:[border-color:#f87171] focus:[box-shadow:0_0_0_2px_#f87171]' : '[border-color:#0189ff] focus:[border-color:#0189ff] focus:[box-shadow:0_0_0_2px_#0189ff]'
                   }`} 
-                  placeholder="A detailed description about your project" 
+                  placeholder="Project description" 
                   id="project-description-textarea"
                 />
                 {form.description === '' && (
-                  <span className="pointer-events-none absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400 text-lg select-none whitespace-pre-line text-center w-[90%]">
-                    A detailed description about your project
+                  <span className="pointer-events-none absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400 text-base sm:text-lg select-none whitespace-pre-line text-center w-[90%]">
+                    Project description
                   </span>
                 )}
               </div>

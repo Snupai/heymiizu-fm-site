@@ -38,7 +38,7 @@ export function DatePicker({
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-between text-left font-normal border-4 rounded-2xl px-4 py-3 text-lg bg-white focus:outline-none transition-all appearance-none cursor-pointer h-auto min-h-[60px] pr-5",
+            "w-full justify-between text-left font-normal border-4 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-base sm:text-lg bg-white focus:outline-none transition-all appearance-none cursor-pointer h-auto min-h-[60px] pr-5",
             !date && "text-gray-400",
             error 
               ? "border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/20" 
