@@ -335,7 +335,7 @@ const projectsData: Category[] = [
         description: "Peepoplush.com Advertisement",
         media: {
           src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQDAk9uDMB0LusGHraYwU8C2po4RNO7ezklxm9",
-          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQK3DcxA27uS6Gqm1sjkhlMgQYe0W27CabLUBH"
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQHjaJ7C9vjnqPRMUgawSA1EtX80eQcG5Jr94h"
         },
         link: "https://peepoplush.com/"
       }
