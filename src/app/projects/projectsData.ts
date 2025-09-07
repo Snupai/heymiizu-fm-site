@@ -322,6 +322,15 @@ const projectsData: Category[] = [
         link: "https://youtube.com/@SELTIXX"
       },
       {
+        title: "@Seltix",
+        description: "Revolut Advertisement",
+        media: {
+          src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQ37jEBogxXwhQ7jgsFaHdEmZp5V9vA2b8PSUI",
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQA1riMYeK6Di0RzBCOSjJxVfPUht1YwekTZou"
+        },
+        link: "https://youtube.com/@SELTIXX"
+      },
+      {
         title: "Peepoplush.com",
         description: "Peepoplush.com Advertisement",
         media: {
