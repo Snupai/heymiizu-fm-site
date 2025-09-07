@@ -320,6 +320,15 @@ const projectsData: Category[] = [
           thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQmfYmhXaWwKavAiXez1TL53bSfqJEgR0jQsHx"
         },
         link: "https://youtube.com/@SELTIXX"
+      },
+      {
+        title: "Peepoplush.com",
+        description: "Peepoplush.com Advertisement",
+        media: {
+          src: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQDAk9uDMB0LusGHraYwU8C2po4RNO7ezklxm9",
+          thumbnail: "https://rlawubu0ke.ufs.sh/f/L7hnLmJRteHQK3DcxA27uS6Gqm1sjkhlMgQYe0W27CabLUBH"
+        },
+        link: "https://peepoplush.com/"
       }
     ]
   }
