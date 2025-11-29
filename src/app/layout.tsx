@@ -9,7 +9,10 @@ import React, { Suspense } from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next"
 import ChromeGate from "../components/ChromeGate";
-const publicSans = Public_Sans({ 
+import AutoLogout from "../components/AutoLogout";
+import { Toaster } from "@/components/ui/sonner";
+
+const publicSans = Public_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-public-sans"
@@ -68,6 +71,7 @@ export default function RootLayout({
         <ChromeGate>
           <NavbarContent />
         </ChromeGate>
+        <AutoLogout />
         <div className="flex-1 flex flex-col">
           <Suspense fallback={<Spinner />}>
             {children}
@@ -76,8 +80,9 @@ export default function RootLayout({
         <ChromeGate>
           <FooterContent />
         </ChromeGate>
+        <Toaster />
       </body>
-      <Script src="https://scripts.simpleanalyticscdn.com/latest.js"  />
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
       <Analytics />
     </html>
   );

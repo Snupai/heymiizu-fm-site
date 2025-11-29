@@ -39,6 +39,11 @@ const nextConfig = {
         hostname: '*.ufs.sh',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'tmimqoublwvlnywfigww.supabase.co',
+        pathname: '/**',
+      },
     ],
   },
   // Configure output options
