@@ -61,7 +61,7 @@ export default function VideoLoader({
       if (finishedRef.current) return null;
       if (!waitForDuration()) return null;
       
-      const minPlayTime = 1.6; // Minimum play time before fade-out can start
+      const minPlayTime = 1.2; // Minimum play time before fade-out can start
       
       // Only start fade if we've played at least the minimum time
       if (video.currentTime < minPlayTime) {
