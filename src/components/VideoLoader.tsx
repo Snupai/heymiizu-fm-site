@@ -32,10 +32,16 @@ export default function VideoLoader({
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !visible || !isProjectsPage) return;
+    
+    // Prevent video from starting if we're already fading out
+    if (isFadingOut || finishedRef.current) {
+      // Don't start a new video, but let the current one continue playing
+      return;
+    }
 
     video.loop = true;
     void video.play().catch(() => {});
-  }, [visible, isProjectsPage]);
+  }, [visible, isProjectsPage, isFadingOut]);
 
   // Handle finish request - fade out during video playback (only on projects page)
   // Start fade-out so it ends exactly when video ends
