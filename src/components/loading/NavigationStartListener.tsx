@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useLoadingOverlay } from "./LoadingOverlayContext";
 
 function isModifiedEvent(e: MouseEvent) {
@@ -17,6 +18,7 @@ function findAnchor(el: EventTarget | null): HTMLAnchorElement | null {
 }
 
 export default function NavigationStartListener() {
+  const pathname = usePathname();
   const { resetForNewRoute } = useLoadingOverlay();
 
   useEffect(() => {
@@ -40,6 +42,14 @@ export default function NavigationStartListener() {
         if (url.origin !== window.location.origin) return;
         // If it’s the same exact URL, don't flash the loader.
         if (url.href === window.location.href) return;
+        
+        // Only trigger overlay for navigation to/from projects page
+        const isNavigatingToProjects = url.pathname === "/projects";
+        const isNavigatingFromProjects = pathname === "/projects";
+        
+        if (!isNavigatingToProjects && !isNavigatingFromProjects) {
+          return; // Don't trigger overlay for other pages
+        }
       } catch {
         return;
       }
@@ -49,7 +59,7 @@ export default function NavigationStartListener() {
 
     document.addEventListener("click", onClickCapture, true);
     return () => document.removeEventListener("click", onClickCapture, true);
-  }, [resetForNewRoute]);
+  }, [resetForNewRoute, pathname]);
 
   return null;
 }

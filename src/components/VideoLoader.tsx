@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function VideoLoader({
   visible,
@@ -11,73 +12,64 @@ export default function VideoLoader({
   finishRequested: boolean;
   onFinished: () => void;
 }) {
+  const pathname = usePathname();
   const [isFadedIn, setIsFadedIn] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const finishedRef = useRef(false);
 
-  // Fade in when visible
+  // Only show video loader on projects page
+  const isProjectsPage = pathname === "/projects";
+
+  // Fade in when visible (only on projects page)
   useEffect(() => {
-    if (!visible) {
+    if (!visible || !isProjectsPage) {
       setIsFadedIn(false);
+      setIsFadingOut(false);
       finishedRef.current = false;
       return;
     }
     const timer = setTimeout(() => setIsFadedIn(true), 50);
     return () => clearTimeout(timer);
-  }, [visible]);
+  }, [visible, isProjectsPage]);
 
-  // Handle video playback
+  // Handle video playback (only on projects page)
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !visible) return;
+    if (!video || !visible || !isProjectsPage) return;
 
     video.loop = true;
     void video.play().catch(() => {});
-  }, [visible]);
+  }, [visible, isProjectsPage]);
 
-  // Handle finish request - wait for loop to complete
+  // Handle finish request - fade out during video playback (only on projects page)
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !visible || !finishRequested) return;
+    if (!visible || !finishRequested || !isProjectsPage) return;
     if (finishedRef.current) return;
 
-    // Use 'seeking' event which fires when the video loops (seeks back to 0)
-    const onSeeking = () => {
-      // Video is seeking back to start (looping)
-      if (video.currentTime < 0.1) {
-        finishedRef.current = true;
-        onFinished();
-      }
-    };
+    // Start fading out immediately when finish is requested
+    setIsFadingOut(true);
+    finishedRef.current = true;
 
-    // Also use timeupdate as backup to detect when we're near the end
-    let lastTime = video.currentTime;
-    const onTimeUpdate = () => {
-      if (finishedRef.current) return;
-      const currentTime = video.currentTime;
-      // Detect wrap-around (time went backwards significantly)
-      if (currentTime < lastTime - 0.5) {
-        finishedRef.current = true;
-        onFinished();
-      }
-      lastTime = currentTime;
-    };
+    // After fade-out transition completes, call onFinished
+    const fadeDuration = 600; // Match the transition duration
+    const timer = setTimeout(() => {
+      onFinished();
+    }, fadeDuration);
 
-    video.addEventListener("seeking", onSeeking);
-    video.addEventListener("timeupdate", onTimeUpdate);
+    return () => clearTimeout(timer);
+  }, [visible, finishRequested, onFinished, isProjectsPage]);
 
-    return () => {
-      video.removeEventListener("seeking", onSeeking);
-      video.removeEventListener("timeupdate", onTimeUpdate);
-    };
-  }, [visible, finishRequested, onFinished]);
-
-  if (!visible) return null;
+  // Don't render on non-projects pages
+  if (!visible || !isProjectsPage) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center bg-white transition-opacity duration-300"
-      style={{ opacity: isFadedIn ? 1 : 0 }}
+      className="fixed inset-0 z-[9990] flex items-center justify-center bg-white transition-opacity"
+      style={{ 
+        opacity: isFadingOut ? 0 : (isFadedIn ? 1 : 0),
+        transitionDuration: '600ms'
+      }}
       aria-busy="true"
       aria-live="polite"
     >

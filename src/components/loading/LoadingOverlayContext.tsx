@@ -31,7 +31,7 @@ export function LoadingOverlayProvider({
 }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [routeReady, setRouteReady] = useState(false);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [finishRequested, setFinishRequested] = useState(false);
 
   // Use refs to track latest values for async checks
