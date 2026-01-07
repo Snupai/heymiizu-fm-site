@@ -14,8 +14,10 @@ export default function VideoLoader({
 }) {
   const pathname = usePathname();
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [fadeDurationMs, setFadeDurationMs] = useState(690);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const finishedRef = useRef(false);
+  const loopCountRef = useRef(0); // Track how many times video has looped
 
   // Only show video loader on projects page
   const isProjectsPage = pathname === "/projects";
@@ -24,30 +26,46 @@ export default function VideoLoader({
   useEffect(() => {
     if (!visible || !isProjectsPage) {
       setIsFadingOut(false);
+      setFadeDurationMs(690);
       finishedRef.current = false;
+      loopCountRef.current = 0;
     }
   }, [visible, isProjectsPage]);
 
-  // Handle video playback (only on projects page)
+  // Handle video playback and track loops (only on projects page)
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !visible || !isProjectsPage) return;
 
     video.loop = true;
     void video.play().catch(() => {});
+
+    // Track loop count by detecting when video seeks back to start
+    let lastTime = video.currentTime;
+    const onTimeUpdate = () => {
+      const currentTime = video.currentTime;
+      // Detect loop: time went backwards significantly or reset to near 0
+      if (currentTime < lastTime - 0.5 || (lastTime > 0.5 && currentTime < 0.1)) {
+        loopCountRef.current += 1;
+      }
+      lastTime = currentTime;
+    };
+
+    video.addEventListener("timeupdate", onTimeUpdate);
+
+    return () => {
+      video.removeEventListener("timeupdate", onTimeUpdate);
+    };
   }, [visible, isProjectsPage]);
 
   // Handle finish request - fade out during video playback (only on projects page)
-  // Start fade-out so it ends exactly when video ends
+  // Require at least one full loop before allowing fade-out on second playthrough
   useEffect(() => {
     if (!visible || !finishRequested || !isProjectsPage) return;
     if (finishedRef.current) return;
 
     const video = videoRef.current;
     if (!video) return;
-
-    const fadeDuration = 690; // milliseconds (0.69 seconds)
-    const fadeDurationSeconds = fadeDuration / 1000;
 
     // Wait for video duration to be available
     const waitForDuration = () => {
@@ -57,22 +75,33 @@ export default function VideoLoader({
       return false;
     };
 
-    // Check if video has already played enough
+    // Check if video has already played enough and can start fade
     const checkAndStartFade = () => {
       if (finishedRef.current) return null;
       if (!waitForDuration()) return null;
       
-      // Calculate when to start fade-out: video duration - fade duration
-      // This ensures fade-out ends exactly when the loop cycle completes
-      const fadeStartTime = video.duration - fadeDurationSeconds;
-      const minPlayTime = 1.6; // Minimum play time before fade-out can start
+      // Must have completed at least one full loop (loopCount >= 1 means we're on second playthrough)
+      if (loopCountRef.current < 1) {
+        return null;
+      }
       
-      // Calculate the actual start time (either at minPlayTime or at fadeStartTime, whichever is later)
-      const actualStartTime = Math.max(minPlayTime, fadeStartTime);
+      // Must have played at least 1.6 seconds in the current loop
+      const minPlayTime = 1.6;
+      if (video.currentTime < minPlayTime) {
+        return null;
+      }
       
-      // For looping video, we check if we're in the window before loop end
-      // Use a small buffer (0.1s) to account for timing precision
-      if (video.currentTime >= actualStartTime - 0.1 && video.currentTime < video.duration) {
+      // Calculate remaining time until video loop ends
+      const remainingTime = video.duration - video.currentTime;
+      
+      // Only start if there's meaningful time remaining (at least 100ms)
+      if (remainingTime > 0.1 && remainingTime <= video.duration) {
+        // Calculate fade duration in milliseconds based on remaining time
+        const calculatedFadeDurationMs = Math.max(100, remainingTime * 1000); // Minimum 100ms
+        
+        // Set the fade duration for CSS transition
+        setFadeDurationMs(calculatedFadeDurationMs);
+        
         // Start fading out
         setIsFadingOut(true);
         finishedRef.current = true;
@@ -80,7 +109,7 @@ export default function VideoLoader({
         // After fade-out transition completes, call onFinished
         const timer = setTimeout(() => {
           onFinished();
-        }, fadeDuration);
+        }, calculatedFadeDurationMs);
         return timer;
       }
       return null;
@@ -149,7 +178,7 @@ export default function VideoLoader({
       style={{ 
         // No fade-in: show immediately at opacity 1. Only fade out when finishing.
         opacity: isFadingOut ? 0 : 1,
-        transitionDuration: '690ms',
+        transitionDuration: `${fadeDurationMs}ms`,
         transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
       }}
       aria-busy="true"
