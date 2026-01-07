@@ -234,7 +234,7 @@ const categoryMotionInitial = { opacity: 0, y: 20 };
 const categoryMotionAnimate = { opacity: 1, y: 0 };
 const categoryMotionExit = { opacity: 0, y: -20 };
 
-export default function ProjectsPage() {
+function ProjectsPageContent() {
   const searchParams = useSearchParams();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -486,5 +486,13 @@ export default function ProjectsPage() {
         )}
       </div>
     </motion.div>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProjectsPageContent />
+    </Suspense>
   );
 }
