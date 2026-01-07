@@ -13,7 +13,6 @@ export default function VideoLoader({
   onFinished: () => void;
 }) {
   const pathname = usePathname();
-  const [isFadedIn, setIsFadedIn] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const finishedRef = useRef(false);
@@ -21,16 +20,12 @@ export default function VideoLoader({
   // Only show video loader on projects page
   const isProjectsPage = pathname === "/projects";
 
-  // Fade in when visible (only on projects page)
+  // Reset flags whenever overlay becomes hidden or we leave projects page
   useEffect(() => {
     if (!visible || !isProjectsPage) {
-      setIsFadedIn(false);
       setIsFadingOut(false);
       finishedRef.current = false;
-      return;
     }
-    const timer = setTimeout(() => setIsFadedIn(true), 50);
-    return () => clearTimeout(timer);
   }, [visible, isProjectsPage]);
 
   // Handle video playback (only on projects page)
@@ -52,7 +47,7 @@ export default function VideoLoader({
     finishedRef.current = true;
 
     // After fade-out transition completes, call onFinished
-    const fadeDuration = 600; // Match the transition duration
+    const fadeDuration = 1200; // Smoother, longer fade-out
     const timer = setTimeout(() => {
       onFinished();
     }, fadeDuration);
@@ -67,8 +62,10 @@ export default function VideoLoader({
     <div
       className="fixed inset-0 z-[9990] flex items-center justify-center bg-white transition-opacity"
       style={{ 
-        opacity: isFadingOut ? 0 : (isFadedIn ? 1 : 0),
-        transitionDuration: '600ms'
+        // No fade-in: show immediately at opacity 1. Only fade out when finishing.
+        opacity: isFadingOut ? 0 : 1,
+        transitionDuration: '1200ms',
+        transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
       }}
       aria-busy="true"
       aria-live="polite"
