@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { motion } from "framer-motion";
 
 type AnchorRect = { top: number; left: number; width: number; height: number };
@@ -83,7 +82,7 @@ export default function Popup({ onClose, children, className = "", anchor, offse
               onClick={onClose}
               className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
             >
-              <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
+              <img src="/close_circle_icon.svg" alt="" aria-hidden className="h-8 w-8 invert" />
             </button>
             {children}
           </motion.div>
@@ -105,7 +104,7 @@ export default function Popup({ onClose, children, className = "", anchor, offse
               onClick={onClose}
               className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
             >
-              <Image src="/close_circle_icon.svg" alt="" aria-hidden width={32} height={32} className="h-8 w-8 invert" />
+              <img src="/close_circle_icon.svg" alt="" aria-hidden className="h-8 w-8 invert" />
             </button>
             {children}
           </motion.div>

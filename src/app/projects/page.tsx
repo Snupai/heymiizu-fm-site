@@ -10,6 +10,7 @@ import { ProjectsSimple, ProjectCard } from "./ProjectsSimple";
 import type { Category } from "./ProjectsSimple";
 import { supabase } from "@/lib/supabase/client";
 import { Suspense } from "react";
+import { useLoadingOverlay } from "@/components/loading/LoadingOverlayContext";
 
 interface MessageBubble {
   src: string;
@@ -239,6 +240,7 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("Everything");
   const [deviceType, setDeviceType] = useState("desktop");
+  const { start, done } = useLoadingOverlay();
 
   const fetchCategories = async () => {
     try {
@@ -287,7 +289,14 @@ export default function ProjectsPage() {
   };
 
   useEffect(() => {
-    void fetchCategories();
+    start();
+    void (async () => {
+      try {
+        await fetchCategories();
+      } finally {
+        done();
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -348,13 +357,7 @@ export default function ProjectsPage() {
     return mapping;
   }, [categories]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading projects...</div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   const isSimpleVersion = deviceType === "small" || deviceType === "mobile";
   const visibleCategories = categories.filter(cat => activeCategory === "Everything" || cat.name === activeCategory);
