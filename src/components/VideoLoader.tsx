@@ -155,7 +155,7 @@ export default function VideoLoader({
       style={{ 
         // No fade-in: show immediately at opacity 1. Only fade out when finishing.
         opacity: isFadingOut ? 0 : 1,
-        transitionDuration: '300ms',
+        transitionDuration: '250ms',
         transitionTimingFunction: 'linear'
       }}
       aria-busy="true"
