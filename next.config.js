@@ -39,15 +39,20 @@ const nextConfig = {
         hostname: '*.ufs.sh',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'tmimqoublwvlnywfigww.supabase.co',
+        pathname: '/**',
+      },
     ],
   },
   // Configure output options
   output: 'standalone',
-  // Add headers for video files to support range requests and proper MIME types
+  // Add headers for video files to support range requests, CORS, and proper MIME types
   async headers() {
     return [
       {
-        source: '/projects/:path*\\.mp4',
+        source: '/:path*\\.mp4',
         headers: [
           {
             key: 'Content-Type',
@@ -58,13 +63,25 @@ const nextConfig = {
             value: 'bytes',
           },
           {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Range',
+          },
+          {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
         ],
       },
       {
-        source: '/projects/:path*\\.webm',
+        source: '/:path*\\.webm',
         headers: [
           {
             key: 'Content-Type',
@@ -73,6 +90,47 @@ const nextConfig = {
           {
             key: 'Accept-Ranges',
             value: 'bytes',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Range',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*\\.ogg',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'video/ogg',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Range',
           },
           {
             key: 'Cache-Control',

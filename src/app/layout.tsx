@@ -2,14 +2,12 @@ import { Public_Sans } from "next/font/google";
 import "../styles/globals.css";
 import "../styles/special-gradient-outline.css";
 import type { Metadata } from 'next'
-import NavbarContent from "../components/Navbar";
-import FooterContent from "../components/Footer";
-import Spinner from "../components/Spinner";
-import React, { Suspense } from "react";
+import React from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next"
-import ChromeGate from "../components/ChromeGate";
-const publicSans = Public_Sans({ 
+import AppShell from "../components/AppShell";
+
+const publicSans = Public_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-public-sans"
@@ -65,19 +63,9 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`${publicSans.variable} font-sans min-h-screen flex flex-col`}>
-        <ChromeGate>
-          <NavbarContent />
-        </ChromeGate>
-        <div className="flex-1 flex flex-col">
-          <Suspense fallback={<Spinner />}>
-            {children}
-          </Suspense>
-        </div>
-        <ChromeGate>
-          <FooterContent />
-        </ChromeGate>
+        <AppShell>{children}</AppShell>
       </body>
-      <Script src="https://scripts.simpleanalyticscdn.com/latest.js"  />
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
       <Analytics />
     </html>
   );

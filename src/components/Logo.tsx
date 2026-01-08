@@ -8,7 +8,7 @@ export default function Logo() {
     <Link href="/" className="block">
       <div className="w-10 h-10 relative">
         <Image
-          src="/Sentimental_Icon.svg"
+          src="/Sentimental_Icon.png"
           alt="Sentimental Icon"
           fill
           className="object-contain"

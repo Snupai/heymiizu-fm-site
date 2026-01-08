@@ -20,6 +20,7 @@ export type Project = {
   link?: string;
   categoryName?: string;
   categoryIcon?: string;
+  isNew?: boolean;
 };
 
 export interface Category {
@@ -39,19 +40,22 @@ function isValidCategory(category: unknown): category is Category {
 
 // Helper to render icons from string IDs
 function renderCategoryIcon(icon: string) {
+  // Check if icon is a path (starts with /) or has image extension
+  if (icon.startsWith("/") || /\.(png|jpg|jpeg|svg|webp)$/i.test(icon)) {
+    return (
+      <div className="relative w-6 h-6">
+        <Image
+          src={icon}
+          alt="Category Icon"
+          fill
+          className="object-contain"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
   switch (icon) {
-    case "after-effects":
-      return (
-        <div className="relative w-6 h-6">
-          <Image
-            src="/Adobe_After_Effects_CC_Icon.png"
-            alt="After Effects Icon"
-            fill
-            className="object-contain"
-            loading="lazy"
-          />
-        </div>
-      );
     case "fx3-camera":
       return (
         <div className="relative w-6 h-6">
@@ -167,6 +171,38 @@ export function ProjectsSimple({
       <div className="flex flex-col items-center w-full">
         {activeCategory === "Everything"
           ? safeCategories.map((cat) => {
+            const reversedProjects = reversedProjectsByCategory[cat.name];
+            return (
+              <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
+                <div className="flex items-center gap-2 mb-4">
+                  {renderCategoryIcon(cat.icon)}
+                  <span className="text-xl font-semibold">{cat.name}</span>
+                </div>
+                <Masonry
+                  breakpointCols={{ default: 2, 768: 1 }}
+                  className="flex gap-8 w-full"
+                  columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
+                >
+                  {reversedProjects && reversedProjects.length > 0 ? (
+                    reversedProjects.map((project, idx) => (
+                      <MemoizedProjectCard
+                        key={project.title + '-' + idx}
+                        project={project}
+                        categoryName={cat.name}
+                        aspect={project.aspect}
+                        gold={cat.name === 'Special' && idx === 0}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-gray-400 italic">No projects yet.</div>
+                  )}
+                </Masonry>
+              </div>
+            );
+          })
+          : safeCategories
+            .filter((cat) => cat.name === activeCategory)
+            .map((cat) => {
               const reversedProjects = reversedProjectsByCategory[cat.name];
               return (
                 <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
@@ -195,39 +231,7 @@ export function ProjectsSimple({
                   </Masonry>
                 </div>
               );
-            })
-          : safeCategories
-              .filter((cat) => cat.name === activeCategory)
-              .map((cat) => {
-                const reversedProjects = reversedProjectsByCategory[cat.name];
-                return (
-                  <div key={cat.name} className="mb-20 w-full max-w-screen-lg px-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      {renderCategoryIcon(cat.icon)}
-                      <span className="text-xl font-semibold">{cat.name}</span>
-                    </div>
-                    <Masonry
-                      breakpointCols={{ default: 2, 768: 1 }}
-                      className="flex gap-8 w-full"
-                      columnClassName="masonry-column w-1/2 space-y-8 md:space-y-10"
-                    >
-                      {reversedProjects && reversedProjects.length > 0 ? (
-                        reversedProjects.map((project, idx) => (
-                          <MemoizedProjectCard
-                            key={project.title + '-' + idx}
-                            project={project}
-                            categoryName={cat.name}
-                            aspect={project.aspect}
-                            gold={cat.name === 'Special' && idx === 0}
-                          />
-                        ))
-                      ) : (
-                        <div className="text-gray-400 italic">No projects yet.</div>
-                      )}
-                    </Masonry>
-                  </div>
-                );
-              })}
+            })}
       </div>
     </main>
   );
@@ -242,11 +246,11 @@ const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; p
     if (videoRef.current) {
       const video = videoRef.current;
       video.volume = 0.42;
-      
+
       const handleError = (e: Event) => {
         const target = e.target as HTMLVideoElement;
-        const errorMessage = target.error ? 
-          `Video error (${target.error.code}): ${target.error.message}` : 
+        const errorMessage = target.error ?
+          `Video error (${target.error.code}): ${target.error.message}` :
           'Unknown video error';
         console.error('Video playback error:', errorMessage);
         setVideoError(errorMessage);
@@ -279,7 +283,7 @@ const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; p
         <div className="text-center p-4">
           <div className="text-red-500 mb-2">Video Error</div>
           <div className="text-sm text-gray-600">{videoError}</div>
-          <button 
+          <button
             onClick={() => {
               setVideoError(null);
               if (videoRef.current) {
@@ -304,14 +308,16 @@ const LazyVideoPlayer = memo(function VideoPlayerWrapper(props: { src: string; p
         poster={props.poster}
         className="w-full h-full object-contain rounded-lg"
         style={{ borderRadius: 'inherit' }}
+        controlsList="nodownload noplaybackrate"
+        disablePictureInPicture
         preload="metadata"
         playsInline
-        webkit-playsinline={true}
+        webkit-playsinline="true"
         muted={false}
         onError={(e) => {
           const target = e.currentTarget;
-          const errorMessage = target.error ? 
-            `Video error (${target.error.code}): ${target.error.message}` : 
+          const errorMessage = target.error ?
+            `Video error (${target.error.code}): ${target.error.message}` :
             'Unknown video error';
           console.error('Video element error:', errorMessage);
           setVideoError(errorMessage);
@@ -367,7 +373,7 @@ export const ProjectCard = memo(function ProjectCard({
       animate={motionAnimate}
       exit={motionExit}
       transition={motionTransition}
-      className={`rounded-xl shadow-lg overflow-hidden flex flex-col ${isSpecial ? 'min-w-[500px] max-w-[500px]' : 'w-full'} bg-white transition-all duration-200`}
+      className={`relative rounded-xl shadow-lg overflow-hidden flex flex-col ${isSpecial ? 'min-w-[500px] max-w-[500px]' : 'w-full'} bg-white transition-all duration-200`}
     >
       <div className={`relative w-full ${aspectClass} overflow-hidden`}>
         {/* Video thumbnail and play button overlay */}
@@ -390,7 +396,7 @@ export const ProjectCard = memo(function ProjectCard({
                     unoptimized={isExternalUrl(project.media?.thumbnail) && isUploadThingHost(project.media?.thumbnail)}
                     priority={false}
                     sizes="100vw"
-                    style={{objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)'}}
+                    style={{ objectFit: 'cover', background: '#fff', border: 'none', boxShadow: 'none', transform: 'scale(1.01)' }}
                     loading="lazy"
                   />
                 </Suspense>
@@ -402,8 +408,8 @@ export const ProjectCard = memo(function ProjectCard({
                     style={{ opacity: 0.8, transition: 'opacity 0.2s', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.45))' }}
                     className="group-hover:opacity-100"
                   >
-                    <polygon 
-                      points="20,14 44,28 20,42" 
+                    <polygon
+                      points="20,14 44,28 20,42"
                       fill="white"
                     />
                   </svg>
@@ -429,12 +435,18 @@ export const ProjectCard = memo(function ProjectCard({
               unoptimized={isExternalUrl(project.media?.src) && isUploadThingHost(project.media?.src)}
               priority={false}
               sizes="100vw"
-              style={{objectFit: 'cover'}}
+              style={{ objectFit: 'cover' }}
               loading="lazy"
             />
           </Suspense>
         )}
       </div>
+      {/* New Badge */}
+      {project.isNew && (
+        <div className="absolute top-3 right-3 z-30 bg-brand text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+          NEW
+        </div>
+      )}
       {/* Card Content */}
       <div className="p-6 flex flex-col flex-1 justify-end">
         <div className="flex items-center gap-2 mb-2">

@@ -53,7 +53,7 @@ function FooterContent() {
               <div className="flex items-center space-x-6">
                 <Link href="/" className="w-12 h-12 relative">
                   <Image
-                    src="/Sentimental_Icon.svg"
+                    src="/Sentimental_Icon.png"
                     alt="Miizu Logo"
                     fill
                     className="object-contain"
