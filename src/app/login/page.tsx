@@ -110,7 +110,7 @@ const LoginPage = () => {
                             {loading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
                         </Button>
                     </form>
-
+                    {/* 
                     <Button
                         variant="link"
                         className="w-full"
@@ -118,6 +118,7 @@ const LoginPage = () => {
                     >
                         {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
                     </Button>
+                    */}
                 </CardContent>
             </Card>
         </div>
