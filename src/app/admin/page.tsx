@@ -13,6 +13,7 @@ import { CategoryForm } from "@/components/admin/CategoryForm";
 import { ProjectsList } from "@/components/admin/ProjectsList";
 import { CategoriesList } from "@/components/admin/CategoriesList";
 import { UsersList } from "@/components/admin/UsersList";
+import { ContactSettingsForm } from "@/components/admin/ContactSettingsForm";
 import type { Database } from "@/lib/supabase/types";
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -91,10 +92,11 @@ const AdminPage = () => {
 
             <main className="container mx-auto px-4 py-8">
                 <Tabs defaultValue="projects" className="space-y-6">
-                    <TabsList className="grid w-full max-w-md grid-cols-3">
+                    <TabsList className="grid w-full max-w-xl grid-cols-4">
                         <TabsTrigger value="projects">Projects</TabsTrigger>
                         <TabsTrigger value="categories">Categories</TabsTrigger>
                         <TabsTrigger value="users">Users</TabsTrigger>
+                        <TabsTrigger value="contact">Contact</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="projects" className="space-y-6">
@@ -176,6 +178,11 @@ const AdminPage = () => {
                     <TabsContent value="users" className="space-y-6">
                         <h2 className="text-2xl font-bold">Manage Users</h2>
                         <UsersList refreshTrigger={refreshTrigger} />
+                    </TabsContent>
+
+                    <TabsContent value="contact" className="space-y-6">
+                        <h2 className="text-2xl font-bold">Manage Contact Form</h2>
+                        <ContactSettingsForm />
                     </TabsContent>
                 </Tabs>
             </main>

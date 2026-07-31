@@ -15,6 +15,30 @@ export type Database = {
     }
     public: {
         Tables: {
+            contact_settings: {
+                Row: {
+                    id: string
+                    pause_until: string | null
+                    paused: boolean
+                    updated_at: string
+                    updated_by: string | null
+                }
+                Insert: {
+                    id?: string
+                    pause_until?: string | null
+                    paused?: boolean
+                    updated_at?: string
+                    updated_by?: string | null
+                }
+                Update: {
+                    id?: string
+                    pause_until?: string | null
+                    paused?: boolean
+                    updated_at?: string
+                    updated_by?: string | null
+                }
+                Relationships: []
+            }
             categories: {
                 Row: {
                     created_at: string

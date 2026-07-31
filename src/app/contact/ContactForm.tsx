@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { ChevronsUpDown, ArrowUpCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronsUpDown, ArrowUpCircle, PauseCircle } from 'lucide-react';
 import { Combobox } from '../../components/ui/combobox';
 import { DatePicker } from '../../components/ui/date-picker';
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from '../../components/ui/command';
+import { formatPauseUntilDate, type ContactFormStatus } from '../../lib/contact-settings';
 
 const PROJECT_TYPES = [
   { value: 'Commercial Spot', label: 'Commercial Spot' },
@@ -79,6 +80,36 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
   const [customDropdownOpen, setCustomDropdownOpen] = useState(false);
   const [deadlinePreset, setDeadlinePreset] = useState<string>('custom');
   const [deadlineOpen, setDeadlineOpen] = useState(false);
+  const [contactStatus, setContactStatus] = useState<ContactFormStatus>({
+    paused: false,
+    pauseUntil: null,
+  });
+  const [statusLoading, setStatusLoading] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadContactStatus() {
+      try {
+        const response = await fetch('/api/contact', {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+
+        if (!response.ok) return;
+
+        const status = (await response.json()) as ContactFormStatus;
+        setContactStatus(status);
+      } catch {
+        // The POST endpoint still enforces the setting if this status request fails.
+      } finally {
+        if (!controller.signal.aborted) setStatusLoading(false);
+      }
+    }
+
+    void loadContactStatus();
+    return () => controller.abort();
+  }, []);
 
   const formatDateEU = (date: Date) => {
     const d = String(date.getDate()).padStart(2, '0');
@@ -200,6 +231,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (contactStatus.paused || statusLoading) return;
     // Validate required fields
     const missingFields = [];
     if (!form.name) missingFields.push('name');
@@ -247,7 +279,10 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
         }
         setTimeout(() => setSuccess(false), 5000);
       } else {
-        const data = await res.json() as { error?: string };
+        const data = await res.json() as { error?: string; paused?: boolean; pauseUntil?: string | null };
+        if (data.paused) {
+          setContactStatus({ paused: true, pauseUntil: data.pauseUntil ?? null });
+        }
         setError(data.error ?? 'Failed to send.');
       }
     } catch {
@@ -260,8 +295,34 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
 
   return (
     <div className="relative w-full flex flex-col items-center px-4 md:px-8 lg:px-0 pb-8">
-      <div className="w-full max-w-5xl mx-auto">
-        <form onSubmit={handleSubmit} noValidate className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 px-4 md:px-8 lg:px-0">
+      <div className="relative w-full max-w-5xl mx-auto">
+        {contactStatus.paused && (
+          <div
+            role="status"
+            className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 md:p-8 -translate-y-[20%]"
+          >
+            <div className="flex w-full max-w-3xl flex-col items-center gap-3 rounded-2xl border-4 border-brand bg-brand-light/95 px-8 py-10 text-center shadow-xl backdrop-blur-sm md:px-12 md:py-14">
+              <PauseCircle className="h-12 w-12 shrink-0 text-brand md:h-14 md:w-14" aria-hidden="true" />
+              <p className="text-3xl font-black text-black leading-tight md:whitespace-nowrap md:text-4xl">
+                Commissions are currently paused
+              </p>
+              {contactStatus.pauseUntil && (
+                <p className="text-xl font-medium text-black">
+                  Until {formatPauseUntilDate(contactStatus.pauseUntil)}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          aria-busy={statusLoading}
+          className={`w-full grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 px-4 md:px-8 lg:px-0 transition-all duration-300 ${
+            contactStatus.paused ? 'opacity-40 grayscale pointer-events-none select-none' : ''
+          }`}
+        >
+          <fieldset disabled={contactStatus.paused || statusLoading} className="contents">
           {/* Name */}
           <div className="col-span-1 md:col-span-1 flex flex-col">
             <label className="block font-bold mb-1 text-lg pl-4">Name</label>
@@ -567,8 +628,9 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
             {success && <div className="mt-4 text-green-600 font-bold text-xl">Email sent successfully!</div>}
             {error && <div className="mt-4 text-red-600 font-bold text-xl">{error}</div>}
           </div>
+          </fieldset>
         </form>
       </div>
     </div>
   );
-} 
+}
