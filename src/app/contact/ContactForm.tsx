@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronsUpDown, ArrowUpCircle, PauseCircle } from 'lucide-react';
+import { ChevronsUpDown, ArrowUpCircle } from 'lucide-react';
 import { Combobox } from '../../components/ui/combobox';
 import { DatePicker } from '../../components/ui/date-picker';
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
@@ -299,18 +299,50 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
         {contactStatus.paused && (
           <div
             role="status"
-            className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 md:p-8 -translate-y-[20%]"
+            className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 md:p-8 -translate-y-[14%]"
           >
-            <div className="flex w-full max-w-3xl flex-col items-center gap-3 rounded-2xl border-4 border-brand bg-brand-light/95 px-8 py-10 text-center shadow-xl backdrop-blur-sm md:px-12 md:py-14">
-              <PauseCircle className="h-12 w-12 shrink-0 text-brand md:h-14 md:w-14" aria-hidden="true" />
-              <p className="text-3xl font-black text-black leading-tight md:whitespace-nowrap md:text-4xl">
-                Commissions are currently paused
-              </p>
-              {contactStatus.pauseUntil && (
-                <p className="text-xl font-medium text-black">
-                  Until {formatPauseUntilDate(contactStatus.pauseUntil)}
+            <div className="paused-card relative w-full max-w-xl overflow-hidden rounded-[28px] bg-white/65 px-8 py-11 text-center shadow-[0_32px_80px_-24px_rgba(11,12,15,0.35)] ring-1 ring-black/[0.06] backdrop-blur-2xl backdrop-saturate-150 md:rounded-[34px] md:px-14 md:py-14">
+              <div
+                aria-hidden="true"
+                className="paused-halo pointer-events-none absolute -top-28 left-1/2 h-56 w-[130%] -translate-x-1/2 rounded-full bg-brand/25 blur-3xl"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent"
+              />
+
+              <div className="relative flex flex-col items-center gap-5">
+                <span className="inline-flex items-center gap-2 rounded-full bg-ink/[0.04] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-muted ring-1 ring-inset ring-black/[0.06]">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="paused-ping absolute inline-flex h-full w-full rounded-full bg-brand" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
+                  </span>
+                  Paused
+                </span>
+
+                <h2 className="text-balance text-[30px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink md:text-[42px]">
+                  Commissions are currently paused
+                </h2>
+
+                <p className="max-w-sm text-balance text-[15px] leading-relaxed text-ink-muted md:text-base">
+                  I&rsquo;m not taking on new projects at the moment. Do check back soon.
                 </p>
-              )}
+
+                {contactStatus.pauseUntil && (
+                  <div className="flex flex-col items-center gap-4 pt-1">
+                    <span
+                      aria-hidden="true"
+                      className="h-px w-20 bg-gradient-to-r from-transparent via-black/10 to-transparent"
+                    />
+                    <p className="text-[13px] tracking-[-0.01em] text-ink-muted md:text-sm">
+                      Reopening{' '}
+                      <span className="font-semibold text-ink">
+                        {formatPauseUntilDate(contactStatus.pauseUntil)}
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -319,7 +351,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
           noValidate
           aria-busy={statusLoading}
           className={`w-full grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 px-4 md:px-8 lg:px-0 transition-all duration-300 ${
-            contactStatus.paused ? 'opacity-40 grayscale pointer-events-none select-none' : ''
+            contactStatus.paused ? 'opacity-30 saturate-50 blur-[3px] pointer-events-none select-none' : ''
           }`}
         >
           <fieldset disabled={contactStatus.paused || statusLoading} className="contents">
