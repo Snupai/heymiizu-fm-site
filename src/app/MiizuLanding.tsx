@@ -2,6 +2,7 @@
 
 import {
   AnimatePresence,
+  LayoutGroup,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -628,31 +629,31 @@ export default function MiizuLanding() {
 
   const panelX = useTransform(
     scrollYProgress,
-    [0, 0.42, 0.78, 1],
+    [0, 0.29, 0.54, 1],
     compact ? ["-5vw", "-5vw", "0vw", "0vw"] : ["-3vw", "-3vw", "0vw", "0vw"],
   );
   const panelY = useTransform(
     scrollYProgress,
-    [0, 0.42, 0.78, 1],
+    [0, 0.29, 0.54, 1],
     compact
       ? ["43svh", "43svh", "0svh", "0svh"]
       : ["9svh", "9svh", "0svh", "0svh"],
   );
   const panelScaleX = useTransform(
     scrollYProgress,
-    [0, 0.42, 0.78, 1],
+    [0, 0.29, 0.54, 1],
     compact ? [0.9, 0.9, 1, 1] : [0.31, 0.31, 1, 1],
   );
   const panelScaleY = useTransform(
     scrollYProgress,
-    [0, 0.42, 0.78, 1],
+    [0, 0.29, 0.54, 1],
     compact ? [0.51, 0.51, 1, 1] : [0.82, 0.82, 1, 1],
   );
   const cardScaleX = useTransform(panelScaleX, (value) => 1 / value);
   const cardScaleY = useTransform(panelScaleY, (value) => 1 / value);
   const visualRadius = useTransform(
     scrollYProgress,
-    [0, 0.5, 0.78],
+    [0, 0.35, 0.54],
     [2.6, 2.6, 0],
   );
   const panelRadius = useTransform(() => {
@@ -661,24 +662,24 @@ export default function MiizuLanding() {
     const scaleY = Math.max(panelScaleY.get(), 0.001);
     return `${radius / scaleX}rem / ${radius / scaleY}rem`;
   });
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.36, 0.58], [1, 1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.58], ["0vh", "-6vh"]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.25, 0.39], [1, 1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.39], ["0vh", "-6vh"]);
   const cardLabelOpacity = useTransform(
     scrollYProgress,
-    [0, 0.4, 0.56],
+    [0, 0.28, 0.38],
     [1, 1, 0],
   );
-  const workOpacity = useTransform(scrollYProgress, [0.68, 0.86], [0, 1]);
-  const workY = useTransform(scrollYProgress, [0.68, 0.86], [42, 0]);
-  const workShadeOpacity = useTransform(scrollYProgress, [0.52, 0.78], [0, 1]);
+  const workOpacity = useTransform(scrollYProgress, [0.47, 0.6], [0, 1]);
+  const workY = useTransform(scrollYProgress, [0.47, 0.6], [42, 0]);
+  const workShadeOpacity = useTransform(scrollYProgress, [0.36, 0.54], [0, 1]);
   const railX = useTransform(
     clientsProgress,
-    [0, 0.18, 0.78, 1],
+    [0, 0.18, 0.72, 1],
     ["-28vw", "-20vw", "0vw", "0vw"],
   );
   const railOpacity = useTransform(
     clientsProgress,
-    [0, 0.14, 0.78, 1],
+    [0, 0.14, 0.68, 1],
     [0, 0.08, 1, 1],
   );
 
@@ -693,7 +694,7 @@ export default function MiizuLanding() {
 
     const travel = Math.max(0, scene.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: scene.offsetTop + travel * 0.86,
+      top: scene.offsetTop + travel * 0.6,
       behavior: "smooth",
     });
   };
@@ -848,85 +849,121 @@ export default function MiizuLanding() {
       </div>
 
       <section
-        className={styles.clientsBridge}
+        className={styles.clientsScene}
         id="clients"
         ref={clientsRef}
         aria-label="Selected clients"
       >
-        <motion.div
-          className={styles.clientsRail}
-          style={{ opacity: railOpacity, x: railX }}
-        >
-          <span className={styles.clientsLabel}>selected clients</span>
-          <div className={styles.clientMarquee}>
-            <div className={styles.clientNames}>
-              {[0, 1].map((copy) => (
-                <div
-                  aria-hidden={copy === 1}
-                  className={styles.clientGroup}
-                  key={copy}
-                >
-                  {CLIENTS.map((client) => (
-                    <span key={`${copy}-${client}`}>{client}</span>
-                  ))}
-                </div>
-              ))}
+        <div className={styles.clientsBridge}>
+          <motion.div
+            className={styles.clientsRail}
+            style={{ opacity: railOpacity, x: railX }}
+          >
+            <span className={styles.clientsLabel}>selected clients</span>
+            <div className={styles.clientMarquee}>
+              <div className={styles.clientNames}>
+                {[0, 1].map((copy) => (
+                  <div
+                    aria-hidden={copy === 1}
+                    className={styles.clientGroup}
+                    key={copy}
+                  >
+                    {CLIENTS.map((client) => (
+                      <span key={`${copy}-${client}`}>{client}</span>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
 
-      <section className={styles.contactSection} id="contact">
-        <div className={styles.contactPitch}>
-          <div>
-            <h2>{headline}</h2>
-            <div
-              className={styles.regionToggle}
-              role="group"
-              aria-label="Project location"
-            >
-              <button
-                aria-pressed={region === "local"}
-                className={region === "local" ? styles.regionActive : ""}
-                onClick={() => setRegion("local")}
-                type="button"
+      <section className={styles.contactScene} id="contact">
+        <div className={styles.contactSection}>
+          <div className={styles.contactPitch}>
+            <div>
+              <h2>{headline}</h2>
+              <LayoutGroup id="region-toggle">
+                <div
+                  className={styles.regionToggle}
+                  role="group"
+                  aria-label="Project location"
+                >
+                  <button
+                    aria-pressed={region === "local"}
+                    className={region === "local" ? styles.regionActive : ""}
+                    onClick={() => setRegion("local")}
+                    type="button"
+                  >
+                    {region === "local" ? (
+                      <motion.span
+                        aria-hidden="true"
+                        className={styles.regionPill}
+                        layoutId="region-pill"
+                        transition={{
+                          type: "spring",
+                          stiffness: 520,
+                          damping: 28,
+                          mass: 0.6,
+                        }}
+                      />
+                    ) : null}
+                    <span className={styles.regionToggleLabel}>
+                      Local <small>(Germany)</small>
+                    </span>
+                  </button>
+                  <button
+                    aria-pressed={region === "international"}
+                    className={
+                      region === "international" ? styles.regionActive : ""
+                    }
+                    onClick={() => setRegion("international")}
+                    type="button"
+                  >
+                    {region === "international" ? (
+                      <motion.span
+                        aria-hidden="true"
+                        className={styles.regionPill}
+                        layoutId="region-pill"
+                        transition={{
+                          type: "spring",
+                          stiffness: 520,
+                          damping: 28,
+                          mass: 0.6,
+                        }}
+                      />
+                    ) : null}
+                    <span className={styles.regionToggleLabel}>
+                      International
+                    </span>
+                  </button>
+                </div>
+              </LayoutGroup>
+            </div>
+
+            <div className={styles.directContact}>
+              <a
+                className={styles.bookCall}
+                href={bookingUrl}
+                rel={bookingUrl.startsWith("http") ? "noreferrer" : undefined}
+                target={bookingUrl.startsWith("http") ? "_blank" : undefined}
               >
-                Local <small>(Germany)</small>
-              </button>
-              <button
-                aria-pressed={region === "international"}
-                className={
-                  region === "international" ? styles.regionActive : ""
-                }
-                onClick={() => setRegion("international")}
-                type="button"
-              >
-                International
-              </button>
+                <span className={styles.bookCallText}>book a call</span>
+                <span aria-hidden="true" className={styles.callIcon}>
+                  <ArrowUpRight />
+                </span>
+              </a>
+              <p>or just say hello</p>
+              <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
+                hey@miizumelon.com
+              </a>
             </div>
           </div>
 
-          <div className={styles.directContact}>
-            <a
-              className={styles.bookCall}
-              href={bookingUrl}
-              rel={bookingUrl.startsWith("http") ? "noreferrer" : undefined}
-              target={bookingUrl.startsWith("http") ? "_blank" : undefined}
-            >
-              <span className={styles.bookCallText}>book a call</span>
-              <span aria-hidden="true" className={styles.callIcon}>
-                <ArrowUpRight />
-              </span>
-            </a>
-            <p>or just say hello</p>
-            <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
-              hey@miizumelon.com
-            </a>
+          <div className={styles.formPanel}>
+            <ContactForm region={region} />
           </div>
-        </div>
-
-        <div className={styles.formPanel}>
-          <ContactForm region={region} />
         </div>
       </section>
 
