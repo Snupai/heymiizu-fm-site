@@ -149,7 +149,7 @@ export function ContactSettingsForm() {
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full border border-gray-200 bg-white shadow-md transition-transform ${
+                  className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full border border-gray-200 bg-white shadow-md transition-transform ${
                     settings.paused ? "translate-x-5" : "translate-x-0"
                   }`}
                 />

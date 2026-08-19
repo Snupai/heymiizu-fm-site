@@ -32,7 +32,7 @@ export default function VideoLoader({
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !visible || !isProjectsPage) return;
-    
+
     // Prevent video from starting if we're already fading out
     if (isFadingOut || finishedRef.current) {
       // Don't start a new video, but let the current one continue playing
@@ -40,7 +40,7 @@ export default function VideoLoader({
     }
 
     video.loop = true;
-    void video.play().catch(() => {});
+    void video.play().catch(() => undefined);
   }, [visible, isProjectsPage, isFadingOut]);
 
   // Handle finish request - fade out during video playback (only on projects page)
@@ -57,7 +57,12 @@ export default function VideoLoader({
 
     // Wait for video duration to be available
     const waitForDuration = () => {
-      if (video.duration && !isNaN(video.duration) && isFinite(video.duration) && video.duration > 0) {
+      if (
+        video.duration &&
+        !isNaN(video.duration) &&
+        isFinite(video.duration) &&
+        video.duration > 0
+      ) {
         return true;
       }
       return false;
@@ -67,18 +72,21 @@ export default function VideoLoader({
     const checkAndStartFade = () => {
       if (finishedRef.current) return null;
       if (!waitForDuration()) return null;
-      
+
       // Calculate when to start fade-out: video duration - fade duration
       // This ensures fade-out ends exactly when the loop cycle completes
       const fadeStartTime = video.duration - fadeDurationSeconds;
       const minPlayTime = 1.6; // Minimum play time before fade-out can start
-      
+
       // Calculate the actual start time (either at minPlayTime or at fadeStartTime, whichever is later)
       const actualStartTime = Math.max(minPlayTime, fadeStartTime);
-      
+
       // For looping video, we check if we're in the window before loop end
       // Use a small buffer (0.1s) to account for timing precision
-      if (video.currentTime >= actualStartTime - 0.1 && video.currentTime < video.duration) {
+      if (
+        video.currentTime >= actualStartTime - 0.1 &&
+        video.currentTime < video.duration
+      ) {
         // Start fading out
         setIsFadingOut(true);
         finishedRef.current = true;
@@ -103,7 +111,7 @@ export default function VideoLoader({
           return () => clearTimeout(timer);
         }
       };
-      
+
       const onTimeUpdate = () => {
         if (finishedRef.current) return;
         const timer = checkAndStartFade();
@@ -112,10 +120,10 @@ export default function VideoLoader({
           video.removeEventListener("timeupdate", onTimeUpdate);
         }
       };
-      
+
       video.addEventListener("loadedmetadata", onLoadedMetadata);
       video.addEventListener("timeupdate", onTimeUpdate);
-      
+
       return () => {
         video.removeEventListener("loadedmetadata", onLoadedMetadata);
         video.removeEventListener("timeupdate", onTimeUpdate);
@@ -152,11 +160,11 @@ export default function VideoLoader({
   return (
     <div
       className="fixed inset-0 z-[9990] flex items-center justify-center bg-white transition-opacity"
-      style={{ 
+      style={{
         // No fade-in: show immediately at opacity 1. Only fade out when finishing.
         opacity: isFadingOut ? 0 : 1,
-        transitionDuration: '250ms',
-        transitionTimingFunction: 'linear'
+        transitionDuration: "250ms",
+        transitionTimingFunction: "linear",
       }}
       aria-busy="true"
       aria-live="polite"
@@ -167,7 +175,7 @@ export default function VideoLoader({
         muted
         playsInline
         preload="auto"
-        className="w-full h-full object-contain"
+        className="h-full w-full object-contain"
       >
         <source src="/Heartloading_Looping.mp4" type="video/mp4" />
       </video>

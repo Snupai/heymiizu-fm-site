@@ -1,4 +1,4 @@
-import { scroller } from 'react-scroll';
+import { scroller } from "react-scroll";
 
 /**
  * Centralized configuration for react-scroll settings
@@ -8,31 +8,31 @@ import { scroller } from 'react-scroll';
 export const scrollConfig = {
   // Enable smooth scrolling
   smooth: true,
-  
+
   // Enable scroll spy functionality
   spy: true,
-  
+
   // Offset from the top when scrolling to elements (in pixels)
   offset: -64, // Adjust this value based on your navbar height
-  
+
   // Duration of the smooth scroll animation (in milliseconds)
   duration: 500,
-  
+
   // Delay before scroll spy updates (in milliseconds)
   delay: 0,
-  
+
   // Whether to hash the URL when scrolling to elements
   hashSpy: false,
-  
+
   // Whether to update the URL hash when scrolling to elements
   updateHash: true,
-  
+
   // Whether to scroll to the top of the page when clicking on a link
   scrollToTop: true,
-  
+
   // Whether to prevent default behavior of links
   preventDefault: true,
-  
+
   // Whether to use smooth scrolling for the entire page
   smoothBehavior: true,
 };
@@ -44,7 +44,7 @@ export const scrollConfig = {
  */
 export const scrollToElement = (
   elementName: string,
-  options: Partial<typeof scrollConfig> = {}
+  options: Partial<typeof scrollConfig> = {},
 ) => {
   scroller.scrollTo(elementName, {
     ...scrollConfig,
@@ -57,7 +57,7 @@ export const scrollToElement = (
  * @param options - Optional scroll options
  */
 export const scrollToTop = (options: Partial<typeof scrollConfig> = {}) => {
-  scroller.scrollTo('top', {
+  scroller.scrollTo("top", {
     ...scrollConfig,
     ...options,
   });
@@ -68,8 +68,8 @@ export const scrollToTop = (options: Partial<typeof scrollConfig> = {}) => {
  * @param options - Optional scroll options
  */
 export const scrollToBottom = (options: Partial<typeof scrollConfig> = {}) => {
-  scroller.scrollTo('bottom', {
+  scroller.scrollTo("bottom", {
     ...scrollConfig,
     ...options,
   });
-}; 
+};

@@ -1,6 +1,14 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type LoadingOverlayApi = {
   start: () => void;
@@ -14,11 +22,16 @@ type LoadingOverlayState = {
   finishRequested: boolean;
 };
 
-const LoadingOverlayContext = createContext<(LoadingOverlayApi & LoadingOverlayState) | null>(null);
+const LoadingOverlayContext = createContext<
+  (LoadingOverlayApi & LoadingOverlayState) | null
+>(null);
 
 export function useLoadingOverlay() {
   const ctx = useContext(LoadingOverlayContext);
-  if (!ctx) throw new Error("useLoadingOverlay must be used within LoadingOverlayProvider");
+  if (!ctx)
+    throw new Error(
+      "useLoadingOverlay must be used within LoadingOverlayProvider",
+    );
   return ctx;
 }
 
@@ -27,7 +40,9 @@ export function LoadingOverlayProvider({
   renderOverlay,
 }: {
   children: React.ReactNode;
-  renderOverlay: (state: LoadingOverlayState & { onFinished: () => void }) => React.ReactNode;
+  renderOverlay: (
+    state: LoadingOverlayState & { onFinished: () => void },
+  ) => React.ReactNode;
 }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [routeReady, setRouteReady] = useState(false);
@@ -39,9 +54,15 @@ export function LoadingOverlayProvider({
   const routeReadyRef = useRef(routeReady);
   const visibleRef = useRef(visible);
 
-  useEffect(() => { pendingCountRef.current = pendingCount; }, [pendingCount]);
-  useEffect(() => { routeReadyRef.current = routeReady; }, [routeReady]);
-  useEffect(() => { visibleRef.current = visible; }, [visible]);
+  useEffect(() => {
+    pendingCountRef.current = pendingCount;
+  }, [pendingCount]);
+  useEffect(() => {
+    routeReadyRef.current = routeReady;
+  }, [routeReady]);
+  useEffect(() => {
+    visibleRef.current = visible;
+  }, [visible]);
 
   const start = useCallback(() => {
     setPendingCount((c) => c + 1);
@@ -106,4 +127,3 @@ export function LoadingOverlayProvider({
     </LoadingOverlayContext.Provider>
   );
 }
-

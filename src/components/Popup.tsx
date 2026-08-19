@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 type AnchorRect = { top: number; left: number; width: number; height: number };
 
@@ -14,7 +15,13 @@ type PopupProps = {
   offsetY?: number; // distance above the anchor
 };
 
-export default function Popup({ onClose, children, className = "", anchor, offsetY = 16 }: PopupProps) {
+export default function Popup({
+  onClose,
+  children,
+  className = "",
+  anchor,
+  offsetY = 16,
+}: PopupProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -27,7 +34,8 @@ export default function Popup({ onClose, children, className = "", anchor, offse
     ? {
         position: "fixed",
         // Vertically center over the anchor element and allow small offset
-        top: Math.max(12, anchor.top + anchor.height / 2 + (offsetY ?? 0)) + "px",
+        top:
+          Math.max(12, anchor.top + anchor.height / 2 + (offsetY ?? 0)) + "px",
         // Horizontally center to viewport
         left: "50%",
         transform: "translate(-50%, -50%)",
@@ -67,9 +75,9 @@ export default function Popup({ onClose, children, className = "", anchor, offse
 
       {/* Centered fallback if no anchor provided */}
       {!anchor && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <motion.div
-            className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed pointer-events-auto ${className}`}
+            className={`pointer-events-auto relative w-[min(80vw,520px)] rounded-[28px] bg-[#0A84FF] px-8 py-6 leading-relaxed text-white shadow-2xl ${className}`}
             role="dialog"
             aria-modal="true"
             variants={cardVariants}
@@ -80,9 +88,16 @@ export default function Popup({ onClose, children, className = "", anchor, offse
               type="button"
               aria-label="Close"
               onClick={onClose}
-              className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
+              className="absolute right-6 top-6 flex items-center justify-center transition-transform hover:scale-105"
             >
-              <img src="/close_circle_icon.svg" alt="" aria-hidden className="h-8 w-8 invert" />
+              <Image
+                src="/close_circle_icon.svg"
+                alt=""
+                aria-hidden
+                width={32}
+                height={32}
+                className="h-8 w-8 invert"
+              />
             </button>
             {children}
           </motion.div>
@@ -93,7 +108,7 @@ export default function Popup({ onClose, children, className = "", anchor, offse
       {anchor && (
         <div role="dialog" aria-modal="true" style={cardStyle}>
           <motion.div
-            className={`relative bg-[#0A84FF] text-white shadow-2xl rounded-[28px] px-8 py-6 w-[min(80vw,520px)] leading-relaxed ${className}`}
+            className={`relative w-[min(80vw,520px)] rounded-[28px] bg-[#0A84FF] px-8 py-6 leading-relaxed text-white shadow-2xl ${className}`}
             variants={cardVariants}
             transition={{ duration: 0.25, ease: "easeOut" }}
             onClick={(e) => e.stopPropagation()}
@@ -102,9 +117,16 @@ export default function Popup({ onClose, children, className = "", anchor, offse
               type="button"
               aria-label="Close"
               onClick={onClose}
-              className="absolute top-6 right-6 flex items-center justify-center hover:scale-105 transition-transform"
+              className="absolute right-6 top-6 flex items-center justify-center transition-transform hover:scale-105"
             >
-              <img src="/close_circle_icon.svg" alt="" aria-hidden className="h-8 w-8 invert" />
+              <Image
+                src="/close_circle_icon.svg"
+                alt=""
+                aria-hidden
+                width={32}
+                height={32}
+                className="h-8 w-8 invert"
+              />
             </button>
             {children}
           </motion.div>

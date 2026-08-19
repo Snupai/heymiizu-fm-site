@@ -4,7 +4,11 @@ import React, { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useLoadingOverlay } from "./LoadingOverlayContext";
 
-export default function RouteReadySignal({ children }: { children: React.ReactNode }) {
+export default function RouteReadySignal({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const { resetForNewRoute, markRouteReady } = useLoadingOverlay();
   const isFirstMount = useRef(true);
@@ -21,12 +25,12 @@ export default function RouteReadySignal({ children }: { children: React.ReactNo
       }
       return;
     }
-    
+
     // Only trigger overlay for projects page
     if (!isProjectsPage) {
       return;
     }
-    
+
     // On subsequent navigations to projects page, reset first
     resetForNewRoute();
     // Then mark ready after a tick so reset has time to take effect
@@ -38,4 +42,3 @@ export default function RouteReadySignal({ children }: { children: React.ReactNo
 
   return <>{children}</>;
 }
-

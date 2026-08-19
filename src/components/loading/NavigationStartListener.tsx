@@ -42,11 +42,11 @@ export default function NavigationStartListener() {
         if (url.origin !== window.location.origin) return;
         // If it’s the same exact URL, don't flash the loader.
         if (url.href === window.location.href) return;
-        
+
         // Only trigger overlay for navigation to/from projects page
         const isNavigatingToProjects = url.pathname === "/projects";
         const isNavigatingFromProjects = pathname === "/projects";
-        
+
         if (!isNavigatingToProjects && !isNavigatingFromProjects) {
           return; // Don't trigger overlay for other pages
         }
@@ -63,4 +63,3 @@ export default function NavigationStartListener() {
 
   return null;
 }
-

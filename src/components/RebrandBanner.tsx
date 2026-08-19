@@ -10,7 +10,9 @@ export default function RebrandBanner() {
 
   useEffect(() => {
     try {
-      const dismissed = typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY) === "true";
+      const dismissed =
+        typeof window !== "undefined" &&
+        localStorage.getItem(STORAGE_KEY) === "true";
       if (!dismissed) setVisible(true);
     } catch {
       setVisible(true);
@@ -42,13 +44,14 @@ export default function RebrandBanner() {
     <div className="fixed bottom-0 left-0 right-0 z-[60] w-full border-t border-amber-200 bg-amber-50 text-amber-900 shadow-[0_-2px_8px_rgba(0,0,0,0.05)]">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6 lg:px-8">
         <p className="text-sl">
-          We are currently undergoing a rebrand. Some visuals and names may change. Thanks for your patience!
+          We are currently undergoing a rebrand. Some visuals and names may
+          change. Thanks for your patience!
         </p>
         <button
           type="button"
           aria-label="Dismiss rebranding notice"
           onClick={dismiss}
-          className="rounded-md border border-amber-300 px-2 py-1 text-xm font-medium text-amber-900 hover:bg-amber-100"
+          className="text-xm rounded-md border border-amber-300 px-2 py-1 font-medium text-amber-900 hover:bg-amber-100"
         >
           Dismiss
         </button>

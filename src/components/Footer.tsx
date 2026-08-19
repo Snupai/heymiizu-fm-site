@@ -12,28 +12,50 @@ function FooterContent() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setIsMobile(/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent));
+      setIsMobile(
+        /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          window.navigator.userAgent,
+        ),
+      );
     }
   }, []);
 
   if (isMobile) {
     return (
-      <footer className="w-full bg-white py-4 border-t border-gray-200">
+      <footer className="w-full border-t border-gray-200 bg-white py-4">
         <div className="flex flex-col items-center gap-1">
-          <div className="flex justify-center gap-8 items-center mb-1">
-            <a href="https://x.com/heymiizu" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-ink text-2xl hover:text-brand transition-colors">
+          <div className="mb-1 flex items-center justify-center gap-8">
+            <a
+              href="https://x.com/heymiizu"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Twitter"
+              className="text-2xl text-ink transition-colors hover:text-brand"
+            >
               <FaTwitter />
             </a>
-            <a href="https://www.instagram.com/miizumelon/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-ink text-2xl hover:text-brand transition-colors">
+            <a
+              href="https://www.instagram.com/miizumelon/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="text-2xl text-ink transition-colors hover:text-brand"
+            >
               <FaInstagram />
             </a>
-            <a href="https://www.youtube.com/@Miizumelon" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-ink text-2xl hover:text-brand transition-colors">
+            <a
+              href="https://www.youtube.com/@Miizumelon"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              className="text-2xl text-ink transition-colors hover:text-brand"
+            >
               <FaYoutube />
             </a>
           </div>
-          <Link 
+          <Link
             href="/imprint"
-            className="text-ink text-xs opacity-80 hover:opacity-100 hover:text-brand transition-colors duration-300 underline"
+            className="text-xs text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
           >
             Imprint
           </Link>
@@ -43,15 +65,15 @@ function FooterContent() {
   }
 
   return (
-    <div className="w-screen bg-white relative left-[50%] right-[50%] mr-[-50vw] ml-[-50vw] border-t border-gray-200">
+    <div className="relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] w-screen border-t border-gray-200 bg-white">
       <div className="py-4">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="mx-auto max-w-7xl px-4 md:px-8">
           <div className="flex flex-col">
             {/* Main Footer Content */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               {/* Left Side: Logo and Email */}
               <div className="flex items-center space-x-6">
-                <Link href="/" className="w-12 h-12 relative">
+                <Link href="/" className="relative h-12 w-12">
                   <Image
                     src="/Sentimental_Icon.png"
                     alt="Miizu Logo"
@@ -59,9 +81,9 @@ function FooterContent() {
                     className="object-contain"
                   />
                 </Link>
-                <a 
+                <a
                   href="mailto:hey@miizumelon.de"
-                  className="text-ink text-base hover:text-brand transition-colors duration-300"
+                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
                 >
                   hey@miizumelon.de
                 </a>
@@ -69,27 +91,27 @@ function FooterContent() {
 
               {/* Right Side: Social Links */}
               <div className="flex space-x-6">
-                <a 
-                  href="https://x.com/FromNuvia" 
-                  target="_blank" 
+                <a
+                  href="https://x.com/FromNuvia"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ink text-base hover:text-brand transition-colors duration-300"
+                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
                 >
                   Twitter
                 </a>
-                <a 
-                  href="https://www.instagram.com/fromnuvia/" 
-                  target="_blank" 
+                <a
+                  href="https://www.instagram.com/fromnuvia/"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ink text-base hover:text-brand transition-colors duration-300"
+                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
                 >
                   Instagram
                 </a>
-                <a 
-                  href="https://www.youtube.com/@Miizumelon" 
-                  target="_blank" 
+                <a
+                  href="https://www.youtube.com/@Miizumelon"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="text-ink text-base hover:text-brand transition-colors duration-300"
+                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
                 >
                   YouTube
                 </a>
@@ -98,23 +120,25 @@ function FooterContent() {
 
             {/* Made with Heart - Centered at Bottom */}
             <div className="flex flex-col items-center border-t border-black/5 pt-3">
-              <div className="text-ink text-xs flex items-center space-x-1 opacity-70">
+              <div className="flex items-center space-x-1 text-xs text-ink opacity-70">
                 <p>
-                  Made with{' '}
-                  <span className="text-[#8839ef] animate-pulse inline-block">❤</span>
-                  {' '}by
+                  Made with{" "}
+                  <span className="inline-block animate-pulse text-[#8839ef]">
+                    ❤
+                  </span>{" "}
+                  by
                 </p>
-                <a 
-                  href="https://snupai.me" 
-                  target="_blank" 
-                  className="hover:text-ink transition-colors duration-300"
+                <a
+                  href="https://snupai.me"
+                  target="_blank"
+                  className="transition-colors duration-300 hover:text-ink"
                 >
                   Snupai
                 </a>
               </div>
-              <Link 
+              <Link
                 href="/imprint"
-                className="text-ink text-sm mt-2 opacity-80 hover:opacity-100 hover:text-brand transition-colors duration-300 underline"
+                className="mt-2 text-sm text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
               >
                 Imprint
               </Link>
@@ -123,7 +147,7 @@ function FooterContent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default FooterContent;
