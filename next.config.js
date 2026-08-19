@@ -47,8 +47,9 @@ const nextConfig = {
       },
     ],
   },
-  // Configure output options
-  output: "standalone",
+  // Vercel injects a build adapter and does not consume the standalone folder.
+  // Next.js 16.3 currently fails when both features are enabled together.
+  output: process.env.VERCEL ? undefined : "standalone",
   // Add headers for video files to support range requests, CORS, and proper MIME types
   async headers() {
     return [
