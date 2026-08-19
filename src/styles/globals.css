@@ -6,58 +6,53 @@
 
 /* SF Pro Display font family definition */
 @font-face {
-  font-family: 'SF Pro Display';
-  src: local('SF Pro Display'),
-       local('SF Pro'),
-       local('SF Pro Text');
+  font-family: "SF Pro Display";
+  src: local("SF Pro Display"), local("SF Pro"), local("SF Pro Text");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'SF Pro Display';
-  src: local('SF Pro Display'),
-       local('SF Pro'),
-       local('SF Pro Text');
+  font-family: "SF Pro Display";
+  src: local("SF Pro Display"), local("SF Pro"), local("SF Pro Text");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'SF Pro Display';
-  src: local('SF Pro Display'),
-       local('SF Pro'),
-       local('SF Pro Text');
+  font-family: "SF Pro Display";
+  src: local("SF Pro Display"), local("SF Pro"), local("SF Pro Text");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'SF Pro Display';
-  src: local('SF Pro Display'),
-       local('SF Pro'),
-       local('SF Pro Text');
+  font-family: "SF Pro Display";
+  src: local("SF Pro Display"), local("SF Pro"), local("SF Pro Text");
   font-weight: 300;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'SF Pro Display';
-  src: local('SF Pro Display'),
-       local('SF Pro'),
-       local('SF Pro Text');
+  font-family: "SF Pro Display";
+  src: local("SF Pro Display"), local("SF Pro"), local("SF Pro Text");
   font-weight: 900;
   font-style: italic;
   font-display: swap;
 }
 
 :root {
-  --font-sans: 'SF Pro Display', var(--font-public-sans);
+  --font-sans:
+    "SF Pro Display", -apple-system, BlinkMacSystemFont, var(--font-public-sans);
   --radius: 0.625rem;
+}
+
+html {
+  position: relative;
 }
 
 /* Custom scrollbar styling for a more polished look */
@@ -78,9 +73,10 @@
   background: #555;
 }
 
-html, body {
+html,
+body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Removed broken import for missing specialCardOutline.css */
@@ -102,7 +98,14 @@ html, body {
   content: attr(data-text);
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(270deg, #00e5ff, #005bea, #00e5ff, #002766, #00e5ff);
+  background-image: linear-gradient(
+    270deg,
+    #00e5ff,
+    #005bea,
+    #00e5ff,
+    #002766,
+    #00e5ff
+  );
   background-size: 400% 400%;
   background-position: 0% 50%;
   -webkit-background-clip: text;
@@ -121,9 +124,15 @@ html, body {
 }
 
 @keyframes gradient-text-move {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -160,13 +169,27 @@ html, body {
 }
 
 @keyframes paused-halo-breathe {
-  0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
-  50% { opacity: 0.9; transform: translateX(-50%) scale(1.12); }
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(1.12);
+  }
 }
 
 @keyframes paused-ping {
-  0% { opacity: 0.65; transform: scale(1); }
-  75%, 100% { opacity: 0; transform: scale(2.75); }
+  0% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(2.75);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
