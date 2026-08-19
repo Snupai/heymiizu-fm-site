@@ -1,4 +1,4 @@
-import { Public_Sans } from "next/font/google";
+import { Rethink_Sans } from "next/font/google";
 import "../styles/globals.css";
 import "../styles/special-gradient-outline.css";
 import type { Metadata } from "next";
@@ -7,10 +7,10 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import AppShell from "../components/AppShell";
 
-const publicSans = Public_Sans({
+const rethinkSans = Rethink_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-public-sans",
+  style: ["normal", "italic"],
+  variable: "--font-rethink-sans",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -64,11 +64,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html className={rethinkSans.variable} lang="en">
       <head></head>
-      <body
-        className={`${publicSans.variable} flex min-h-screen flex-col font-sans`}
-      >
+      <body className="flex min-h-screen flex-col font-sans font-semibold">
         <AppShell>{children}</AppShell>
       </body>
       <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />

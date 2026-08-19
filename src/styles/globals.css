@@ -23,8 +23,39 @@
 
 @font-face {
   font-family: "SF Pro Display";
+  src:
+    local("SF Pro Display Semibold"), local("SFProDisplay-Semibold"),
+    local("SF Pro Display"), local("SF Pro");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src:
+    local("SF Pro Display Semibold Italic"),
+    local("SFProDisplay-SemiboldItalic"), local("SF Pro Display"),
+    local("SF Pro");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
   src: local("SF Pro Display"), local("SF Pro"), local("SF Pro Text");
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src:
+    local("SF Pro Display Black"), local("SF Pro Display Heavy"),
+    local("SF Pro Display"), local("SF Pro");
+  font-weight: 800 900;
   font-style: normal;
   font-display: swap;
 }
@@ -47,7 +78,8 @@
 
 :root {
   --font-sans:
-    "SF Pro Display", -apple-system, BlinkMacSystemFont, var(--font-public-sans);
+    "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    var(--font-rethink-sans), system-ui, sans-serif;
   --radius: 0.625rem;
 }
 
@@ -75,6 +107,8 @@ html {
 
 html,
 body {
+  font-weight: 600;
+  letter-spacing: 0.02em;
   max-width: 100vw;
   overflow-x: clip;
 }

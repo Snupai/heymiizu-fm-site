@@ -12,6 +12,7 @@
   --miizu-primary: #2117e6;
   background: var(--miizu-bg);
   color: var(--miizu-ink);
+  font-weight: 600;
   min-width: 0;
   overflow: visible;
 }
@@ -25,9 +26,10 @@
     "SF Pro Display",
     -apple-system,
     BlinkMacSystemFont,
-    var(--font-public-sans),
+    var(--font-rethink-sans),
     system-ui,
     sans-serif;
+  letter-spacing: 0.02em;
 }
 
 .site button,
@@ -45,7 +47,7 @@
   font-weight: 650;
   inset: 0;
   justify-content: center;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.01em;
   position: fixed;
   z-index: 10000;
 }
@@ -61,7 +63,7 @@
 }
 
 .heroWorkScene {
-  height: 230svh;
+  height: 420svh;
   position: relative;
 }
 
@@ -88,7 +90,7 @@
   color: var(--miizu-ink);
   font-size: clamp(0.95rem, 1.35vw, 1.55rem);
   font-weight: 620;
-  letter-spacing: -0.035em;
+  letter-spacing: 0.02em;
   pointer-events: auto;
   text-decoration: none;
 }
@@ -129,6 +131,11 @@
   transform-origin: left;
 }
 
+.footerLinks a:hover::after,
+.footerLinks a:focus-visible::after {
+  transform-origin: center;
+}
+
 .heroCopy {
   left: clamp(1.6rem, 9vw, 11rem);
   position: absolute;
@@ -140,7 +147,7 @@
 .heroCopy h1 {
   font-size: clamp(4.4rem, 12vw, 12rem);
   font-weight: 720;
-  letter-spacing: -0.085em;
+  letter-spacing: -0.02em;
   line-height: 0.84;
   margin: 0;
   position: relative;
@@ -160,7 +167,7 @@
   font-family: "Caveat Brush", cursive;
   font-size: clamp(7rem, 20vw, 20rem);
   left: 0;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.02em;
   line-height: 0.7;
   pointer-events: none;
   position: absolute;
@@ -178,7 +185,7 @@
   color: color-mix(in srgb, var(--miizu-ink) 20%, transparent);
   cursor: pointer;
   font-size: clamp(0.95rem, 1.2vw, 1.3rem);
-  font-weight: 550;
+  font-weight: 600;
   left: 50%;
   padding: 0.5rem;
   position: absolute;
@@ -190,7 +197,7 @@
   backface-visibility: hidden;
   background: var(--miizu-primary);
   color: var(--miizu-bg);
-  contain: layout paint;
+  contain: layout;
   height: 100svh;
   overflow: hidden;
   position: absolute;
@@ -257,7 +264,7 @@
 .workList {
   align-self: center;
   font-size: clamp(1.5rem, 2.4vw, 3.5rem);
-  letter-spacing: -0.055em;
+  letter-spacing: -0.01em;
   line-height: 0.96;
   position: relative;
   z-index: 2;
@@ -277,7 +284,7 @@
   font-size: clamp(3.6rem, 7vw, 9rem);
   font-weight: 620;
   justify-self: center;
-  letter-spacing: -0.07em;
+  letter-spacing: -0.02em;
   line-height: 0.93;
   margin: 0;
   position: relative;
@@ -291,7 +298,7 @@
 
 .clientsBridge {
   background: var(--miizu-ink);
-  height: clamp(10.5rem, 20svh, 14rem);
+  height: clamp(16rem, 42svh, 28rem);
   overflow: hidden;
   position: relative;
 }
@@ -351,8 +358,8 @@
 
 .clientGroup span {
   font-size: clamp(1.7rem, 3vw, 4.4rem);
-  font-weight: 570;
-  letter-spacing: -0.055em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 @keyframes ticker {
@@ -380,7 +387,7 @@
 .contactPitch h2 {
   font-size: clamp(3.9rem, 6.2vw, 8rem);
   font-weight: 700;
-  letter-spacing: -0.075em;
+  letter-spacing: -0.02em;
   line-height: 0.86;
   margin: 0 0 2.8rem;
   max-width: 15ch;
@@ -388,8 +395,8 @@
 
 .contactPitch h2 span {
   font-size: 0.58em;
-  font-weight: 520;
-  letter-spacing: -0.055em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .regionToggle {
@@ -442,9 +449,9 @@
   color: var(--miizu-bg);
   display: flex;
   font-size: clamp(2rem, 3.1vw, 4.6rem);
-  font-weight: 560;
+  font-weight: 600;
   gap: 0.45em;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.01em;
   text-decoration: none;
 }
 
@@ -482,7 +489,7 @@
   color: var(--miizu-ink);
   font-size: clamp(1.35rem, 2vw, 2.4rem);
   font-weight: 600;
-  letter-spacing: -0.045em;
+  letter-spacing: 0.02em;
   margin: 1.2em 0 -0.1em;
 }
 
@@ -491,7 +498,7 @@
   display: block;
   font-size: clamp(2.6rem, 5.3vw, 7.2rem);
   font-weight: 700;
-  letter-spacing: -0.075em;
+  letter-spacing: -0.02em;
   line-height: 0.95;
   overflow-wrap: anywhere;
   text-decoration: none;
@@ -541,7 +548,7 @@
 .contactForm label > span {
   font-size: clamp(0.94rem, 1.2vw, 1.25rem);
   font-weight: 620;
-  letter-spacing: -0.025em;
+  letter-spacing: 0.02em;
   margin-bottom: 0.12rem;
 }
 
@@ -555,7 +562,7 @@
   border-radius: 0;
   color: var(--miizu-bg);
   font-size: clamp(1rem, 1.25vw, 1.32rem);
-  font-weight: 430;
+  font-weight: 600;
   line-height: 1.2;
   outline: 0;
   padding: 0.18rem 0 0.42rem;
@@ -594,7 +601,7 @@
   color: var(--miizu-bg);
   cursor: pointer;
   font-size: clamp(1.25rem, 1.8vw, 2rem);
-  font-weight: 560;
+  font-weight: 600;
   margin-top: clamp(0.8rem, 2vh, 1.8rem);
   padding: 0.65em 1.2em;
   transition:
@@ -651,7 +658,7 @@
 
 .pausedNotice strong {
   font-size: clamp(2rem, 3.2vw, 3.4rem);
-  letter-spacing: -0.06em;
+  letter-spacing: -0.02em;
   line-height: 0.95;
   margin-top: 1rem;
 }
@@ -677,15 +684,18 @@
 }
 
 .footer {
+  --nva-size: clamp(18rem, 46vw, 40rem);
   background: var(--miizu-bg);
   display: grid;
   grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
-  min-height: clamp(30rem, 56svh, 48rem);
+  height: calc(var(--nva-size) * 0.66);
+  min-height: 0;
   overflow: hidden;
   position: relative;
 }
 
 .nuviaPanel {
+  cursor: help;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -694,34 +704,44 @@
 .representedBy {
   color: var(--miizu-primary);
   font-size: clamp(0.75rem, 1vw, 1rem);
-  left: clamp(2.5rem, 7vw, 8rem);
+  font-weight: 650;
+  left: var(--n-x, 6%);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  pointer-events: none;
   position: absolute;
-  rotate: 58deg;
-  top: clamp(2rem, 5vw, 5rem);
+  top: var(--n-y, 22%);
+  transform: translate(-50%, -50%) rotate(var(--n-angle, 58deg));
+  transform-origin: center;
+  white-space: nowrap;
   z-index: 4;
 }
 
 .nuviaWordmark {
+  bottom: -0.2em;
   cursor: help;
-  font-size: clamp(18rem, 46vw, 112rem);
-  height: 0.72em;
+  font-size: var(--nva-size);
+  height: 0.92em;
   left: 0;
   outline: 0;
   position: absolute;
-  top: -0.07em;
+  top: auto;
   width: 100%;
   z-index: 1;
 }
 
 .nuviaWord {
-  font-weight: 760;
+  font-synthesis: none;
+  font-weight: 900;
   inset: 0;
-  letter-spacing: 0.1em;
-  line-height: 0.72;
-  padding-left: 0;
+  letter-spacing: 0;
+  line-height: 0.8;
+  margin: 0;
+  padding: 0;
   position: absolute;
-  transform: translateX(var(--nva-shift, 4vw)) scaleX(var(--nva-scale, 0.56));
-  transform-origin: left top;
+  text-indent: 0;
+  transform: translateX(var(--nva-shift, 0px)) scaleX(var(--nva-scale, 0.56));
+  transform-origin: 0 100%;
   white-space: nowrap;
 }
 
@@ -736,48 +756,61 @@
 }
 
 .nuviaTooltip {
-  background: var(--miizu-bg);
+  background: #fbfbfe;
   border-radius: 999px;
-  color: var(--miizu-primary);
-  font-size: clamp(0.7rem, 0.8vw, 1rem);
+  box-shadow: 0 0.4rem 1.4rem rgba(5, 3, 21, 0.12);
+  color: #2117e6;
+  display: inline-flex;
+  font-family:
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    var(--font-rethink-sans),
+    system-ui,
+    sans-serif;
+  font-size: clamp(1.1rem, 1.7vw, 1.65rem);
   font-weight: 700;
-  left: 10%;
-  letter-spacing: -0.02em;
+  isolation: isolate;
+  left: 0;
+  letter-spacing: 0.02em;
   line-height: 1;
   opacity: 0;
-  padding: 0.7rem 1rem;
+  padding: 0.85rem 1.25rem;
   pointer-events: none;
-  position: absolute;
-  top: 48%;
-  transform: translateY(0.7rem);
-  transition:
-    opacity 200ms ease,
-    transform 200ms ease;
+  position: fixed;
+  top: 0;
+  transition: opacity 160ms ease;
+  white-space: nowrap;
+  z-index: 50;
 }
 
-.nuviaWordmark:hover .nuviaTooltip,
-.nuviaWordmark:focus-visible .nuviaTooltip {
+.nuviaTooltipVisible {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .footerLinks {
-  align-items: flex-end;
+  align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: clamp(2rem, 4vw, 5rem);
   position: relative;
+  text-align: center;
   z-index: 3;
 }
 
 .footerLinks a {
   color: var(--miizu-primary);
   font-size: clamp(1.15rem, 1.8vw, 2rem);
-  font-weight: 540;
-  letter-spacing: -0.035em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   margin: 0.22em 0;
+  text-align: center;
   text-decoration: none;
+}
+
+.footerLinks a::after {
+  transform-origin: center;
 }
 
 .site :focus-visible {
@@ -807,7 +840,7 @@
   }
 
   .heroWorkScene {
-    height: 240svh;
+    height: 360svh;
   }
 
   .header {
@@ -866,7 +899,7 @@
   }
 
   .clientsBridge {
-    height: 9.5rem;
+    height: 16rem;
   }
 
   .clientsRail {
@@ -934,6 +967,7 @@
   }
 
   .footer {
+    height: auto;
     min-height: 0;
   }
 
@@ -945,17 +979,20 @@
     position: relative;
   }
 
+  .representedBy {
+    color: var(--miizu-bg);
+  }
+
   .nuviaWordmark {
+    bottom: -0.16em;
     font-size: 58vw;
-    top: 0;
+    top: auto;
   }
 
   .nuviaWord {
-    letter-spacing: -0.11em;
-    padding-left: 0;
-    transform: translateX(var(--nva-shift, -3.4vw))
-      scaleX(var(--nva-scale, 0.97));
-    transform-origin: left top;
+    letter-spacing: 0;
+    transform: translateX(var(--nva-shift, 0px)) scaleX(var(--nva-scale, 0.97));
+    transform-origin: 0 100%;
   }
 
   .nuviaWordLight {
@@ -968,7 +1005,7 @@
   }
 
   .footerLinks {
-    align-items: flex-start;
+    align-items: center;
     background: var(--miizu-bg);
     min-height: 15rem;
     padding: 2.5rem 1.4rem;

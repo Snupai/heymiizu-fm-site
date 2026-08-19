@@ -3,14 +3,17 @@
 import {
   AnimatePresence,
   motion,
+  useMotionValue,
   useReducedMotion,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import { createPortal } from "react-dom";
+import type { FormEvent, PointerEvent } from "react";
 
 import {
   formatPauseUntilDate,
@@ -350,11 +353,161 @@ function ContactForm({ region }: { region: "local" | "international" }) {
   );
 }
 
+type CanvasWithLetterSpacing = CanvasRenderingContext2D & {
+  letterSpacing?: string;
+};
+
+function applyNvaCanvasFont(
+  context: CanvasRenderingContext2D,
+  computed: CSSStyleDeclaration,
+  letterSpacing: number,
+) {
+  context.font = `${computed.fontWeight} ${computed.fontSize} ${computed.fontFamily}`;
+  context.fontKerning = "normal";
+  context.textAlign = "left";
+  context.textBaseline = "alphabetic";
+  const typed = context as CanvasWithLetterSpacing;
+  if (typeof typed.letterSpacing === "string") {
+    typed.letterSpacing = `${letterSpacing}px`;
+  }
+}
+
+function measureNvaInk(computed: CSSStyleDeclaration, fontSize: number) {
+  const text = "NVA";
+  const letterSpacing = Number.parseFloat(computed.letterSpacing) || 0;
+  const sampleScale = Math.min(window.devicePixelRatio || 1, 2);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!context) return null;
+
+  applyNvaCanvasFont(context, computed, letterSpacing);
+  const metrics = context.measureText(text);
+  const hasCanvasTracking =
+    typeof (context as CanvasWithLetterSpacing).letterSpacing === "string";
+  const padding = Math.ceil(fontSize * 0.5);
+  const ascent = Math.ceil(metrics.actualBoundingBoxAscent || fontSize * 0.9);
+  const descent = Math.ceil(
+    metrics.actualBoundingBoxDescent || fontSize * 0.25,
+  );
+  const trackedWidth =
+    metrics.width +
+    (hasCanvasTracking ? 0 : Math.abs(letterSpacing) * text.length);
+
+  canvas.width = Math.ceil((trackedWidth + padding * 2) * sampleScale);
+  canvas.height = Math.ceil((ascent + descent + padding * 2) * sampleScale);
+  context.setTransform(sampleScale, 0, 0, sampleScale, 0, 0);
+  applyNvaCanvasFont(context, computed, letterSpacing);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "#000";
+
+  if (hasCanvasTracking) {
+    context.fillText(text, padding, padding + ascent);
+  } else {
+    for (let index = 0; index < text.length; index += 1) {
+      const character = text[index];
+      if (!character) continue;
+
+      const prefix = text.slice(0, index + 1);
+      const characterWidth = context.measureText(character).width;
+      const characterX =
+        padding +
+        context.measureText(prefix).width -
+        characterWidth +
+        letterSpacing * index;
+
+      context.fillText(character, characterX, padding + ascent);
+    }
+  }
+
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+  const alphaThreshold = 128;
+  let firstInkPixel = canvas.width;
+  let lastInkPixel = -1;
+
+  for (let index = 3; index < pixels.length; index += 4) {
+    const alpha = pixels[index];
+    if (alpha === undefined || alpha < alphaThreshold) continue;
+    const pixelX = ((index - 3) / 4) % canvas.width;
+    firstInkPixel = Math.min(firstInkPixel, pixelX);
+    lastInkPixel = Math.max(lastInkPixel, pixelX);
+  }
+
+  if (lastInkPixel < firstInkPixel) return null;
+
+  const pixelInkLeft = firstInkPixel / sampleScale - padding;
+  const pixelInkRight = (lastInkPixel + 1) / sampleScale - padding;
+  const metricsInkLeft = Number.isFinite(metrics.actualBoundingBoxLeft)
+    ? -metrics.actualBoundingBoxLeft
+    : pixelInkLeft;
+  const metricsInkRight = Number.isFinite(metrics.actualBoundingBoxRight)
+    ? metrics.actualBoundingBoxRight
+    : pixelInkRight;
+  const inkLeft = Math.max(pixelInkLeft, metricsInkLeft);
+  const inkRight = Math.max(pixelInkRight, metricsInkRight);
+  const inkWidth = inkRight - inkLeft;
+
+  if (!Number.isFinite(inkWidth) || inkWidth <= 0) return null;
+
+  return { inkLeft, inkWidth };
+}
+
+function anchorRepresentedBy(word: HTMLElement, label: HTMLElement) {
+  const panel = word.parentElement?.parentElement;
+  const textNode = word.firstChild;
+
+  if (!panel || textNode?.nodeType !== Node.TEXT_NODE) return;
+
+  const range = document.createRange();
+  range.setStart(textNode, 0);
+  range.setEnd(textNode, 1);
+  const nRect = range.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  range.detach();
+
+  if (nRect.width < 2 || nRect.height < 2 || panelRect.height < 2) return;
+
+  const computed = window.getComputedStyle(word);
+  const letterSpacing = Number.parseFloat(computed.letterSpacing);
+  const scaleX = new DOMMatrix(computed.transform).a || 1;
+  const visualTracking = Number.isFinite(letterSpacing)
+    ? Math.abs(letterSpacing * scaleX)
+    : 0;
+  const inkWidth = Math.max(1, nRect.width - visualTracking);
+  const yAbs = panelRect.top + panelRect.height * 0.28;
+  const alongGlyph = (yAbs - nRect.top) / nRect.height;
+  const xAbs = nRect.left + inkWidth * alongGlyph;
+
+  label.style.setProperty("--n-x", `${xAbs - panelRect.left}px`);
+  label.style.setProperty("--n-y", `${yAbs - panelRect.top}px`);
+  label.style.setProperty(
+    "--n-angle",
+    `${(Math.atan2(nRect.height, inkWidth) * 180) / Math.PI}deg`,
+  );
+  label.style.fontSize = `${Math.min(16, Math.max(11, panelRect.height * 0.048))}px`;
+}
+
 export default function MiizuLanding() {
   const reduceMotion = useReducedMotion();
   const sceneRef = useRef<HTMLDivElement>(null);
   const clientsRef = useRef<HTMLElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
+  const representedByRef = useRef<HTMLSpanElement>(null);
+  const nuviaTooltipReady = useRef(false);
+  const nuviaTooltipX = useMotionValue(0);
+  const nuviaTooltipY = useMotionValue(0);
+  const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
+    stiffness: 420,
+    damping: 32,
+    mass: 0.35,
+  });
+  const nuviaTooltipFollowY = useSpring(nuviaTooltipY, {
+    stiffness: 420,
+    damping: 32,
+    mass: 0.35,
+  });
+  const [nuviaTooltipVisible, setNuviaTooltipVisible] = useState(false);
+  const [nuviaTooltipMounted, setNuviaTooltipMounted] = useState(false);
   const [compact, setCompact] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
   const [region, setRegion] = useState<"local" | "international">(
@@ -387,105 +540,45 @@ export default function MiizuLanding() {
   }, []);
 
   useEffect(() => {
+    setNuviaTooltipMounted(true);
+  }, []);
+
+  useEffect(() => {
     setHeadlineIndex(Math.floor(Math.random() * CONTACT_HEADLINES.length));
   }, []);
 
   useEffect(() => {
     const wordmark = nuviaWordmarkRef.current;
-    const word = wordmark?.querySelector<HTMLElement>(`.${styles.nuviaWord}`);
 
-    if (!wordmark || !word) return;
+    if (!wordmark) return;
 
     const fitWordmark = () => {
+      const words = [
+        ...wordmark.querySelectorAll<HTMLElement>(`.${styles.nuviaWord}`),
+      ];
+      const word =
+        words.find((el) => window.getComputedStyle(el).display !== "none") ??
+        words[0];
+
+      if (!word) return;
+
       const computed = window.getComputedStyle(word);
       const fontSize = Number.parseFloat(computed.fontSize);
-      const letterSpacing = Number.parseFloat(computed.letterSpacing) || 0;
-      const canvas = document.createElement("canvas");
-      const sampleScale = Math.min(window.devicePixelRatio || 1, 2);
-      const measurementContext = canvas.getContext("2d");
 
-      if (!measurementContext || !Number.isFinite(fontSize)) return;
+      if (!Number.isFinite(fontSize) || fontSize <= 0) return;
 
-      const setFont = (context: CanvasRenderingContext2D) => {
-        context.font = `${computed.fontWeight} ${computed.fontSize} ${computed.fontFamily}`;
-        context.fontKerning = "normal";
-        context.textBaseline = "alphabetic";
-      };
+      const ink = measureNvaInk(computed, fontSize);
+      if (!ink) return;
 
-      setFont(measurementContext);
-
-      const text = "NVA";
-      const metrics = measurementContext.measureText(text);
-      const padding = Math.ceil(fontSize * 0.5);
-      const ascent = Math.ceil(
-        metrics.actualBoundingBoxAscent || fontSize * 0.9,
-      );
-      const descent = Math.ceil(
-        metrics.actualBoundingBoxDescent || fontSize * 0.25,
-      );
-      const canvasWidth = Math.ceil(
-        metrics.width + Math.abs(letterSpacing) * text.length + padding * 2,
-      );
-      const canvasHeight = ascent + descent + padding * 2;
-
-      canvas.width = Math.ceil(canvasWidth * sampleScale);
-      canvas.height = Math.ceil(canvasHeight * sampleScale);
-
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      context.scale(sampleScale, sampleScale);
-      setFont(context);
-      context.fillStyle = "#000";
-
-      for (let index = 0; index < text.length; index += 1) {
-        const character = text[index];
-        if (!character) continue;
-
-        const prefix = text.slice(0, index + 1);
-        const characterWidth = context.measureText(character).width;
-        const characterX =
-          padding +
-          context.measureText(prefix).width -
-          characterWidth +
-          letterSpacing * index;
-
-        context.fillText(character, characterX, padding + ascent);
-      }
-
-      const pixels = context.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height,
-      ).data;
-      let firstInkPixel = canvas.width;
-      let lastInkPixel = -1;
-
-      for (let index = 3; index < pixels.length; index += 4) {
-        if (pixels[index] === 0) continue;
-        const pixelX = ((index - 3) / 4) % canvas.width;
-        firstInkPixel = Math.min(firstInkPixel, pixelX);
-        lastInkPixel = Math.max(lastInkPixel, pixelX);
-      }
-
-      if (lastInkPixel < firstInkPixel) return;
-
-      const inkLeft = firstInkPixel / sampleScale - padding;
-      const inkRight = (lastInkPixel + 1) / sampleScale - padding;
-      const inkWidth = inkRight - inkLeft;
-
-      if (!Number.isFinite(inkWidth) || inkWidth <= 0) return;
-
-      const mobile = window.matchMedia("(max-width: 760px)").matches;
-      const sideInset = mobile
-        ? 0
-        : Math.max(24, Math.min(64, wordmark.clientWidth * 0.05));
-      const targetWidth = Math.max(1, wordmark.clientWidth - sideInset * 2 - 1);
-      const scale = targetWidth / inkWidth;
-      const shift = sideInset - inkLeft * scale;
+      const bleed = 1;
+      const targetWidth = Math.max(1, wordmark.clientWidth);
+      const scale = targetWidth / ink.inkWidth;
+      const shift = -ink.inkLeft * scale - bleed;
       wordmark.style.setProperty("--nva-scale", scale.toString());
       wordmark.style.setProperty("--nva-shift", `${shift}px`);
+
+      const label = representedByRef.current;
+      if (label) anchorRepresentedBy(word, label);
     };
 
     const resizeObserver = new ResizeObserver(fitWordmark);
@@ -535,51 +628,57 @@ export default function MiizuLanding() {
 
   const panelX = useTransform(
     scrollYProgress,
-    [0, 0.48, 0.72, 1],
+    [0, 0.42, 0.78, 1],
     compact ? ["-5vw", "-5vw", "0vw", "0vw"] : ["-3vw", "-3vw", "0vw", "0vw"],
   );
   const panelY = useTransform(
     scrollYProgress,
-    [0, 0.48, 0.72, 1],
+    [0, 0.42, 0.78, 1],
     compact
       ? ["43svh", "43svh", "0svh", "0svh"]
       : ["9svh", "9svh", "0svh", "0svh"],
   );
   const panelScaleX = useTransform(
     scrollYProgress,
-    [0, 0.48, 0.72, 1],
+    [0, 0.42, 0.78, 1],
     compact ? [0.9, 0.9, 1, 1] : [0.31, 0.31, 1, 1],
   );
   const panelScaleY = useTransform(
     scrollYProgress,
-    [0, 0.48, 0.72, 1],
+    [0, 0.42, 0.78, 1],
     compact ? [0.51, 0.51, 1, 1] : [0.82, 0.82, 1, 1],
   );
   const cardScaleX = useTransform(panelScaleX, (value) => 1 / value);
   const cardScaleY = useTransform(panelScaleY, (value) => 1 / value);
-  const panelRadius = useTransform(
+  const visualRadius = useTransform(
     scrollYProgress,
-    [0, 0.55, 0.72],
-    ["2.6rem", "2.6rem", "0rem"],
+    [0, 0.5, 0.78],
+    [2.6, 2.6, 0],
   );
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.38, 0.58], [1, 1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.56], ["0vh", "-6vh"]);
+  const panelRadius = useTransform(() => {
+    const radius = visualRadius.get();
+    const scaleX = Math.max(panelScaleX.get(), 0.001);
+    const scaleY = Math.max(panelScaleY.get(), 0.001);
+    return `${radius / scaleX}rem / ${radius / scaleY}rem`;
+  });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.36, 0.58], [1, 1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.58], ["0vh", "-6vh"]);
   const cardLabelOpacity = useTransform(
     scrollYProgress,
-    [0, 0.43, 0.58],
+    [0, 0.4, 0.56],
     [1, 1, 0],
   );
-  const workOpacity = useTransform(scrollYProgress, [0.7, 0.82], [0, 1]);
-  const workY = useTransform(scrollYProgress, [0.7, 0.82], [42, 0]);
-  const workShadeOpacity = useTransform(scrollYProgress, [0.58, 0.78], [0, 1]);
+  const workOpacity = useTransform(scrollYProgress, [0.68, 0.86], [0, 1]);
+  const workY = useTransform(scrollYProgress, [0.68, 0.86], [42, 0]);
+  const workShadeOpacity = useTransform(scrollYProgress, [0.52, 0.78], [0, 1]);
   const railX = useTransform(
     clientsProgress,
-    [0, 0.28, 0.62, 1],
+    [0, 0.18, 0.78, 1],
     ["-28vw", "-20vw", "0vw", "0vw"],
   );
   const railOpacity = useTransform(
     clientsProgress,
-    [0, 0.22, 0.62, 1],
+    [0, 0.14, 0.78, 1],
     [0, 0.08, 1, 1],
   );
 
@@ -589,11 +688,42 @@ export default function MiizuLanding() {
     "mailto:hey@miizumelon.com?subject=Let%27s%20book%20a%20call";
 
   const openWork = () => {
-    const sceneTop = sceneRef.current?.offsetTop ?? 0;
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    const travel = Math.max(0, scene.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: sceneTop + window.innerHeight * 1.05,
+      top: scene.offsetTop + travel * 0.86,
       behavior: "smooth",
     });
+  };
+
+  const placeNuviaTooltip = (
+    event: PointerEvent<HTMLElement>,
+    instant = false,
+  ) => {
+    const x = event.clientX;
+    const y = event.clientY;
+
+    if (instant || !nuviaTooltipReady.current) {
+      nuviaTooltipX.jump(x);
+      nuviaTooltipY.jump(y);
+      nuviaTooltipReady.current = true;
+      return;
+    }
+
+    nuviaTooltipX.set(x);
+    nuviaTooltipY.set(y);
+  };
+
+  const showNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
+    placeNuviaTooltip(event, true);
+    setNuviaTooltipVisible(true);
+  };
+
+  const hideNuviaTooltip = () => {
+    nuviaTooltipReady.current = false;
+    setNuviaTooltipVisible(false);
   };
 
   return (
@@ -801,11 +931,29 @@ export default function MiizuLanding() {
       </section>
 
       <footer className={styles.footer} id="footer">
-        <div className={styles.nuviaPanel}>
-          <span className={styles.representedBy}>represented by</span>
+        <div
+          className={styles.nuviaPanel}
+          onPointerEnter={showNuviaTooltip}
+          onPointerLeave={hideNuviaTooltip}
+          onPointerMove={placeNuviaTooltip}
+        >
+          <span className={styles.representedBy} ref={representedByRef}>
+            represented by
+          </span>
           <div
             aria-label="NVA, represented by Nuvia"
             className={styles.nuviaWordmark}
+            onBlur={hideNuviaTooltip}
+            onFocus={() => {
+              const panel = nuviaWordmarkRef.current?.parentElement;
+              if (panel) {
+                const rect = panel.getBoundingClientRect();
+                nuviaTooltipX.jump(rect.left + rect.width * 0.2);
+                nuviaTooltipY.jump(rect.top + rect.height * 0.42);
+                nuviaTooltipReady.current = true;
+              }
+              setNuviaTooltipVisible(true);
+            }}
             ref={nuviaWordmarkRef}
             tabIndex={0}
           >
@@ -813,16 +961,13 @@ export default function MiizuLanding() {
               aria-hidden="true"
               className={`${styles.nuviaWord} ${styles.nuviaWordDark}`}
             >
-              NVA
+              {"NVA"}
             </span>
             <span
               aria-hidden="true"
               className={`${styles.nuviaWord} ${styles.nuviaWordLight}`}
             >
-              NVA
-            </span>
-            <span aria-hidden="true" className={styles.nuviaTooltip}>
-              Nuvia is literally my Brand
+              {"NVA"}
             </span>
           </div>
         </div>
@@ -832,6 +977,21 @@ export default function MiizuLanding() {
           <Link href="#hero">who is miizu?</Link>
         </nav>
       </footer>
+      {nuviaTooltipMounted
+        ? createPortal(
+            <motion.span
+              aria-hidden="true"
+              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}`}
+              style={{ x: nuviaTooltipFollowX, y: nuviaTooltipFollowY }}
+              transformTemplate={({ x, y }) =>
+                `translate(${x}, ${y}) translate(14px, -50%)`
+              }
+            >
+              Nuvia is literally my Brand
+            </motion.span>,
+            document.body,
+          )
+        : null}
     </main>
   );
 }
