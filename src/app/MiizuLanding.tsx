@@ -63,6 +63,7 @@ const CLIENTS = [
   "HOLY",
   "Airalo",
 ];
+const CLIENT_MARQUEE_ROWS = 7;
 
 const SERVICES = [
   "Launch campaign",
@@ -74,6 +75,7 @@ const SERVICES = [
 ];
 
 const BUDGETS = ["5 - 10k", "10 - 25k", "25 - 50k", "50 - 100k", "100k+"];
+const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
 
 type ContactData = {
   name: string;
@@ -101,6 +103,10 @@ function scrollToId(id: string) {
   document
     .getElementById(id)
     ?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function supportsFineHover() {
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 }
 
 function ContactForm({ region }: { region: "local" | "international" }) {
@@ -492,9 +498,11 @@ export default function MiizuLanding() {
   const reduceMotion = useReducedMotion();
   const sceneRef = useRef<HTMLDivElement>(null);
   const clientsRef = useRef<HTMLElement>(null);
+  const clientMarqueesRef = useRef<HTMLDivElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
   const representedByRef = useRef<HTMLSpanElement>(null);
   const nuviaTooltipReady = useRef(false);
+  const lastNuviaTouchAt = useRef(-Infinity);
   const nuviaTooltipX = useMotionValue(0);
   const nuviaTooltipY = useMotionValue(0);
   const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
@@ -508,6 +516,7 @@ export default function MiizuLanding() {
     mass: 0.35,
   });
   const [nuviaTooltipVisible, setNuviaTooltipVisible] = useState(false);
+  const [nuviaTooltipTouch, setNuviaTooltipTouch] = useState(false);
   const [nuviaTooltipMounted, setNuviaTooltipMounted] = useState(false);
   const [compact, setCompact] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
@@ -547,6 +556,91 @@ export default function MiizuLanding() {
   useEffect(() => {
     setHeadlineIndex(Math.floor(Math.random() * CONTACT_HEADLINES.length));
   }, []);
+
+  useEffect(() => {
+    const tracks = clientMarqueesRef.current;
+
+    if (!tracks || reduceMotion) return;
+
+    let animations: Animation[] = [];
+    let lastScrollY = window.scrollY;
+    let lastScrollAt = window.performance.now();
+    let decelerationFrame = 0;
+    let idleTimer = 0;
+
+    const getAnimations = () => {
+      if (animations.length === 0) {
+        animations = tracks.getAnimations({ subtree: true });
+      }
+
+      return animations;
+    };
+
+    const updateRate = (rate: number) => {
+      for (const animation of getAnimations()) {
+        animation.updatePlaybackRate(rate);
+      }
+    };
+
+    const decelerate = () => {
+      const currentAnimations = getAnimations();
+
+      if (currentAnimations.length === 0) return;
+
+      const currentRate = Math.max(
+        ...currentAnimations.map((animation) => animation.playbackRate),
+      );
+      const nextRate = 1 + (currentRate - 1) * 0.82;
+
+      if (nextRate - 1 < 0.02) {
+        updateRate(1);
+        decelerationFrame = 0;
+        return;
+      }
+
+      updateRate(nextRate);
+      decelerationFrame = window.requestAnimationFrame(decelerate);
+    };
+
+    const accelerateMarquee = () => {
+      const currentAnimations = getAnimations();
+
+      if (currentAnimations.length === 0) return;
+
+      const now = window.performance.now();
+      const distance = Math.abs(window.scrollY - lastScrollY);
+      const elapsed = Math.max(16, Math.min(64, now - lastScrollAt));
+      const velocity = distance / elapsed;
+      const boostedRate = Math.min(6, 1 + velocity * 1.4);
+
+      lastScrollY = window.scrollY;
+      lastScrollAt = now;
+
+      window.cancelAnimationFrame(decelerationFrame);
+      window.clearTimeout(idleTimer);
+      updateRate(
+        Math.max(
+          boostedRate,
+          ...currentAnimations.map((animation) => animation.playbackRate),
+        ),
+      );
+
+      idleTimer = window.setTimeout(() => {
+        decelerationFrame = window.requestAnimationFrame(decelerate);
+      }, 90);
+    };
+
+    window.addEventListener("scroll", accelerateMarquee, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", accelerateMarquee);
+      window.cancelAnimationFrame(decelerationFrame);
+      window.clearTimeout(idleTimer);
+      for (const animation of animations) {
+        animation.updatePlaybackRate(1);
+      }
+    };
+  }, [reduceMotion]);
 
   useEffect(() => {
     const wordmark = nuviaWordmarkRef.current;
@@ -674,13 +768,15 @@ export default function MiizuLanding() {
   const workShadeOpacity = useTransform(scrollYProgress, [0.36, 0.54], [0, 1]);
   const railX = useTransform(
     clientsProgress,
-    [0, 0.18, 0.72, 1],
-    ["-28vw", "-20vw", "0vw", "0vw"],
+    compact ? [0, 0.08, 0.28, 1] : [0, 0.18, 0.72, 1],
+    compact
+      ? ["-42vw", "-28vw", "0vw", "0vw"]
+      : ["-28vw", "-20vw", "0vw", "0vw"],
   );
   const railOpacity = useTransform(
     clientsProgress,
-    [0, 0.14, 0.68, 1],
-    [0, 0.08, 1, 1],
+    compact ? [0, 0.1, 0.3, 1] : [0, 0.14, 0.68, 1],
+    compact ? [0, 0.04, 1, 1] : [0, 0.08, 1, 1],
   );
 
   const headline = CONTACT_HEADLINES[headlineIndex];
@@ -718,14 +814,91 @@ export default function MiizuLanding() {
   };
 
   const showNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
+    if (
+      event.pointerType === "touch" ||
+      !supportsFineHover() ||
+      window.performance.now() - lastNuviaTouchAt.current <
+        NUVIA_POST_TOUCH_SUPPRESSION_MS
+    )
+      return;
+
+    setNuviaTooltipTouch(false);
     placeNuviaTooltip(event, true);
     setNuviaTooltipVisible(true);
   };
 
   const hideNuviaTooltip = () => {
     nuviaTooltipReady.current = false;
+    setNuviaTooltipTouch(false);
     setNuviaTooltipVisible(false);
   };
+
+  const moveNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
+    if (
+      event.pointerType !== "touch" &&
+      supportsFineHover() &&
+      window.performance.now() - lastNuviaTouchAt.current >=
+        NUVIA_POST_TOUCH_SUPPRESSION_MS
+    )
+      placeNuviaTooltip(event);
+  };
+
+  const leaveNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
+    if (
+      event.pointerType !== "touch" &&
+      supportsFineHover() &&
+      window.performance.now() - lastNuviaTouchAt.current >=
+        NUVIA_POST_TOUCH_SUPPRESSION_MS
+    )
+      hideNuviaTooltip();
+  };
+
+  const toggleNuviaTouchTooltip = (event: PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "touch") return;
+
+    lastNuviaTouchAt.current = window.performance.now();
+    event.preventDefault();
+
+    if (nuviaTooltipTouch && nuviaTooltipVisible) {
+      hideNuviaTooltip();
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const centerY = Math.min(
+      window.innerHeight - 48,
+      Math.max(48, rect.top + rect.height / 2),
+    );
+
+    nuviaTooltipX.jump(window.innerWidth / 2);
+    nuviaTooltipY.jump(centerY);
+    nuviaTooltipReady.current = true;
+    setNuviaTooltipTouch(true);
+    setNuviaTooltipVisible(true);
+  };
+
+  useEffect(() => {
+    if (!nuviaTooltipTouch || !nuviaTooltipVisible) return;
+
+    const dismissTouchTooltip = () => {
+      nuviaTooltipReady.current = false;
+      setNuviaTooltipTouch(false);
+      setNuviaTooltipVisible(false);
+    };
+    const dismissOutside = (event: globalThis.PointerEvent) => {
+      const panel = nuviaWordmarkRef.current?.parentElement;
+      if (panel?.contains(event.target as Node)) return;
+      dismissTouchTooltip();
+    };
+
+    document.addEventListener("pointerdown", dismissOutside);
+    window.addEventListener("scroll", dismissTouchTooltip, { passive: true });
+
+    return () => {
+      document.removeEventListener("pointerdown", dismissOutside);
+      window.removeEventListener("scroll", dismissTouchTooltip);
+    };
+  }, [nuviaTooltipTouch, nuviaTooltipVisible]);
 
   return (
     <main className={styles.site}>
@@ -860,20 +1033,28 @@ export default function MiizuLanding() {
             style={{ opacity: railOpacity, x: railX }}
           >
             <span className={styles.clientsLabel}>selected clients</span>
-            <div className={styles.clientMarquee}>
-              <div className={styles.clientNames}>
-                {[0, 1].map((copy) => (
-                  <div
-                    aria-hidden={copy === 1}
-                    className={styles.clientGroup}
-                    key={copy}
-                  >
-                    {CLIENTS.map((client) => (
-                      <span key={`${copy}-${client}`}>{client}</span>
+            <div className={styles.clientMarquees} ref={clientMarqueesRef}>
+              {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
+                <div
+                  aria-hidden={row > 0}
+                  className={styles.clientMarquee}
+                  key={row}
+                >
+                  <div className={styles.clientNames}>
+                    {[0, 1].map((copy) => (
+                      <div
+                        aria-hidden={copy === 1}
+                        className={styles.clientGroup}
+                        key={`${row}-${copy}`}
+                      >
+                        {CLIENTS.map((client) => (
+                          <span key={`${row}-${copy}-${client}`}>{client}</span>
+                        ))}
+                      </div>
                     ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -970,9 +1151,10 @@ export default function MiizuLanding() {
       <footer className={styles.footer} id="footer">
         <div
           className={styles.nuviaPanel}
+          onPointerDown={toggleNuviaTouchTooltip}
           onPointerEnter={showNuviaTooltip}
-          onPointerLeave={hideNuviaTooltip}
-          onPointerMove={placeNuviaTooltip}
+          onPointerLeave={leaveNuviaTooltip}
+          onPointerMove={moveNuviaTooltip}
         >
           <span className={styles.representedBy} ref={representedByRef}>
             represented by
@@ -982,6 +1164,13 @@ export default function MiizuLanding() {
             className={styles.nuviaWordmark}
             onBlur={hideNuviaTooltip}
             onFocus={() => {
+              if (
+                window.performance.now() - lastNuviaTouchAt.current <
+                NUVIA_POST_TOUCH_SUPPRESSION_MS
+              )
+                return;
+
+              setNuviaTooltipTouch(false);
               const panel = nuviaWordmarkRef.current?.parentElement;
               if (panel) {
                 const rect = panel.getBoundingClientRect();
@@ -1018,10 +1207,15 @@ export default function MiizuLanding() {
         ? createPortal(
             <motion.span
               aria-hidden="true"
-              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}`}
-              style={{ x: nuviaTooltipFollowX, y: nuviaTooltipFollowY }}
+              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}${nuviaTooltipTouch ? ` ${styles.nuviaTooltipTouch}` : ""}`}
+              style={{
+                x: nuviaTooltipTouch ? nuviaTooltipX : nuviaTooltipFollowX,
+                y: nuviaTooltipTouch ? nuviaTooltipY : nuviaTooltipFollowY,
+              }}
               transformTemplate={({ x, y }) =>
-                `translate(${x}, ${y}) translate(14px, -50%)`
+                nuviaTooltipTouch
+                  ? `translate(${x}, ${y}) translate(-50%, -50%)`
+                  : `translate(${x}, ${y}) translate(14px, -50%)`
               }
             >
               Nuvia is literally my Brand
