@@ -151,32 +151,43 @@
   color: var(--miizu-bg);
   contain: layout;
   height: 100svh;
+  inset: 0;
   isolation: isolate;
   position: absolute;
-  right: 0;
-  top: 0;
   transform-origin: 100% 0;
-  width: 100vw;
+  width: 100%;
   will-change: transform;
   z-index: 8;
 }
 
 .showreelSurface {
-  background: var(--miizu-primary);
+  background: transparent;
   inset: 0;
   overflow: hidden;
   position: absolute;
   will-change: border-radius, inset;
 }
 
+.showreelVideoFrame {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  transform-origin: center;
+  z-index: 0;
+}
+
 .showreelVideo {
+  display: block;
   height: 100%;
   inset: 0;
+  min-height: 100%;
+  min-width: 100%;
   object-fit: cover;
+  object-position: center;
   pointer-events: none;
   position: absolute;
   width: 100%;
-  z-index: 0;
 }
 
 .cardLabel {
@@ -211,100 +222,115 @@
   transform: scaleX(1);
 }
 
-.sceneShade {
-  --clients-edge: 30vw;
+.workShade {
+  --work-shade-copy: 34vw;
+  --work-shade-edge: 30vw;
   display: flex;
   height: 100%;
   inset: 0 auto auto 0;
   pointer-events: none;
   position: absolute;
-  width: calc(100% + var(--clients-edge));
+  width: calc(var(--work-shade-copy) + var(--work-shade-edge));
   will-change: transform;
-  z-index: 1;
+  z-index: 3;
 }
 
-.sceneShadeBody {
-  background: var(--miizu-ink);
-  flex: 1 1 auto;
-  min-width: 0;
+.workShadeCopy {
+  background: #000;
+  flex: 0 0 var(--work-shade-copy);
   overflow: hidden;
   position: relative;
 }
 
-.sceneShadeEdge {
+.workShadeEdge {
   background: linear-gradient(
     90deg,
-    var(--miizu-ink) 0%,
-    color-mix(in srgb, var(--miizu-ink) 55%, var(--miizu-primary)) 42%,
-    var(--miizu-primary) 100%
+    #000 0%,
+    rgba(0, 0, 0, 0.88) 26%,
+    rgba(0, 0, 0, 0.5) 52%,
+    rgba(0, 0, 0, 0.12) 78%,
+    rgba(0, 0, 0, 0) 100%
   );
-  flex: 0 0 var(--clients-edge);
+  flex: 0 0 var(--work-shade-edge);
   height: 100%;
 }
 
-.sceneShade .clientsRail {
+.clientsOverlay {
+  background: #000;
+  height: 100%;
+  inset: 0 auto auto 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  will-change: transform;
+  z-index: 2;
+}
+
+.clientsOverlay .clientsRail {
   height: 100%;
   justify-content: center;
   pointer-events: none;
 }
 
-.sceneShade .clientMarquees {
+.clientsOverlay .clientMarquees {
   display: flex;
   flex-direction: column;
   gap: clamp(0.55rem, 1.6svh, 1rem);
 }
 
-.sceneShade .clientMarquee {
+.clientsOverlay .clientMarquee {
   display: block;
 }
 
-.sceneShade .clientMarquee:nth-child(n + 2) {
+.clientsOverlay .clientMarquee:nth-child(n + 2) {
   display: block;
 }
 
-.sceneShade .clientMarquee:nth-child(2) .clientNames {
+.clientsOverlay .clientMarquee:nth-child(2) .clientNames {
   animation-delay: -4s;
 }
 
-.sceneShade .clientMarquee:nth-child(3) .clientNames {
+.clientsOverlay .clientMarquee:nth-child(3) .clientNames {
   animation-delay: -8s;
 }
 
-.sceneShade .clientMarquee:nth-child(4) .clientNames {
+.clientsOverlay .clientMarquee:nth-child(4) .clientNames {
   animation-delay: -12s;
 }
 
-.sceneShade .clientMarquee:nth-child(5) .clientNames {
+.clientsOverlay .clientMarquee:nth-child(5) .clientNames {
   animation-delay: -16s;
 }
 
-.sceneShade .clientMarquee:nth-child(6) .clientNames {
+.clientsOverlay .clientMarquee:nth-child(6) .clientNames {
   animation-delay: -20s;
 }
 
-.sceneShade .clientMarquee:nth-child(7) .clientNames {
+.clientsOverlay .clientMarquee:nth-child(7) .clientNames {
   animation-delay: -24s;
 }
 
 .workContent {
   align-items: center;
-  display: grid;
-  grid-template-columns: 30% 70%;
+  color: var(--miizu-bg);
+  display: flex;
   inset: 0;
-  padding: clamp(2rem, 3.2vw, 4.5rem);
+  padding: clamp(1.4rem, 2.4vw, 2.8rem) clamp(1.2rem, 2vw, 2.4rem);
   pointer-events: none;
   position: absolute;
-  will-change: opacity, transform;
-  z-index: 2;
+  will-change: opacity;
 }
 
 .workList {
   align-self: center;
+  color: var(--miizu-bg);
   font-size: clamp(1.5rem, 2.4vw, 3.5rem);
   letter-spacing: -0.01em;
   line-height: 0.96;
+  max-width: none;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .workList p {
@@ -315,22 +341,6 @@
   display: block;
   font-weight: 720;
   margin-bottom: 0.9em;
-}
-
-.workContent h2 {
-  font-size: clamp(3.6rem, 7vw, 9rem);
-  font-weight: 620;
-  justify-self: center;
-  letter-spacing: -0.02em;
-  line-height: 0.93;
-  margin: 0;
-  position: relative;
-  text-align: left;
-  z-index: 2;
-}
-
-.workContent h2 span {
-  font-size: 0.72em;
 }
 
 .clientsRail {
@@ -1130,41 +1140,31 @@
   }
 
   .workContent {
-    align-content: center;
-    grid-template-columns: 1fr;
-    gap: 3.5rem;
+    align-items: flex-end;
     padding: 1.6rem;
+  }
+
+  .workShade {
+    --work-shade-copy: 58vw;
+    --work-shade-edge: 28vw;
   }
 
   .workList {
     align-self: end;
     font-size: clamp(1.4rem, 5.8vw, 2rem);
+    max-width: none;
   }
 
-  .workContent h2 {
-    font-size: clamp(3.1rem, 14vw, 5.5rem);
-    justify-self: start;
-  }
-
-  .workShade {
-    background: linear-gradient(
-      180deg,
-      #050315 0%,
-      rgba(5, 3, 21, 0.8) 38%,
-      rgba(5, 3, 21, 0) 74%
-    );
-  }
-
-  .sceneShade .clientsRail {
+  .clientsOverlay .clientsRail {
     gap: clamp(1.1rem, 2.4svh, 1.5rem);
     padding-block: clamp(2.5rem, 7svh, 4rem);
   }
 
-  .sceneShade .clientsLabel {
+  .clientsOverlay .clientsLabel {
     padding-left: 1.25rem;
   }
 
-  .sceneShade .clientMarquee {
+  .clientsOverlay .clientMarquee {
     mask-image: linear-gradient(
       90deg,
       transparent 0%,
@@ -1174,7 +1174,7 @@
     );
   }
 
-  .sceneShade .clientGroup span {
+  .clientsOverlay .clientGroup span {
     font-size: clamp(2.7rem, 14vw, 4.5rem);
   }
 

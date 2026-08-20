@@ -116,50 +116,59 @@ const SCROLL_SURFACE_INSET_MID = 0.16;
 const SCROLL_WORK_REVEAL = 0.45;
 const SCROLL_WORK_SHADE_SET = 0.51;
 const SCROLL_WORK_SHADE_HOLD = 0.63;
-const SCROLL_WORK_SHADE_FULL = 0.69;
-const SCROLL_WORK_DONE = 0.53;
-const SCROLL_MARQUEE_HOLD_END = 0.77;
-const SCROLL_CONTACT_SET = 0.94;
-const SCROLL_SCENE_SHADE_HOLD_X = 0.76;
+const SCROLL_WORK_SHADE_FULL = 0.8;
+const SCROLL_MARQUEE_HOLD_END = 0.86;
+const SCROLL_CONTACT_SET = 0.96;
+const WORK_SHADE_COPY = 0.34;
+const WORK_SHADE_EDGE = 0.3;
+const WORK_SHADE_COPY_COMPACT = 0.58;
+const WORK_SHADE_EDGE_COMPACT = 0.28;
 type IntroPhase = "video" | "revealing" | "complete";
 
-function getClientsEdgeWidth(viewportWidth: number) {
-  return viewportWidth * 0.3;
+function getWorkShadeCarrierWidth(viewportWidth: number, compact: boolean) {
+  const copy = viewportWidth * (compact ? WORK_SHADE_COPY_COMPACT : WORK_SHADE_COPY);
+  const edge = viewportWidth * (compact ? WORK_SHADE_EDGE_COMPACT : WORK_SHADE_EDGE);
+  return copy + edge;
 }
 
-function getSceneShadeOffset(progress: number, viewportWidth: number) {
-  const edge = getClientsEdgeWidth(viewportWidth);
-  const startX = -(viewportWidth + edge);
-  const fullBlackX = 0;
+function getWorkShadeOffset(
+  progress: number,
+  viewportWidth: number,
+  compact: boolean,
+) {
+  const carrier = getWorkShadeCarrierWidth(viewportWidth, compact);
+  const startX = -carrier;
+  const parkedX = 0;
   const exitX = viewportWidth;
-  const workX = -viewportWidth * SCROLL_SCENE_SHADE_HOLD_X;
 
   if (progress <= SCROLL_WORK_REVEAL) return startX;
-  if (progress >= SCROLL_CONTACT_SET) return exitX;
-
-  if (progress > SCROLL_MARQUEE_HOLD_END) {
-    const t =
-      (progress - SCROLL_MARQUEE_HOLD_END) /
-      (SCROLL_CONTACT_SET - SCROLL_MARQUEE_HOLD_END);
-    return fullBlackX + t * viewportWidth;
-  }
-
-  if (progress >= SCROLL_WORK_SHADE_FULL) return fullBlackX;
+  if (progress >= SCROLL_WORK_SHADE_FULL) return exitX;
 
   if (progress < SCROLL_WORK_SHADE_SET) {
     const t =
       (progress - SCROLL_WORK_REVEAL) /
       (SCROLL_WORK_SHADE_SET - SCROLL_WORK_REVEAL);
-    return startX + t * (workX - startX);
+    return startX + t * (parkedX - startX);
   }
 
-  if (progress < SCROLL_WORK_SHADE_HOLD) return workX;
+  if (progress < SCROLL_WORK_SHADE_HOLD) return parkedX;
 
   const t =
     (progress - SCROLL_WORK_SHADE_HOLD) /
     (SCROLL_WORK_SHADE_FULL - SCROLL_WORK_SHADE_HOLD);
 
-  return workX + t * (fullBlackX - workX);
+  return parkedX + t * (exitX - parkedX);
+}
+
+function getClientsOverlayOffset(progress: number, viewportWidth: number) {
+  if (progress <= SCROLL_WORK_SHADE_HOLD) return -viewportWidth;
+  if (progress >= SCROLL_WORK_SHADE_FULL) return 0;
+
+  const t =
+    (progress - SCROLL_WORK_SHADE_HOLD) /
+    (SCROLL_WORK_SHADE_FULL - SCROLL_WORK_SHADE_HOLD);
+
+  return -viewportWidth * (1 - t);
 }
 
 function getContactWipeOffset(progress: number, viewportWidth: number) {
@@ -1344,7 +1353,9 @@ export default function MiizuLanding() {
   const panelX = useTransform(
     scrollYProgress,
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
-    compact ? ["-5vw", "-5vw", "0vw", "0vw"] : ["-3vw", "-3vw", "0vw", "0vw"],
+    compact
+      ? ["-5vw", "-5vw", "0vw", "0vw"]
+      : ["-3vw", "-3vw", "0vw", "0vw"],
   );
   const panelY = useTransform(
     scrollYProgress,
@@ -1413,11 +1424,18 @@ export default function MiizuLanding() {
     [0, SCROLL_WORK_REVEAL, SCROLL_WORK_REVEAL + 0.1],
     [1, 1, 0],
   );
-  const sceneShadeX = useTransform(
+  const workShadeX = useTransform(
     [scrollYProgress, viewportWidthMV],
     ([progress, width]) => {
       if (!width) return -10000;
-      return getSceneShadeOffset(progress as number, width as number);
+      return getWorkShadeOffset(progress as number, width as number, compact);
+    },
+  );
+  const clientsOverlayX = useTransform(
+    [scrollYProgress, viewportWidthMV],
+    ([progress, width]) => {
+      if (!width) return -10000;
+      return getClientsOverlayOffset(progress as number, width as number);
     },
   );
   const contactWipeX = useTransform(
@@ -1429,24 +1447,8 @@ export default function MiizuLanding() {
   );
   const workOpacity = useTransform(
     scrollYProgress,
-    [
-      0,
-      SCROLL_WORK_REVEAL + 0.05,
-      SCROLL_WORK_SHADE_SET,
-      SCROLL_WORK_SHADE_HOLD,
-      SCROLL_WORK_SHADE_FULL - 0.03,
-    ],
-    [0, 0, 1, 1, 0],
-  );
-  const workX = useTransform(
-    scrollYProgress,
-    [SCROLL_WORK_REVEAL, SCROLL_WORK_DONE],
-    ["-18vw", "0vw"],
-  );
-  const clientsContentOpacity = useTransform(
-    scrollYProgress,
-    [SCROLL_WORK_SHADE_FULL, SCROLL_WORK_SHADE_FULL + 0.04],
-    [0, 1],
+    [0, SCROLL_WORK_REVEAL, SCROLL_WORK_SHADE_SET],
+    [0, 0, 1],
   );
   const headline = CONTACT_HEADLINES[headlineIndex];
   const bookingUrl =
@@ -1696,60 +1698,93 @@ export default function MiizuLanding() {
                 inset: surfaceInset,
               }}
             >
-              <video
-                ref={showreelVideoRef}
+              <motion.div
                 aria-hidden="true"
-                autoPlay
-                className={styles.showreelVideo}
-                disablePictureInPicture
-                loop
-                muted
-                playsInline
-                preload="auto"
+                className={styles.showreelVideoFrame}
+                style={{
+                  scaleX: cardScaleX,
+                  scaleY: cardScaleY,
+                }}
               >
-                <source src="/showreel_2026.mp4" type="video/mp4" />
-              </video>
+                <video
+                  ref={showreelVideoRef}
+                  autoPlay
+                  className={styles.showreelVideo}
+                  disablePictureInPicture
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                >
+                  <source src="/showreel_2026.mp4" type="video/mp4" />
+                </video>
+              </motion.div>
 
               <motion.div
                 aria-label="Selected clients"
-                className={styles.sceneShade}
+                className={styles.clientsOverlay}
                 id="clients"
-                style={{ x: sceneShadeX }}
+                style={{ x: clientsOverlayX }}
               >
-                <div className={styles.sceneShadeBody}>
-                  <motion.div
-                    className={styles.clientsRail}
-                    style={{ opacity: clientsContentOpacity }}
-                  >
-                    <span className={styles.clientsLabel}>selected clients</span>
-                    <div className={styles.clientMarquees} ref={clientMarqueesRef}>
-                      {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
-                        <div
-                          aria-hidden={row > 0}
-                          className={styles.clientMarquee}
-                          key={row}
-                        >
-                          <div className={styles.clientNames}>
-                            {[0, 1].map((copy) => (
-                              <div
-                                aria-hidden={copy === 1}
-                                className={styles.clientGroup}
-                                key={`${row}-${copy}`}
-                              >
-                                {CLIENTS.map((client) => (
-                                  <span key={`${row}-${copy}-${client}`}>
-                                    {client}
-                                  </span>
-                                ))}
-                              </div>
-                            ))}
-                          </div>
+                <div className={styles.clientsRail}>
+                  <span className={styles.clientsLabel}>selected clients</span>
+                  <div className={styles.clientMarquees} ref={clientMarqueesRef}>
+                    {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
+                      <div
+                        aria-hidden={row > 0}
+                        className={styles.clientMarquee}
+                        key={row}
+                      >
+                        <div className={styles.clientNames}>
+                          {[0, 1].map((copy) => (
+                            <div
+                              aria-hidden={copy === 1}
+                              className={styles.clientGroup}
+                              key={`${row}-${copy}`}
+                            >
+                              {CLIENTS.map((client) => (
+                                <span key={`${row}-${copy}-${client}`}>
+                                  {client}
+                                </span>
+                              ))}
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                className={styles.workShade}
+                style={{ x: workShadeX }}
+              >
+                <div className={styles.workShadeCopy}>
+                  <motion.div
+                    className={styles.workContent}
+                    style={{ opacity: workOpacity }}
+                  >
+                    <div className={styles.workList}>
+                      <p>I&rsquo;ve directed</p>
+                      <strong>
+                        Launches
+                        <br />
+                        Trailers
+                        <br />
+                        Keynotes
+                        <br />
+                        Placements
+                      </strong>
+                      <p>
+                        for brands
+                        <br />
+                        and creators
+                      </p>
                     </div>
                   </motion.div>
                 </div>
-                <div aria-hidden="true" className={styles.sceneShadeEdge} />
+                <div aria-hidden="true" className={styles.workShadeEdge} />
               </motion.div>
 
               <motion.button
@@ -1764,34 +1799,6 @@ export default function MiizuLanding() {
               >
                 Showreel video
               </motion.button>
-
-              <motion.div
-                className={styles.workContent}
-                style={{ opacity: workOpacity, x: workX }}
-              >
-                <div className={styles.workList}>
-                  <p>I&rsquo;ve directed</p>
-                  <strong>
-                    Launches
-                    <br />
-                    Trailers
-                    <br />
-                    Keynotes
-                    <br />
-                    Placements
-                  </strong>
-                  <p>
-                    for brands
-                    <br />
-                    and creators
-                  </p>
-                </div>
-                <h2>
-                  Showreel video
-                  <br />
-                  <span>(customized for web)</span>
-                </h2>
-              </motion.div>
             </motion.div>
           </motion.section>
 
