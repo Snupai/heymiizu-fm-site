@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AnimatePresence,
   LayoutGroup,
   motion,
   useMotionValue,
@@ -10,12 +9,32 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import IntlTelInput from "@intl-tel-input/react";
+import type { ValidationError } from "intl-tel-input";
+import { ArrowUpRight, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { FormEvent, PointerEvent } from "react";
+import type { DateRange } from "react-day-picker";
+import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/base-select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import {
   formatPauseUntilDate,
   type ContactFormStatus,
@@ -75,8 +94,19 @@ const SERVICES = [
 ];
 
 const BUDGETS = ["5 - 10k", "10 - 25k", "25 - 50k", "50 - 100k", "100k+"];
+const SERVICE_ITEMS = [
+  { label: "Choose a service", value: null },
+  ...SERVICES.map((service) => ({ label: service, value: service })),
+];
+const BUDGET_ITEMS = [
+  { label: "Choose a range", value: null },
+  ...BUDGETS.map((budget) => ({ label: budget, value: budget })),
+];
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
+const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
+
+const loadPhoneUtils = () => import("intl-tel-input/utils");
 
 type ContactData = {
   name: string;
@@ -89,6 +119,8 @@ type ContactData = {
   description: string;
 };
 
+type ValidatedContactField = Exclude<keyof ContactData, "referral">;
+
 const INITIAL_CONTACT_DATA: ContactData = {
   name: "",
   email: "",
@@ -100,6 +132,88 @@ const INITIAL_CONTACT_DATA: ContactData = {
   description: "",
 };
 
+const INITIAL_TOUCHED_FIELDS: Record<ValidatedContactField, boolean> = {
+  name: false,
+  email: false,
+  telephone: false,
+  service: false,
+  budget: false,
+  deadline: false,
+  description: false,
+};
+
+const ALL_CONTACT_FIELDS_TOUCHED: Record<ValidatedContactField, boolean> = {
+  name: true,
+  email: true,
+  telephone: true,
+  service: true,
+  budget: true,
+  deadline: true,
+  description: true,
+};
+
+function formatContactDate(date: Date | undefined) {
+  if (!date) return "";
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatContactDateRange(range: DateRange | undefined) {
+  if (!range?.from) return "";
+  if (!range.to) return formatContactDate(range.from);
+
+  return `${formatContactDate(range.from)} – ${formatContactDate(range.to)}`;
+}
+
+function getContactDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function isAvailableContactDate(date: Date) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const candidate = new Date(date);
+  candidate.setHours(0, 0, 0, 0);
+  return candidate >= today;
+}
+
+function getEmailValidationMessage(email: string) {
+  if (!email.trim()) return "Please enter your email address.";
+  if (!CONTACT_EMAIL_SCHEMA.safeParse(email).success) {
+    return "Please enter a valid email address.";
+  }
+  return null;
+}
+
+function getPhoneValidationMessage(
+  phone: string,
+  isValid: boolean,
+  errorCode: ValidationError | null,
+) {
+  if (!phone || isValid) return null;
+
+  switch (errorCode) {
+    case "INVALID_COUNTRY_CODE":
+      return "Please choose a valid country code.";
+    case "TOO_SHORT":
+      return "This phone number is too short.";
+    case "TOO_LONG":
+      return "This phone number is too long.";
+    case "IS_POSSIBLE_LOCAL_ONLY":
+      return "Please include the area or country code.";
+    default:
+      return "Please enter a valid phone number.";
+  }
+}
+
 function scrollToId(id: string) {
   document
     .getElementById(id)
@@ -110,7 +224,13 @@ function supportsFineHover() {
   return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 }
 
-function ContactForm({ region }: { region: "local" | "international" }) {
+function ContactForm({
+  compact,
+  region,
+}: {
+  compact: boolean;
+  region: "local" | "international";
+}) {
   const [data, setData] = useState<ContactData>(INITIAL_CONTACT_DATA);
   const [status, setStatus] = useState<ContactFormStatus>({
     paused: false,
@@ -118,6 +238,13 @@ function ContactForm({ region }: { region: "local" | "international" }) {
   });
   const [statusLoading, setStatusLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [deadlineRange, setDeadlineRange] = useState<DateRange | undefined>();
+  const [deadlineMonth, setDeadlineMonth] = useState<Date | undefined>();
+  const [touchedFields, setTouchedFields] = useState(INITIAL_TOUCHED_FIELDS);
+  const [phoneIsValid, setPhoneIsValid] = useState(false);
+  const [phoneErrorCode, setPhoneErrorCode] = useState<ValidationError | null>(
+    null,
+  );
   const [result, setResult] = useState<{
     type: "success" | "error";
     message: string;
@@ -156,9 +283,93 @@ function ContactForm({ region }: { region: "local" | "international" }) {
     setResult(null);
   };
 
+  const markFieldTouched = (field: ValidatedContactField) => {
+    setTouchedFields((current) =>
+      current[field] ? current : { ...current, [field]: true },
+    );
+  };
+
+  const updatePhone = (phone: string) => {
+    setData((current) =>
+      current.telephone === phone ? current : { ...current, telephone: phone },
+    );
+    setResult((current) =>
+      phone === "" && current?.type === "success" ? current : null,
+    );
+    if (phone) markFieldTouched("telephone");
+  };
+
+  const updateDeadlineRange = (range: DateRange | undefined) => {
+    const from =
+      range?.from && isAvailableContactDate(range.from)
+        ? range.from
+        : undefined;
+    const to =
+      range?.to && isAvailableContactDate(range.to) ? range.to : undefined;
+    const availableRange = from ? { from, to } : undefined;
+
+    setDeadlineRange(availableRange);
+    if (from) setDeadlineMonth(from);
+    updateField(
+      "deadline",
+      from && to ? `${getContactDateKey(from)} - ${getContactDateKey(to)}` : "",
+    );
+  };
+
+  const nameValidationMessage = data.name.trim()
+    ? null
+    : "Please enter your name.";
+  const emailValidationMessage = getEmailValidationMessage(data.email);
+  const phoneValidationMessage = getPhoneValidationMessage(
+    data.telephone,
+    phoneIsValid,
+    phoneErrorCode,
+  );
+  const serviceValidationMessage = data.service
+    ? null
+    : "Please choose a service.";
+  const budgetValidationMessage = data.budget
+    ? null
+    : "Please choose a budget range.";
+  const deadlineValidationMessage = !deadlineRange?.from
+    ? "Please select a project date range."
+    : !deadlineRange.to || !data.deadline
+      ? "Please select an end date."
+      : null;
+  const descriptionValidationMessage = data.description.trim()
+    ? null
+    : "Please tell me a little about your project.";
+
+  const nameError = touchedFields.name ? nameValidationMessage : null;
+  const emailError = touchedFields.email ? emailValidationMessage : null;
+  const phoneError = touchedFields.telephone ? phoneValidationMessage : null;
+  const serviceError = touchedFields.service ? serviceValidationMessage : null;
+  const budgetError = touchedFields.budget ? budgetValidationMessage : null;
+  const deadlineError = touchedFields.deadline
+    ? deadlineValidationMessage
+    : null;
+  const descriptionError = touchedFields.description
+    ? descriptionValidationMessage
+    : null;
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting || status.paused || statusLoading) return;
+
+    setTouchedFields(ALL_CONTACT_FIELDS_TOUCHED);
+
+    if (
+      nameValidationMessage ||
+      emailValidationMessage ||
+      phoneValidationMessage ||
+      serviceValidationMessage ||
+      budgetValidationMessage ||
+      deadlineValidationMessage ||
+      descriptionValidationMessage
+    ) {
+      setResult(null);
+      return;
+    }
 
     setSubmitting(true);
     setResult(null);
@@ -169,7 +380,7 @@ function ContactForm({ region }: { region: "local" | "international" }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.name,
-          email: data.email,
+          email: data.email.trim(),
           telephone: data.telephone,
           company: data.referral
             ? `Found via: ${data.referral}`
@@ -197,6 +408,11 @@ function ContactForm({ region }: { region: "local" | "international" }) {
       }
 
       setData(INITIAL_CONTACT_DATA);
+      setDeadlineRange(undefined);
+      setDeadlineMonth(undefined);
+      setTouchedFields(INITIAL_TOUCHED_FIELDS);
+      setPhoneIsValid(false);
+      setPhoneErrorCode(null);
       setResult({
         type: "success",
         message: "Request sent. I’ll be in touch soon.",
@@ -234,99 +450,296 @@ function ContactForm({ region }: { region: "local" | "international" }) {
 
       <form
         className={`${styles.contactForm} ${status.paused ? styles.formPaused : ""}`}
+        noValidate
         onSubmit={handleSubmit}
       >
         <fieldset disabled={disabled}>
-          <label>
+          <label htmlFor="contact-name">
             <span>what should i call you?</span>
             <input
+              id="contact-name"
+              aria-describedby={nameError ? "contact-name-error" : undefined}
+              aria-invalid={Boolean(nameError)}
               autoComplete="name"
               maxLength={60}
+              onBlur={() => markFieldTouched("name")}
               onChange={(event) => updateField("name", event.target.value)}
               placeholder="Type your Name"
               required
               value={data.name}
             />
+            <div className={styles.fieldFeedback}>
+              {nameError && (
+                <small
+                  className={styles.fieldError}
+                  id="contact-name-error"
+                  role="alert"
+                >
+                  {nameError}
+                </small>
+              )}
+            </div>
           </label>
 
-          <label>
+          <label htmlFor="contact-email">
             <span>where do i reach you?</span>
             <input
+              id="contact-email"
+              aria-describedby={emailError ? "contact-email-error" : undefined}
+              aria-invalid={Boolean(emailError)}
               autoComplete="email"
               maxLength={120}
+              onBlur={() => markFieldTouched("email")}
               onChange={(event) => updateField("email", event.target.value)}
+              onInvalid={(event) => {
+                event.preventDefault();
+                markFieldTouched("email");
+              }}
               placeholder="Type your Email"
               required
               type="email"
               value={data.email}
             />
+            <div className={styles.fieldFeedback}>
+              {emailError && (
+                <small
+                  className={styles.fieldError}
+                  id="contact-email-error"
+                  role="alert"
+                >
+                  {emailError}
+                </small>
+              )}
+            </div>
           </label>
 
-          <label>
+          <label htmlFor="contact-phone">
             <span>what&rsquo;s the best number to reach you?</span>
-            <input
-              autoComplete="tel"
-              maxLength={30}
-              onChange={(event) => updateField("telephone", event.target.value)}
-              placeholder="Type your phone number (optional)"
-              type="tel"
+            <IntlTelInput
+              containerClass={styles.phoneInput}
+              countryOrder={["de", "gb", "us"]}
+              disabled={disabled}
+              initialCountry="de"
+              inputProps={{
+                id: "contact-phone",
+                "aria-describedby": phoneError
+                  ? "contact-phone-error"
+                  : undefined,
+                "aria-invalid": Boolean(phoneError),
+                autoComplete: "tel",
+                onBlur: () => markFieldTouched("telephone"),
+                placeholder: "Phone number (optional)",
+              }}
+              loadUtils={loadPhoneUtils}
+              onChangeErrorCode={setPhoneErrorCode}
+              onChangeNumber={updatePhone}
+              onChangeValidity={setPhoneIsValid}
               value={data.telephone}
             />
+            <div className={styles.fieldFeedback}>
+              {phoneError && (
+                <small
+                  className={styles.fieldError}
+                  id="contact-phone-error"
+                  role="alert"
+                >
+                  {phoneError}
+                </small>
+              )}
+            </div>
           </label>
 
-          <label>
+          <label htmlFor="contact-referral">
             <span>how did you find me?</span>
             <input
+              id="contact-referral"
               maxLength={80}
               onChange={(event) => updateField("referral", event.target.value)}
               placeholder="Instagram, LinkedIn, X ..."
               value={data.referral}
             />
+            <div aria-hidden="true" className={styles.fieldFeedback} />
           </label>
 
-          <label>
+          <label htmlFor="service">
             <span>what service do you need?</span>
-            <select
-              onChange={(event) => updateField("service", event.target.value)}
+            <Select
+              disabled={disabled}
+              items={SERVICE_ITEMS}
+              name="service"
+              onValueChange={(value) => {
+                updateField("service", value ?? "");
+                markFieldTouched("service");
+              }}
               required
-              value={data.service}
+              value={data.service || null}
             >
-              <option value="">Choose a service</option>
-              {SERVICES.map((service) => (
-                <option key={service}>{service}</option>
-              ))}
-            </select>
+              <SelectTrigger
+                id="service"
+                aria-describedby={
+                  serviceError ? "contact-service-error" : undefined
+                }
+                aria-invalid={Boolean(serviceError)}
+                aria-label="What service do you need?"
+                data-contact-select
+                onBlur={() => markFieldTouched("service")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                alignItemWithTrigger={false}
+                className={styles.contactSelectContent}
+              >
+                <SelectGroup>
+                  {SERVICE_ITEMS.map((item) => (
+                    <SelectItem
+                      className={styles.contactSelectItem}
+                      key={item.value ?? "service-placeholder"}
+                      value={item.value}
+                    >
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <div className={styles.fieldFeedback}>
+              {serviceError && (
+                <small
+                  className={styles.fieldError}
+                  id="contact-service-error"
+                  role="alert"
+                >
+                  {serviceError}
+                </small>
+              )}
+            </div>
           </label>
 
-          <label>
+          <label htmlFor="budget">
             <span>what&rsquo;s your budget?</span>
-            <select
-              onChange={(event) => updateField("budget", event.target.value)}
+            <Select
+              disabled={disabled}
+              items={BUDGET_ITEMS}
+              name="budget"
+              onValueChange={(value) => {
+                updateField("budget", value ?? "");
+                markFieldTouched("budget");
+              }}
               required
-              value={data.budget}
+              value={data.budget || null}
             >
-              <option value="">Choose a range</option>
-              {BUDGETS.map((budget) => (
-                <option key={budget}>{budget}</option>
-              ))}
-            </select>
+              <SelectTrigger
+                id="budget"
+                aria-describedby={
+                  budgetError ? "contact-budget-error" : undefined
+                }
+                aria-invalid={Boolean(budgetError)}
+                aria-label="What is your budget?"
+                data-contact-select
+                onBlur={() => markFieldTouched("budget")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                alignItemWithTrigger={false}
+                className={styles.contactSelectContent}
+              >
+                <SelectGroup>
+                  {BUDGET_ITEMS.map((item) => (
+                    <SelectItem
+                      className={styles.contactSelectItem}
+                      key={item.value ?? "budget-placeholder"}
+                      value={item.value}
+                    >
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <div className={styles.fieldFeedback}>
+              {budgetError && (
+                <small
+                  className={styles.fieldError}
+                  id="contact-budget-error"
+                  role="alert"
+                >
+                  {budgetError}
+                </small>
+              )}
+            </div>
           </label>
 
-          <label>
-            <span>project delivery date</span>
-            <input
-              min={new Date().toISOString().slice(0, 10)}
-              onChange={(event) => updateField("deadline", event.target.value)}
-              required
-              type="date"
-              value={data.deadline}
-            />
+          <label htmlFor="deadline-picker">
+            <span>project date range</span>
+            <Popover
+              onOpenChange={(open) => {
+                if (!open) markFieldTouched("deadline");
+              }}
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  id="deadline-picker"
+                  aria-describedby={
+                    deadlineError ? "deadline-error" : undefined
+                  }
+                  aria-invalid={Boolean(deadlineError)}
+                  className={styles.dateRangePickerButton}
+                  data-date-range-picker
+                  data-empty={!deadlineRange?.from}
+                  type="button"
+                  variant="outline"
+                >
+                  <span>
+                    {deadlineRange?.from
+                      ? formatContactDateRange(deadlineRange)
+                      : "Pick a date range"}
+                  </span>
+                  <CalendarIcon aria-hidden="true" data-icon="inline-end" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className={`w-auto ${styles.contactDatePopover}`}
+              >
+                <Calendar
+                  className={styles.contactCalendar}
+                  mode="range"
+                  captionLayout="dropdown"
+                  disabled={(date) => !isAvailableContactDate(date)}
+                  min={1}
+                  month={deadlineMonth}
+                  numberOfMonths={compact ? 1 : 2}
+                  onMonthChange={setDeadlineMonth}
+                  onSelect={updateDeadlineRange}
+                  selected={deadlineRange}
+                />
+              </PopoverContent>
+            </Popover>
+            <div className={styles.fieldFeedback}>
+              {deadlineError && (
+                <small
+                  className={styles.fieldError}
+                  id="deadline-error"
+                  role="alert"
+                >
+                  {deadlineError}
+                </small>
+              )}
+            </div>
           </label>
 
-          <label>
+          <label htmlFor="project-description">
             <span>what are you up to?</span>
-            <textarea
+            <Textarea
+              id="project-description"
+              aria-describedby={
+                descriptionError ? "project-description-error" : undefined
+              }
+              aria-invalid={Boolean(descriptionError)}
               maxLength={1600}
+              onBlur={() => markFieldTouched("description")}
               onChange={(event) =>
                 updateField("description", event.target.value)
               }
@@ -335,6 +748,17 @@ function ContactForm({ region }: { region: "local" | "international" }) {
               rows={3}
               value={data.description}
             />
+            <div className={styles.fieldFeedback}>
+              {descriptionError && (
+                <small
+                  className={styles.fieldError}
+                  id="project-description-error"
+                  role="alert"
+                >
+                  {descriptionError}
+                </small>
+              )}
+            </div>
           </label>
 
           <button
@@ -521,7 +945,6 @@ export default function MiizuLanding() {
   const [nuviaTooltipTouch, setNuviaTooltipTouch] = useState(false);
   const [nuviaTooltipMounted, setNuviaTooltipMounted] = useState(false);
   const [compact, setCompact] = useState(false);
-  const [introVisible, setIntroVisible] = useState(true);
   const [region, setRegion] = useState<"local" | "international">(
     "international",
   );
@@ -698,25 +1121,6 @@ export default function MiizuLanding() {
     };
   }, []);
 
-  useEffect(() => {
-    if (reduceMotion) {
-      setIntroVisible(false);
-      return;
-    }
-
-    const previousOverflow = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    const timer = window.setTimeout(() => {
-      setIntroVisible(false);
-      document.documentElement.style.overflow = previousOverflow;
-    }, 1650);
-
-    return () => {
-      window.clearTimeout(timer);
-      document.documentElement.style.overflow = previousOverflow;
-    };
-  }, [reduceMotion]);
-
   const { scrollYProgress } = useScroll({
     target: sceneRef,
     offset: ["start start", "end end"],
@@ -766,12 +1170,16 @@ export default function MiizuLanding() {
   const heroY = useTransform(scrollYProgress, [0, 0.39], ["0vh", "-6vh"]);
   const cardLabelOpacity = useTransform(
     scrollYProgress,
-    [0, 0.28, 0.38],
+    [0, 0.7, 0.8],
     [1, 1, 0],
   );
-  const workOpacity = useTransform(scrollYProgress, [0.47, 0.6], [0, 1]);
-  const workY = useTransform(scrollYProgress, [0.47, 0.6], [42, 0]);
-  const workShadeOpacity = useTransform(scrollYProgress, [0.36, 0.54], [0, 1]);
+  const workShadeX = useTransform(
+    scrollYProgress,
+    [0.7, 0.95],
+    ["-100%", "0%"],
+  );
+  const workOpacity = useTransform(scrollYProgress, [0, 0.75, 0.94], [0, 0, 1]);
+  const workX = useTransform(scrollYProgress, [0.7, 0.96], ["-18vw", "0vw"]);
   const railOpacity = useTransform(
     clientsProgress,
     compact ? [0, 0.025, 0.075, 1] : [0, 0.03, 0.12, 1],
@@ -788,7 +1196,7 @@ export default function MiizuLanding() {
 
     const travel = Math.max(0, scene.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: scene.offsetTop + travel * 0.6,
+      top: scene.offsetTop + travel * 0.56,
       behavior: "smooth",
     });
   };
@@ -917,23 +1325,6 @@ export default function MiizuLanding() {
 
   return (
     <main className={styles.site}>
-      <AnimatePresence>
-        {introVisible && (
-          <motion.div
-            className={styles.intro}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12 }}
-          >
-            <motion.span
-              animate={{ opacity: [0, 1, 1, 0], y: [8, 0, 0, -8] }}
-              transition={{ duration: 1.05, times: [0, 0.2, 0.72, 1] }}
-            >
-              miizumelon
-            </motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className={styles.heroWorkScene} id="hero" ref={sceneRef}>
         <div className={styles.stickyStage}>
           <motion.header
@@ -989,7 +1380,7 @@ export default function MiizuLanding() {
             <motion.div
               aria-hidden="true"
               className={styles.workShade}
-              style={{ opacity: workShadeOpacity }}
+              style={{ x: workShadeX }}
             />
 
             <motion.button
@@ -1007,7 +1398,7 @@ export default function MiizuLanding() {
 
             <motion.div
               className={styles.workContent}
-              style={{ opacity: workOpacity, y: workY }}
+              style={{ opacity: workOpacity, x: workX }}
             >
               <div className={styles.workList}>
                 <p>I&rsquo;ve directed</p>
@@ -1158,7 +1549,7 @@ export default function MiizuLanding() {
           </div>
 
           <div className={styles.formPanel}>
-            <ContactForm region={region} />
+            <ContactForm compact={compact} region={region} />
           </div>
         </div>
       </section>

@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
+import { z } from "zod";
 
 import {
   CONTACT_SETTINGS_ID,
@@ -14,6 +15,8 @@ import type { Database } from "@/lib/supabase/types";
 // Simple in-memory rate limit: { [ip]: timestamp }
 const rateLimit: Record<string, number> = {};
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
+const CONTACT_PHONE_E164_PATTERN = /^\+[1-9]\d{6,14}$/;
 
 function createServerSupabase(accessToken?: string) {
   return createClient<Database>(
@@ -271,6 +274,26 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const emailResult = CONTACT_EMAIL_SCHEMA.safeParse(email);
+  if (!emailResult.success) {
+    return NextResponse.json(
+      { error: "Please enter a valid email address." },
+      { status: 400 },
+    );
+  }
+  const normalizedEmail = emailResult.data;
+
+  if (
+    telephone &&
+    (typeof telephone !== "string" ||
+      !CONTACT_PHONE_E164_PATTERN.test(telephone))
+  ) {
+    return NextResponse.json(
+      { error: "Please enter a valid international phone number." },
+      { status: 400 },
+    );
+  }
+
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
@@ -288,7 +311,7 @@ export async function POST(req: NextRequest) {
     from: process.env.EMAIL_FROM ?? process.env.EMAIL_USER,
     to: process.env.EMAIL_TO ?? process.env.EMAIL_USER,
     subject: `New Project Request from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\nTelephone: ${telephone ?? "N/A"}\nCompany: ${company ?? "N/A"}\nProject Type: ${projectType}\nCommission Type: ${cooperation ?? "N/A"}\nSequence Length: ${sequenceLength}\nDeadline: ${deadlineDisplay}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
+    text: `Name: ${name}\nEmail: ${normalizedEmail}\nTelephone: ${telephone ?? "N/A"}\nCompany: ${company ?? "N/A"}\nProject Type: ${projectType}\nCommission Type: ${cooperation ?? "N/A"}\nSequence Length: ${sequenceLength}\nDeadline: ${deadlineDisplay}\nAny Assets: ${assets}\n\nDescription:\n${description}`,
     html: `
 <!doctype html>
 <html lang="en">
@@ -348,7 +371,7 @@ export async function POST(req: NextRequest) {
                   <p class="value">${esc(name)}</p>
 
                   <p class="label">Email</p>
-                  <p class="value"><a href="mailto:${esc(email)}" style="color:#0189ff; text-decoration:underline;">${esc(email)}</a></p>
+                  <p class="value"><a href="mailto:${esc(normalizedEmail)}" style="color:#0189ff; text-decoration:underline;">${esc(normalizedEmail)}</a></p>
 
                   <p class="label">Telephone</p>
                   <p class="value">${esc(telephone ?? "N/A")}</p>
@@ -382,7 +405,7 @@ export async function POST(req: NextRequest) {
   </body>
 </html>
     `,
-    replyTo: email,
+    replyTo: normalizedEmail,
   };
 
   try {

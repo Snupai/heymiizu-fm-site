@@ -37,33 +37,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.intro {
-  align-items: center;
-  animation: intro-morph 1.58s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-  background: var(--miizu-primary);
-  color: var(--miizu-bg);
-  display: flex;
-  font-size: clamp(1.2rem, 2.2vw, 2.2rem);
-  font-weight: 650;
-  inset: 0;
-  justify-content: center;
-  letter-spacing: -0.01em;
-  position: fixed;
-  z-index: 10000;
-}
-
-@keyframes intro-morph {
-  0%,
-  54% {
-    clip-path: inset(0 0 0 0 round 0);
-  }
-  100% {
-    clip-path: inset(9svh 3vw 9svh 66vw round 2.6rem);
-  }
-}
-
 .heroWorkScene {
-  height: 560svh;
+  height: 980svh;
   position: relative;
 }
 
@@ -201,6 +176,7 @@
   color: var(--miizu-bg);
   contain: layout;
   height: 100svh;
+  isolation: isolate;
   overflow: hidden;
   position: absolute;
   right: 0;
@@ -224,6 +200,7 @@
   padding: 1rem;
   place-items: center;
   position: absolute;
+  z-index: 2;
 }
 
 .cardLabel::after {
@@ -251,7 +228,10 @@
     rgba(5, 3, 21, 0) 62%
   );
   inset: 0;
+  pointer-events: none;
   position: absolute;
+  will-change: transform;
+  z-index: 1;
 }
 
 .workContent {
@@ -260,7 +240,10 @@
   grid-template-columns: 30% 70%;
   inset: 0;
   padding: clamp(2rem, 3.2vw, 4.5rem);
+  pointer-events: none;
   position: absolute;
+  will-change: opacity, transform;
+  z-index: 2;
 }
 
 .workList {
@@ -566,7 +549,7 @@
   border: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.2rem, 2.2vh, 2rem);
+  gap: 0;
   margin: 0;
   padding: 0;
 }
@@ -585,20 +568,23 @@
 
 .contactForm input,
 .contactForm select,
-.contactForm textarea {
+.contactForm textarea,
+.contactForm [data-contact-select],
+.contactForm [data-date-range-picker] {
   appearance: none;
   background: transparent;
-  border: 0;
-  border-bottom: 1px solid rgba(251, 251, 254, 0.18);
-  border-radius: 0;
+  border: 4px solid #0189ff;
+  border-radius: 1rem;
   color: var(--miizu-bg);
   font-size: clamp(1rem, 1.25vw, 1.32rem);
   font-weight: 600;
   line-height: 1.2;
   outline: 0;
-  padding: 0.18rem 0 0.42rem;
+  padding: 0.45rem 0.85rem;
   resize: vertical;
-  transition: border-color 180ms ease;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
   width: 100%;
 }
 
@@ -608,21 +594,204 @@
   padding-right: 1.5rem;
 }
 
+.contactForm [data-contact-select],
+.contactForm [data-date-range-picker] {
+  height: auto;
+  justify-content: space-between;
+  min-height: 0;
+  text-align: left;
+}
+
 .contactForm input::placeholder,
 .contactForm textarea::placeholder,
-.contactForm select:invalid {
+.contactForm select:invalid,
+.contactForm [data-contact-select][data-placeholder],
+.contactForm [data-date-range-picker][data-empty="true"] {
   color: rgba(251, 251, 254, 0.53);
   opacity: 1;
 }
 
 .contactForm input:focus,
 .contactForm select:focus,
-.contactForm textarea:focus {
-  border-color: var(--miizu-primary);
+.contactForm textarea:focus,
+.contactForm [data-contact-select]:focus,
+.contactForm [data-date-range-picker]:focus {
+  border-color: #0189ff;
+  box-shadow: 0 0 0 2px rgba(1, 137, 255, 0.35);
 }
 
-.contactForm input[type="date"] {
+.contactForm input:focus-visible,
+.contactForm select:focus-visible,
+.contactForm textarea:focus-visible,
+.contactForm [data-contact-select]:focus-visible,
+.contactForm [data-date-range-picker]:focus-visible {
+  outline: 0;
+}
+
+.contactForm input[aria-invalid="true"],
+.contactForm textarea[aria-invalid="true"],
+.contactForm [data-contact-select][aria-invalid="true"],
+.contactForm [data-date-range-picker][aria-invalid="true"] {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.28);
+}
+
+.fieldError {
+  color: #ff9696;
+  font-size: clamp(0.72rem, 0.75vw, 0.84rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  margin: 0.12rem 0.65rem 0;
+}
+
+.fieldFeedback {
+  flex: 0 0 1.1rem;
+  height: 1.1rem;
+}
+
+.fieldFeedback .fieldError {
+  display: block;
+}
+
+.phoneInput {
+  --iti-border-color: #0189ff;
+  --iti-border-width: 4px;
+  --iti-country-selector-bg: #050315;
+  --iti-hover-color: rgba(1, 137, 255, 0.2);
+  --iti-icon-color: #0189ff;
+  --iti-strict-reject-flash-color: rgba(255, 107, 107, 0.2);
+
+  color: var(--miizu-bg);
+  width: 100%;
+}
+
+.phoneInput :global(.iti__selected-country-primary) {
+  border-radius: 0.65rem 0 0 0.65rem;
+}
+
+.phoneInput :global(.iti__selected-dial-code) {
+  font-size: clamp(1rem, 1.25vw, 1.32rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.phoneInput :global(.iti__country-selector) {
+  border-color: #0189ff;
+  border-radius: 1rem;
+  color: var(--miizu-bg);
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.phoneInput :global(.iti__search-input) {
+  background: #050315;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--miizu-bg);
+  font-size: 0.95rem;
+  padding-bottom: 0.65rem;
+  padding-top: 0.65rem;
+}
+
+.phoneInput :global(.iti__search-input::placeholder) {
+  color: rgba(251, 251, 254, 0.53);
+}
+
+.contactSelectContent,
+.contactDatePopover {
+  --contact-overlay-background: #050315;
+  --contact-overlay-foreground: #fbfbfe;
+  --contact-overlay-muted: rgba(251, 251, 254, 0.56);
+  --contact-overlay-highlight: rgba(1, 137, 255, 0.2);
+
+  background: var(--contact-overlay-background);
+  border: 2px solid #0189ff;
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.45);
+  color: var(--contact-overlay-foreground);
   color-scheme: dark;
+}
+
+.contactSelectItem {
+  border-radius: 0.65rem;
+  color: var(--contact-overlay-foreground);
+  cursor: pointer;
+}
+
+.contactSelectItem:focus,
+.contactSelectItem[data-highlighted] {
+  background: var(--contact-overlay-highlight);
+  color: var(--contact-overlay-foreground);
+}
+
+.contactDatePopover {
+  overflow: hidden;
+  padding: 0;
+}
+
+.contactCalendar {
+  background: transparent;
+  color: var(--contact-overlay-foreground);
+}
+
+.contactCalendar button {
+  color: var(--contact-overlay-foreground);
+}
+
+.contactCalendar button:hover,
+.contactCalendar button:focus-visible {
+  background: var(--contact-overlay-highlight);
+  color: var(--contact-overlay-foreground);
+}
+
+.contactCalendar button[data-selected-single="true"] {
+  background: #0189ff;
+  color: #fbfbfe;
+}
+
+.contactCalendar button[data-range-start="true"],
+.contactCalendar button[data-range-end="true"] {
+  background: #0189ff;
+  color: #fbfbfe;
+}
+
+.contactCalendar button[data-range-middle="true"] {
+  background: var(--contact-overlay-highlight);
+  color: var(--contact-overlay-foreground);
+}
+
+.contactCalendar :global(.rdp-weekday),
+.contactCalendar :global(.rdp-outside),
+.contactCalendar :global(.rdp-disabled) {
+  color: var(--contact-overlay-muted);
+}
+
+.contactCalendar :global(.rdp-today:not(.rdp-selected)) {
+  background: var(--contact-overlay-highlight);
+}
+
+.dateRangePickerButton:hover {
+  background: rgba(1, 137, 255, 0.14);
+  color: var(--miizu-bg);
+}
+
+.dateRangePickerButton:focus-visible {
+  box-shadow: 0 0 0 2px rgba(1, 137, 255, 0.35);
+  outline: 0;
+}
+
+.dateRangePickerButton > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dateRangePickerButton svg {
+  color: #0189ff;
+  flex: 0 0 auto;
 }
 
 .submitButton {
@@ -872,6 +1041,26 @@
   outline-offset: 5px;
 }
 
+@media (min-width: 761px) and (max-height: 1100px) {
+  .formPanel {
+    padding-block: clamp(0.5rem, 1.2svh, 0.9rem);
+  }
+
+  .contactForm fieldset {
+    gap: 0;
+  }
+
+  .submitButton {
+    margin-top: clamp(0.35rem, 0.7svh, 0.6rem);
+  }
+}
+
+@media (min-width: 761px) and (min-height: 901px) and (max-height: 1100px) {
+  .formPanel {
+    padding-block-end: clamp(2.5rem, 5svh, 3.25rem);
+  }
+}
+
 @media (max-width: 960px) {
   .contactSection {
     grid-template-columns: minmax(0, 3fr) minmax(22rem, 2fr);
@@ -883,18 +1072,8 @@
 }
 
 @media (max-width: 760px) {
-  @keyframes intro-morph {
-    0%,
-    54% {
-      clip-path: inset(0 0 0 0 round 0);
-    }
-    100% {
-      clip-path: inset(43svh 5vw 6svh 5vw round 2.6rem);
-    }
-  }
-
   .heroWorkScene {
-    height: 480svh;
+    height: 820svh;
   }
 
   .header {
@@ -1092,7 +1271,7 @@
   }
 
   .contactForm fieldset {
-    gap: 1.45rem;
+    gap: 0;
   }
 
   .footer {

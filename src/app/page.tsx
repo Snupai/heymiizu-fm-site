@@ -1,5 +1,11 @@
+import LandingPreloader from "@/components/LandingPreloader";
+
 import MiizuLanding from "./MiizuLanding";
 
 export default function HomePage() {
-  return <MiizuLanding />;
+  return (
+    <LandingPreloader>
+      <MiizuLanding />
+    </LandingPreloader>
+  );
 }
