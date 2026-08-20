@@ -83,7 +83,7 @@ const CLIENTS = [
   "HOLY",
   "Airalo",
 ];
-const CLIENT_MARQUEE_ROWS = 7;
+const CLIENT_MARQUEE_ROWS = 2;
 
 const SERVICES = [
   "Launch campaign",
@@ -106,10 +106,11 @@ const BUDGET_ITEMS = [
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
 const SHOWREEL_RADIUS_REM = 2.6;
-const INTRO_REVEAL_DELAY_MS = 5_000;
+const INTRO_REVEAL_DELAY_MS = 1_000;
 const INTRO_HEADER_SLIDE_DURATION_S = 2;
-const INTRO_CARD_SLIDE_DURATION_S = 4;
+const INTRO_CARD_SLIDE_DURATION_S = 6;
 const INTRO_SLIDE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const INTRO_CARD_SLIDE_EASE: [number, number, number, number] = [0.18, 0.9, 0.08, 1];
 const SCROLL_PANEL_HOLD = 0.04;
 const SCROLL_PANEL_EXPANDED = 0.28;
 const SCROLL_HERO_FADE_END = 0.2;
@@ -1141,6 +1142,18 @@ export default function MiizuLanding() {
 
   const introActive = introPhase !== "complete";
   const panelRest = getIntroPanelRest(compact);
+  const introPanelOffscreen = {
+    x: "100vw",
+    y: panelRest.y,
+    scaleX: panelRest.scaleX,
+    scaleY: panelRest.scaleY,
+  };
+  const introPanelResting = {
+    x: panelRest.x,
+    y: panelRest.y,
+    scaleX: panelRest.scaleX,
+    scaleY: panelRest.scaleY,
+  };
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -1196,11 +1209,30 @@ export default function MiizuLanding() {
   useEffect(() => {
     if (introPhase !== "video" || reduceMotion) return;
 
-    const timer = window.setTimeout(() => {
-      setIntroPhase("revealing");
-    }, INTRO_REVEAL_DELAY_MS);
+    const video = introVideoRef.current;
+    if (!video) return;
 
-    return () => window.clearTimeout(timer);
+    let timer: number | undefined;
+
+    const startRevealTimer = () => {
+      if (timer !== undefined) return;
+
+      const remainingMs = Math.max(
+        0,
+        INTRO_REVEAL_DELAY_MS - video.currentTime * 1000,
+      );
+      timer = window.setTimeout(() => {
+        setIntroPhase("revealing");
+      }, remainingMs);
+    };
+
+    if (!video.paused) startRevealTimer();
+    video.addEventListener("playing", startRevealTimer);
+
+    return () => {
+      video.removeEventListener("playing", startRevealTimer);
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, [introPhase, reduceMotion]);
 
   useEffect(() => {
@@ -1740,23 +1772,14 @@ export default function MiizuLanding() {
             animate={
               introActive
                 ? introPhase === "video"
-                  ? {
-                      x: "100vw",
-                      y: panelRest.y,
-                      scaleX: panelRest.scaleX,
-                      scaleY: panelRest.scaleY,
-                    }
-                  : {
-                      x: panelRest.x,
-                      y: panelRest.y,
-                      scaleX: panelRest.scaleX,
-                      scaleY: panelRest.scaleY,
-                    }
+                  ? introPanelOffscreen
+                  : introPanelResting
                 : false
             }
             aria-label="Showreel and selected work"
             className={styles.showreelPanel}
             id="work"
+            initial={introActive ? introPanelOffscreen : false}
             onAnimationComplete={handleIntroSlideComplete}
             style={
               introActive
@@ -1768,10 +1791,14 @@ export default function MiizuLanding() {
                     y: panelY,
                   }
             }
-            transition={{
-              duration: INTRO_CARD_SLIDE_DURATION_S,
-              ease: INTRO_SLIDE_EASE,
-            }}
+            transition={
+              introPhase === "revealing"
+                ? {
+                    duration: INTRO_CARD_SLIDE_DURATION_S,
+                    ease: INTRO_CARD_SLIDE_EASE,
+                  }
+                : { duration: 0 }
+            }
           >
             <motion.div
               className={styles.showreelSurface}

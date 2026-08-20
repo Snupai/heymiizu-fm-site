@@ -154,6 +154,7 @@
   inset: 0;
   isolation: isolate;
   position: absolute;
+  transform: translate3d(100vw, 9svh, 0) scale(0.31, 0.82);
   transform-origin: 100% 0;
   width: 100%;
   will-change: transform;
@@ -251,32 +252,8 @@
   display: block;
 }
 
-.clientsOverlay .clientMarquee:nth-child(n + 2) {
-  display: block;
-}
-
 .clientsOverlay .clientMarquee:nth-child(2) .clientNames {
-  animation-delay: -4s;
-}
-
-.clientsOverlay .clientMarquee:nth-child(3) .clientNames {
-  animation-delay: -8s;
-}
-
-.clientsOverlay .clientMarquee:nth-child(4) .clientNames {
-  animation-delay: -12s;
-}
-
-.clientsOverlay .clientMarquee:nth-child(5) .clientNames {
-  animation-delay: -16s;
-}
-
-.clientsOverlay .clientMarquee:nth-child(6) .clientNames {
-  animation-delay: -20s;
-}
-
-.clientsOverlay .clientMarquee:nth-child(7) .clientNames {
-  animation-delay: -24s;
+  animation-delay: -13s;
 }
 
 .workContent {
@@ -1110,6 +1087,10 @@
 }
 
 @media (max-width: 760px) {
+  .showreelPanel {
+    transform: translate3d(100vw, 43svh, 0) scale(0.9, 0.51);
+  }
+
   .heroWorkScene {
     height: 2350svh;
   }
@@ -1281,6 +1262,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .showreelPanel {
+    transform: none;
+  }
+
   .intro {
     display: none;
   }
