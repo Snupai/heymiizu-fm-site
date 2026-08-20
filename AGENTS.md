@@ -3,7 +3,8 @@
 - Use bun for package installs and scripts, not npm or yarn.
 - Prefer brand blue (`bg-brand` / `#0189ff`) for active UI controls rather than red or undefined theme tokens like `destructive`/`muted`.
 - Keep email/SMTP env vars optional so local `bun run dev` can start without SMTP credentials.
-- When commissions are paused, overlay a large centered notice on the contact form (fields visible underneath, dimmed), not a separate banner stacked above the fields.
+- When commissions are paused, overlay a large centered notice on the contact form (fields visible underneath, dimmed), not a separate banner stacked above the fields. Prefer a frosted-glass, Apple-like card over a chunky bordered blue box.
+- In the admin Contact settings, status copy should reflect the saved pause state, not the unsaved toggle draft.
 - Footer NVA wordmark should sit flush on the left edge: no leftover white gap, and the N must not hang off the page.
 - Footer “represented by” should stay pinned to the middle of the NVA “N” and follow the letter’s diagonal as the wordmark scales.
 

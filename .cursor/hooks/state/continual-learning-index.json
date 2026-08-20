@@ -1,9 +1,33 @@
 {
   "version": 1,
   "transcripts": {
-    "cdf1f1a4-3486-4e4b-83c1-b4a785af8557": {
-      "path": "/Users/snupai/.cursor/projects/Users-snupai-t3-mac-mini-worktrees-heymiizu-fm-site-t3code-e933b844/agent-transcripts/cdf1f1a4-3486-4e4b-83c1-b4a785af8557/cdf1f1a4-3486-4e4b-83c1-b4a785af8557.jsonl",
-      "mtimeMs": 1787237596090
+    "4083c75f-b0ae-4967-8f9a-80a4f55cb2d8": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/4083c75f-b0ae-4967-8f9a-80a4f55cb2d8/4083c75f-b0ae-4967-8f9a-80a4f55cb2d8.jsonl",
+      "mtimeMs": 1785535778893
+    },
+    "40eed727-3b34-4fe6-8b02-5ad830af2918": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/40eed727-3b34-4fe6-8b02-5ad830af2918/40eed727-3b34-4fe6-8b02-5ad830af2918.jsonl",
+      "mtimeMs": 1785531158789
+    },
+    "45f1b9c4-7b3f-41f8-9ac4-eeaf2f98e550": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/45f1b9c4-7b3f-41f8-9ac4-eeaf2f98e550/45f1b9c4-7b3f-41f8-9ac4-eeaf2f98e550.jsonl",
+      "mtimeMs": 1785531192694
+    },
+    "8ada173f-4643-4c7f-942a-623cbf38c74f": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/8ada173f-4643-4c7f-942a-623cbf38c74f/8ada173f-4643-4c7f-942a-623cbf38c74f.jsonl",
+      "mtimeMs": 1785534726877
+    },
+    "cacc1183-1d92-4165-8b85-36deffca07f8": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/8ada173f-4643-4c7f-942a-623cbf38c74f/subagents/cacc1183-1d92-4165-8b85-36deffca07f8.jsonl",
+      "mtimeMs": 1785534617731
+    },
+    "f2328e72-7afd-4b85-9032-6e768e91bb38": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/f2328e72-7afd-4b85-9032-6e768e91bb38/f2328e72-7afd-4b85-9032-6e768e91bb38.jsonl",
+      "mtimeMs": 1787251793584
+    },
+    "8dbbc498-926f-444d-a93a-1e4666decc9d": {
+      "path": "/Users/snupai/.cursor/projects/Users-snupai-git-projects-heymiizu-fm-site/agent-transcripts/f2328e72-7afd-4b85-9032-6e768e91bb38/subagents/8dbbc498-926f-444d-a93a-1e4666decc9d.jsonl",
+      "mtimeMs": 1787251819749
     }
   }
 }
