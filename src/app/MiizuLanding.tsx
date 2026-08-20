@@ -13,7 +13,7 @@ import IntlTelInput from "@intl-tel-input/react";
 import type { ValidationError } from "intl-tel-input";
 import { ArrowUpRight, CalendarIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { FormEvent, PointerEvent } from "react";
 import type { DateRange } from "react-day-picker";
@@ -105,6 +105,90 @@ const BUDGET_ITEMS = [
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
 const SHOWREEL_RADIUS_REM = 2.6;
+const INTRO_REVEAL_DELAY_MS = 5_000;
+const INTRO_HEADER_SLIDE_DURATION_S = 2;
+const INTRO_CARD_SLIDE_DURATION_S = 4;
+const INTRO_SLIDE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const SCROLL_PANEL_HOLD = 0.04;
+const SCROLL_PANEL_EXPANDED = 0.28;
+const SCROLL_HERO_FADE_END = 0.2;
+const SCROLL_SURFACE_INSET_MID = 0.16;
+const SCROLL_WORK_REVEAL = 0.45;
+const SCROLL_WORK_SHADE_SET = 0.51;
+const SCROLL_WORK_SHADE_HOLD = 0.63;
+const SCROLL_WORK_SHADE_FULL = 0.69;
+const SCROLL_WORK_DONE = 0.53;
+const SCROLL_MARQUEE_HOLD_END = 0.77;
+const SCROLL_CONTACT_SET = 0.94;
+const SCROLL_SCENE_SHADE_HOLD_X = 0.76;
+type IntroPhase = "video" | "revealing" | "complete";
+
+function getClientsEdgeWidth(viewportWidth: number) {
+  return viewportWidth * 0.3;
+}
+
+function getSceneShadeOffset(progress: number, viewportWidth: number) {
+  const edge = getClientsEdgeWidth(viewportWidth);
+  const startX = -(viewportWidth + edge);
+  const fullBlackX = 0;
+  const exitX = viewportWidth;
+  const workX = -viewportWidth * SCROLL_SCENE_SHADE_HOLD_X;
+
+  if (progress <= SCROLL_WORK_REVEAL) return startX;
+  if (progress >= SCROLL_CONTACT_SET) return exitX;
+
+  if (progress > SCROLL_MARQUEE_HOLD_END) {
+    const t =
+      (progress - SCROLL_MARQUEE_HOLD_END) /
+      (SCROLL_CONTACT_SET - SCROLL_MARQUEE_HOLD_END);
+    return fullBlackX + t * viewportWidth;
+  }
+
+  if (progress >= SCROLL_WORK_SHADE_FULL) return fullBlackX;
+
+  if (progress < SCROLL_WORK_SHADE_SET) {
+    const t =
+      (progress - SCROLL_WORK_REVEAL) /
+      (SCROLL_WORK_SHADE_SET - SCROLL_WORK_REVEAL);
+    return startX + t * (workX - startX);
+  }
+
+  if (progress < SCROLL_WORK_SHADE_HOLD) return workX;
+
+  const t =
+    (progress - SCROLL_WORK_SHADE_HOLD) /
+    (SCROLL_WORK_SHADE_FULL - SCROLL_WORK_SHADE_HOLD);
+
+  return workX + t * (fullBlackX - workX);
+}
+
+function getContactWipeOffset(progress: number, viewportWidth: number) {
+  if (progress <= SCROLL_MARQUEE_HOLD_END) return -viewportWidth;
+  if (progress >= SCROLL_CONTACT_SET) return 0;
+
+  const t =
+    (progress - SCROLL_MARQUEE_HOLD_END) /
+    (SCROLL_CONTACT_SET - SCROLL_MARQUEE_HOLD_END);
+
+  return -viewportWidth * (1 - t);
+}
+
+function getIntroPanelRest(compact: boolean) {
+  return compact
+    ? {
+        x: "-5vw",
+        y: "43svh",
+        scaleX: 0.9,
+        scaleY: 0.51,
+      }
+    : {
+        x: "-3vw",
+        y: "9svh",
+        scaleX: 0.31,
+        scaleY: 0.82,
+      };
+}
+
 const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
 
 const loadPhoneUtils = () => import("intl-tel-input/utils");
@@ -923,7 +1007,9 @@ function anchorRepresentedBy(word: HTMLElement, label: HTMLElement) {
 export default function MiizuLanding() {
   const reduceMotion = useReducedMotion();
   const sceneRef = useRef<HTMLDivElement>(null);
-  const clientsRef = useRef<HTMLElement>(null);
+  const introVideoRef = useRef<HTMLVideoElement>(null);
+  const showreelVideoRef = useRef<HTMLVideoElement>(null);
+  const introSlideCompletions = useRef(0);
   const clientMarqueesRef = useRef<HTMLDivElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
   const representedByRef = useRef<HTMLSpanElement>(null);
@@ -932,6 +1018,7 @@ export default function MiizuLanding() {
   const lastNuviaTouchAt = useRef(-Infinity);
   const nuviaTooltipX = useMotionValue(0);
   const nuviaTooltipY = useMotionValue(0);
+  const viewportWidthMV = useMotionValue(0);
   const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
     stiffness: 420,
     damping: 32,
@@ -950,6 +1037,14 @@ export default function MiizuLanding() {
     "international",
   );
   const [headlineIndex, setHeadlineIndex] = useState(0);
+  const [introPhase, setIntroPhase] = useState<IntroPhase>(
+    reduceMotion ? "complete" : "video",
+  );
+  const [introSlidesDone, setIntroSlidesDone] = useState(false);
+  const [introVideoEnded, setIntroVideoEnded] = useState(false);
+
+  const introActive = introPhase !== "complete";
+  const panelRest = getIntroPanelRest(compact);
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -975,6 +1070,13 @@ export default function MiizuLanding() {
     return () => query.removeEventListener("change", sync);
   }, []);
 
+  useLayoutEffect(() => {
+    const syncViewport = () => viewportWidthMV.set(window.innerWidth);
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    return () => window.removeEventListener("resize", syncViewport);
+  }, [viewportWidthMV]);
+
   useEffect(() => {
     setNuviaTooltipMounted(true);
 
@@ -988,6 +1090,118 @@ export default function MiizuLanding() {
   useEffect(() => {
     setHeadlineIndex(Math.floor(Math.random() * CONTACT_HEADLINES.length));
   }, []);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setIntroPhase("complete");
+    }
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    if (introPhase !== "video" || reduceMotion) return;
+
+    const timer = window.setTimeout(() => {
+      setIntroPhase("revealing");
+    }, INTRO_REVEAL_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [introPhase, reduceMotion]);
+
+  useEffect(() => {
+    if (introPhase !== "revealing") return;
+
+    introSlideCompletions.current = 0;
+    setIntroSlidesDone(false);
+  }, [introPhase]);
+
+  useEffect(() => {
+    if (introPhase !== "revealing" || !introSlidesDone || !introVideoEnded) return;
+    setIntroPhase("complete");
+  }, [introPhase, introSlidesDone, introVideoEnded]);
+
+  useEffect(() => {
+    if (introPhase === "complete" || reduceMotion) return;
+    void introVideoRef.current?.play().catch(() => undefined);
+  }, [introPhase, reduceMotion]);
+
+  useEffect(() => {
+    if (introPhase === "video") return;
+    void showreelVideoRef.current?.play().catch(() => undefined);
+  }, [introPhase]);
+
+  useEffect(() => {
+    if (introPhase === "complete") return;
+
+    const html = document.documentElement;
+    const body = document.body;
+    const lockedScrollX = window.scrollX;
+    const lockedScrollY = window.scrollY;
+    const scrollKeys = new Set([
+      " ",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "End",
+      "Home",
+      "PageDown",
+      "PageUp",
+      "Spacebar",
+    ]);
+    const previousStyles = {
+      bodyOverflow: body.style.overflow,
+      bodyOverscrollBehavior: body.style.overscrollBehavior,
+      bodyTouchAction: body.style.touchAction,
+      htmlOverflow: html.style.overflow,
+      htmlOverscrollBehavior: html.style.overscrollBehavior,
+      htmlTouchAction: html.style.touchAction,
+    };
+    const preventScroll = (event: Event) => event.preventDefault();
+    const preventScrollKeys = (event: KeyboardEvent) => {
+      if (scrollKeys.has(event.key)) event.preventDefault();
+    };
+    const keepScrollPosition = () => {
+      window.scrollTo(lockedScrollX, lockedScrollY);
+    };
+
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+    html.style.touchAction = "none";
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
+    body.style.touchAction = "none";
+    window.addEventListener("keydown", preventScrollKeys);
+    window.addEventListener("scroll", keepScrollPosition);
+    window.addEventListener("touchmove", preventScroll, { passive: false });
+    window.addEventListener("wheel", preventScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener("keydown", preventScrollKeys);
+      window.removeEventListener("scroll", keepScrollPosition);
+      window.removeEventListener("touchmove", preventScroll);
+      window.removeEventListener("wheel", preventScroll);
+      html.style.overflow = previousStyles.htmlOverflow;
+      html.style.overscrollBehavior = previousStyles.htmlOverscrollBehavior;
+      html.style.touchAction = previousStyles.htmlTouchAction;
+      body.style.overflow = previousStyles.bodyOverflow;
+      body.style.overscrollBehavior = previousStyles.bodyOverscrollBehavior;
+      body.style.touchAction = previousStyles.bodyTouchAction;
+    };
+  }, [introPhase]);
+
+  const handleIntroSlideComplete = () => {
+    if (introPhase !== "revealing") return;
+
+    introSlideCompletions.current += 1;
+    if (introSlideCompletions.current >= 2) {
+      setIntroSlidesDone(true);
+    }
+  };
+
+  const handleIntroVideoEnded = () => {
+    setIntroVideoEnded(true);
+    introVideoRef.current?.pause();
+  };
 
   useEffect(() => {
     const tracks = clientMarqueesRef.current;
@@ -1127,38 +1341,33 @@ export default function MiizuLanding() {
     offset: ["start start", "end end"],
   });
 
-  const { scrollYProgress: clientsProgress } = useScroll({
-    target: clientsRef,
-    offset: ["start end", "end start"],
-  });
-
   const panelX = useTransform(
     scrollYProgress,
-    [0, 0.29, 0.54, 1],
+    [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
     compact ? ["-5vw", "-5vw", "0vw", "0vw"] : ["-3vw", "-3vw", "0vw", "0vw"],
   );
   const panelY = useTransform(
     scrollYProgress,
-    [0, 0.29, 0.54, 1],
+    [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
     compact
       ? ["43svh", "43svh", "0svh", "0svh"]
       : ["9svh", "9svh", "0svh", "0svh"],
   );
   const panelScaleX = useTransform(
     scrollYProgress,
-    [0, 0.29, 0.54, 1],
+    [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
     compact ? [0.9, 0.9, 1, 1] : [0.31, 0.31, 1, 1],
   );
   const panelScaleY = useTransform(
     scrollYProgress,
-    [0, 0.29, 0.54, 1],
+    [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
     compact ? [0.51, 0.51, 1, 1] : [0.82, 0.82, 1, 1],
   );
   const cardScaleX = useTransform(panelScaleX, (value) => 1 / value);
   const cardScaleY = useTransform(panelScaleY, (value) => 1 / value);
   const surfaceInset = useTransform(
     scrollYProgress,
-    [0, 0.35, 0.54],
+    [0, SCROLL_SURFACE_INSET_MID, SCROLL_PANEL_EXPANDED],
     ["0rem", "0rem", `-${SHOWREEL_RADIUS_REM}rem`],
   );
   const panelRadius = useTransform(() => {
@@ -1166,24 +1375,78 @@ export default function MiizuLanding() {
     const scaleY = Math.max(panelScaleY.get(), 0.001);
     return `${SHOWREEL_RADIUS_REM / scaleX}rem / ${SHOWREEL_RADIUS_REM / scaleY}rem`;
   });
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.25, 0.39], [1, 1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.39], ["0vh", "-6vh"]);
-  const cardLabelOpacity = useTransform(
+  const heroOpacity = useTransform(
     scrollYProgress,
-    [0, 0.7, 0.8],
+    [0, SCROLL_PANEL_HOLD, SCROLL_HERO_FADE_END],
     [1, 1, 0],
   );
-  const workShadeX = useTransform(
+  const heroExitY = useTransform(
     scrollYProgress,
-    [0.7, 0.95],
-    ["-100%", "0%"],
+    [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED],
+    ["0%", "0%", "-100%"],
   );
-  const workOpacity = useTransform(scrollYProgress, [0, 0.75, 0.94], [0, 0, 1]);
-  const workX = useTransform(scrollYProgress, [0.7, 0.96], ["-18vw", "0vw"]);
-  const railOpacity = useTransform(
-    clientsProgress,
-    compact ? [0, 0.025, 0.075, 1] : [0, 0.03, 0.12, 1],
-    [0, 0.35, 1, 1],
+  useEffect(() => {
+    if (introPhase !== "complete") return;
+
+    const video = introVideoRef.current;
+    if (!video) return;
+
+    const freezeLastFrame = () => {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        video.currentTime = Math.max(0, video.duration - 0.04);
+      }
+      video.pause();
+    };
+
+    if (video.readyState >= 1) {
+      freezeLastFrame();
+      return;
+    }
+
+    video.addEventListener("loadedmetadata", freezeLastFrame, { once: true });
+    return () => video.removeEventListener("loadedmetadata", freezeLastFrame);
+  }, [introPhase]);
+
+  const scrollHintOpacity = introActive ? 0 : heroOpacity;
+  const cardLabelOpacity = useTransform(
+    scrollYProgress,
+    [0, SCROLL_WORK_REVEAL, SCROLL_WORK_REVEAL + 0.1],
+    [1, 1, 0],
+  );
+  const sceneShadeX = useTransform(
+    [scrollYProgress, viewportWidthMV],
+    ([progress, width]) => {
+      if (!width) return -10000;
+      return getSceneShadeOffset(progress as number, width as number);
+    },
+  );
+  const contactWipeX = useTransform(
+    [scrollYProgress, viewportWidthMV],
+    ([progress, width]) => {
+      if (!width) return -10000;
+      return getContactWipeOffset(progress as number, width as number);
+    },
+  );
+  const workOpacity = useTransform(
+    scrollYProgress,
+    [
+      0,
+      SCROLL_WORK_REVEAL + 0.05,
+      SCROLL_WORK_SHADE_SET,
+      SCROLL_WORK_SHADE_HOLD,
+      SCROLL_WORK_SHADE_FULL - 0.03,
+    ],
+    [0, 0, 1, 1, 0],
+  );
+  const workX = useTransform(
+    scrollYProgress,
+    [SCROLL_WORK_REVEAL, SCROLL_WORK_DONE],
+    ["-18vw", "0vw"],
+  );
+  const clientsContentOpacity = useTransform(
+    scrollYProgress,
+    [SCROLL_WORK_SHADE_FULL, SCROLL_WORK_SHADE_FULL + 0.04],
+    [0, 1],
   );
   const headline = CONTACT_HEADLINES[headlineIndex];
   const bookingUrl =
@@ -1196,7 +1459,7 @@ export default function MiizuLanding() {
 
     const travel = Math.max(0, scene.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: scene.offsetTop + travel * 0.56,
+      top: scene.offsetTop + travel * (SCROLL_PANEL_EXPANDED + 0.14),
       behavior: "smooth",
     });
   };
@@ -1327,9 +1590,46 @@ export default function MiizuLanding() {
     <main className={styles.site}>
       <div className={styles.heroWorkScene} id="hero" ref={sceneRef}>
         <div className={styles.stickyStage}>
+          {!reduceMotion ? (
+            <motion.video
+              ref={introVideoRef}
+              aria-hidden="true"
+              autoPlay
+              className={`${styles.heroIntroVideo} ${
+                introPhase === "video"
+                  ? styles.heroIntroVideoOverlay
+                  : introPhase === "revealing"
+                    ? styles.heroIntroVideoRevealing
+                    : ""
+              }`}
+              disablePictureInPicture
+              muted
+              onEnded={handleIntroVideoEnded}
+              onError={handleIntroVideoEnded}
+              playsInline
+              preload="auto"
+              style={{ y: introPhase === "complete" ? heroExitY : undefined }}
+            >
+              <source src="/preload_v2.mp4" type="video/mp4" />
+            </motion.video>
+          ) : null}
+
           <motion.header
+            animate={
+              introActive
+                ? { y: introPhase === "video" ? "-120%" : "0%" }
+                : false
+            }
             className={styles.header}
-            style={{ opacity: heroOpacity }}
+            onAnimationComplete={handleIntroSlideComplete}
+            style={{
+              opacity: introActive ? 1 : heroOpacity,
+              y: introPhase === "complete" ? heroExitY : undefined,
+            }}
+            transition={{
+              duration: INTRO_HEADER_SLIDE_DURATION_S,
+              ease: INTRO_SLIDE_EASE,
+            }}
           >
             <button onClick={openWork} type="button">
               look at me
@@ -1342,38 +1642,51 @@ export default function MiizuLanding() {
             </button>
           </motion.header>
 
-          <motion.div
-            className={styles.heroCopy}
-            style={{ opacity: heroOpacity, y: heroY }}
-          >
-            <h1>
-              <span className={styles.printHey}>Hey</span>
-              <span>I&rsquo;m Miizu</span>
-            </h1>
-            <span aria-hidden="true" className={styles.handwrittenHey}>
-              Hey
-            </span>
-          </motion.div>
-
           <motion.button
             aria-label="Open the work section"
             className={styles.scrollHint}
             onClick={openWork}
-            style={{ opacity: heroOpacity }}
+            style={{ opacity: scrollHintOpacity }}
             type="button"
           >
             scroll
           </motion.button>
 
           <motion.section
+            animate={
+              introActive
+                ? introPhase === "video"
+                  ? {
+                      x: "100vw",
+                      y: panelRest.y,
+                      scaleX: panelRest.scaleX,
+                      scaleY: panelRest.scaleY,
+                    }
+                  : {
+                      x: panelRest.x,
+                      y: panelRest.y,
+                      scaleX: panelRest.scaleX,
+                      scaleY: panelRest.scaleY,
+                    }
+                : false
+            }
             aria-label="Showreel and selected work"
             className={styles.showreelPanel}
             id="work"
-            style={{
-              scaleX: panelScaleX,
-              scaleY: panelScaleY,
-              x: panelX,
-              y: panelY,
+            onAnimationComplete={handleIntroSlideComplete}
+            style={
+              introActive
+                ? undefined
+                : {
+                    scaleX: panelScaleX,
+                    scaleY: panelScaleY,
+                    x: panelX,
+                    y: panelY,
+                  }
+            }
+            transition={{
+              duration: INTRO_CARD_SLIDE_DURATION_S,
+              ease: INTRO_SLIDE_EASE,
             }}
           >
             <motion.div
@@ -1383,11 +1696,61 @@ export default function MiizuLanding() {
                 inset: surfaceInset,
               }}
             >
-              <motion.div
+              <video
+                ref={showreelVideoRef}
                 aria-hidden="true"
-                className={styles.workShade}
-                style={{ x: workShadeX }}
-              />
+                autoPlay
+                className={styles.showreelVideo}
+                disablePictureInPicture
+                loop
+                muted
+                playsInline
+                preload="auto"
+              >
+                <source src="/showreel_2026.mp4" type="video/mp4" />
+              </video>
+
+              <motion.div
+                aria-label="Selected clients"
+                className={styles.sceneShade}
+                id="clients"
+                style={{ x: sceneShadeX }}
+              >
+                <div className={styles.sceneShadeBody}>
+                  <motion.div
+                    className={styles.clientsRail}
+                    style={{ opacity: clientsContentOpacity }}
+                  >
+                    <span className={styles.clientsLabel}>selected clients</span>
+                    <div className={styles.clientMarquees} ref={clientMarqueesRef}>
+                      {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
+                        <div
+                          aria-hidden={row > 0}
+                          className={styles.clientMarquee}
+                          key={row}
+                        >
+                          <div className={styles.clientNames}>
+                            {[0, 1].map((copy) => (
+                              <div
+                                aria-hidden={copy === 1}
+                                className={styles.clientGroup}
+                                key={`${row}-${copy}`}
+                              >
+                                {CLIENTS.map((client) => (
+                                  <span key={`${row}-${copy}-${client}`}>
+                                    {client}
+                                  </span>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+                <div aria-hidden="true" className={styles.sceneShadeEdge} />
+              </motion.div>
 
               <motion.button
                 className={styles.cardLabel}
@@ -1431,135 +1794,111 @@ export default function MiizuLanding() {
               </motion.div>
             </motion.div>
           </motion.section>
-        </div>
-      </div>
 
-      <section
-        className={styles.clientsScene}
-        id="clients"
-        ref={clientsRef}
-        aria-label="Selected clients"
-      >
-        <div className={styles.clientsBridge}>
           <motion.div
-            className={styles.clientsRail}
-            style={{ opacity: railOpacity }}
+            className={styles.contactWipe}
+            id="contact"
+            style={{ x: contactWipeX }}
           >
-            <span className={styles.clientsLabel}>selected clients</span>
-            <div className={styles.clientMarquees} ref={clientMarqueesRef}>
-              {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
-                <div
-                  aria-hidden={row > 0}
-                  className={styles.clientMarquee}
-                  key={row}
-                >
-                  <div className={styles.clientNames}>
-                    {[0, 1].map((copy) => (
-                      <div
-                        aria-hidden={copy === 1}
-                        className={styles.clientGroup}
-                        key={`${row}-${copy}`}
+            <div className={styles.contactSection}>
+              <div className={styles.contactPitch}>
+                <div>
+                  <h2>{headline}</h2>
+                  <LayoutGroup id="region-toggle">
+                    <div
+                      className={styles.regionToggle}
+                      role="group"
+                      aria-label="Project location"
+                    >
+                      <button
+                        aria-pressed={region === "local"}
+                        className={
+                          region === "local" ? styles.regionActive : ""
+                        }
+                        onClick={() => setRegion("local")}
+                        type="button"
                       >
-                        {CLIENTS.map((client) => (
-                          <span key={`${row}-${copy}-${client}`}>{client}</span>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
+                        {region === "local" ? (
+                          <motion.span
+                            aria-hidden="true"
+                            className={styles.regionPill}
+                            layoutId="region-pill"
+                            transition={{
+                              type: "spring",
+                              stiffness: 520,
+                              damping: 28,
+                              mass: 0.6,
+                            }}
+                          />
+                        ) : null}
+                        <span className={styles.regionToggleLabel}>
+                          Local <small>(Germany)</small>
+                        </span>
+                      </button>
+                      <button
+                        aria-pressed={region === "international"}
+                        className={
+                          region === "international"
+                            ? styles.regionActive
+                            : ""
+                        }
+                        onClick={() => setRegion("international")}
+                        type="button"
+                      >
+                        {region === "international" ? (
+                          <motion.span
+                            aria-hidden="true"
+                            className={styles.regionPill}
+                            layoutId="region-pill"
+                            transition={{
+                              type: "spring",
+                              stiffness: 520,
+                              damping: 28,
+                              mass: 0.6,
+                            }}
+                          />
+                        ) : null}
+                        <span className={styles.regionToggleLabel}>
+                          International
+                        </span>
+                      </button>
+                    </div>
+                  </LayoutGroup>
                 </div>
-              ))}
+
+                <div className={styles.directContact}>
+                  <a
+                    className={styles.bookCall}
+                    href={bookingUrl}
+                    rel={
+                      bookingUrl.startsWith("http") ? "noreferrer" : undefined
+                    }
+                    target={
+                      bookingUrl.startsWith("http") ? "_blank" : undefined
+                    }
+                  >
+                    <span className={styles.bookCallText}>book a call</span>
+                    <span aria-hidden="true" className={styles.callIcon}>
+                      <ArrowUpRight />
+                    </span>
+                  </a>
+                  <p>or just say hello</p>
+                  <a
+                    className={styles.emailLink}
+                    href="mailto:hey@miizumelon.com"
+                  >
+                    hey@miizumelon.com
+                  </a>
+                </div>
+              </div>
+
+              <div className={styles.formPanel}>
+                <ContactForm compact={compact} region={region} />
+              </div>
             </div>
           </motion.div>
         </div>
-      </section>
-
-      <section className={styles.contactScene} id="contact">
-        <div className={styles.contactSection}>
-          <div className={styles.contactPitch}>
-            <div>
-              <h2>{headline}</h2>
-              <LayoutGroup id="region-toggle">
-                <div
-                  className={styles.regionToggle}
-                  role="group"
-                  aria-label="Project location"
-                >
-                  <button
-                    aria-pressed={region === "local"}
-                    className={region === "local" ? styles.regionActive : ""}
-                    onClick={() => setRegion("local")}
-                    type="button"
-                  >
-                    {region === "local" ? (
-                      <motion.span
-                        aria-hidden="true"
-                        className={styles.regionPill}
-                        layoutId="region-pill"
-                        transition={{
-                          type: "spring",
-                          stiffness: 520,
-                          damping: 28,
-                          mass: 0.6,
-                        }}
-                      />
-                    ) : null}
-                    <span className={styles.regionToggleLabel}>
-                      Local <small>(Germany)</small>
-                    </span>
-                  </button>
-                  <button
-                    aria-pressed={region === "international"}
-                    className={
-                      region === "international" ? styles.regionActive : ""
-                    }
-                    onClick={() => setRegion("international")}
-                    type="button"
-                  >
-                    {region === "international" ? (
-                      <motion.span
-                        aria-hidden="true"
-                        className={styles.regionPill}
-                        layoutId="region-pill"
-                        transition={{
-                          type: "spring",
-                          stiffness: 520,
-                          damping: 28,
-                          mass: 0.6,
-                        }}
-                      />
-                    ) : null}
-                    <span className={styles.regionToggleLabel}>
-                      International
-                    </span>
-                  </button>
-                </div>
-              </LayoutGroup>
-            </div>
-
-            <div className={styles.directContact}>
-              <a
-                className={styles.bookCall}
-                href={bookingUrl}
-                rel={bookingUrl.startsWith("http") ? "noreferrer" : undefined}
-                target={bookingUrl.startsWith("http") ? "_blank" : undefined}
-              >
-                <span className={styles.bookCallText}>book a call</span>
-                <span aria-hidden="true" className={styles.callIcon}>
-                  <ArrowUpRight />
-                </span>
-              </a>
-              <p>or just say hello</p>
-              <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
-                hey@miizumelon.com
-              </a>
-            </div>
-          </div>
-
-          <div className={styles.formPanel}>
-            <ContactForm compact={compact} region={region} />
-          </div>
-        </div>
-      </section>
+      </div>
 
       <footer className={styles.footer} id="footer">
         <div

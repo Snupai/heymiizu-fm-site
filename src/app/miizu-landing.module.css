@@ -1,11 +1,3 @@
-@font-face {
-  font-family: "Caveat Brush";
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-  src: url("/fonts/caveat-brush.ttf") format("truetype");
-}
-
 .site {
   --miizu-bg: #fbfbfe;
   --miizu-ink: #050315;
@@ -38,7 +30,7 @@
 }
 
 .heroWorkScene {
-  height: 980svh;
+  height: 2800svh;
   position: relative;
 }
 
@@ -50,12 +42,38 @@
   top: 0;
 }
 
+.heroIntroVideo {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+}
+
+.heroIntroVideoOverlay {
+  height: 100dvh;
+  inset: 0;
+  position: fixed;
+  width: 100vw;
+  z-index: 2147483646;
+}
+
+.heroIntroVideoRevealing {
+  height: 100dvh;
+  inset: 0;
+  position: fixed;
+  width: 100vw;
+  z-index: 1;
+}
+
 .header {
   align-items: center;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   inset: 0 0 auto;
-  padding: clamp(1.5rem, 2.6vw, 3rem) clamp(1.35rem, 3vw, 3.8rem);
+  padding: clamp(0.75rem, 1.2vw, 1.25rem) clamp(1.35rem, 3vw, 3.8rem);
   pointer-events: none;
   position: absolute;
   z-index: 20;
@@ -113,48 +131,6 @@
   transform-origin: center;
 }
 
-.heroCopy {
-  left: clamp(1.6rem, 9vw, 11rem);
-  position: absolute;
-  top: 34%;
-  width: min(58vw, 72rem);
-  z-index: 10;
-}
-
-.heroCopy h1 {
-  font-size: clamp(4.4rem, 12vw, 12rem);
-  font-weight: 720;
-  letter-spacing: -0.02em;
-  line-height: 0.84;
-  margin: 0;
-  position: relative;
-}
-
-.heroCopy h1 > span {
-  display: block;
-  white-space: nowrap;
-}
-
-.heroCopy .printHey {
-  font-size: 0.92em;
-}
-
-.handwrittenHey {
-  color: var(--miizu-primary);
-  font-family: "Caveat Brush", cursive;
-  font-size: clamp(7rem, 20vw, 20rem);
-  left: 0;
-  letter-spacing: -0.02em;
-  line-height: 0.7;
-  pointer-events: none;
-  position: absolute;
-  rotate: -7deg;
-  scale: 1.05 1;
-  top: -0.05em;
-  transform-origin: left center;
-  z-index: 2;
-}
-
 .scrollHint {
   background: transparent;
   border: 0;
@@ -187,9 +163,20 @@
 
 .showreelSurface {
   background: var(--miizu-primary);
+  inset: 0;
   overflow: hidden;
   position: absolute;
   will-change: border-radius, inset;
+}
+
+.showreelVideo {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
 }
 
 .cardLabel {
@@ -224,19 +211,79 @@
   transform: scaleX(1);
 }
 
-.workShade {
-  background: linear-gradient(
-    90deg,
-    #050315 0%,
-    rgba(5, 3, 21, 0.96) 15%,
-    rgba(5, 3, 21, 0.48) 34%,
-    rgba(5, 3, 21, 0) 62%
-  );
-  inset: 0;
+.sceneShade {
+  --clients-edge: 30vw;
+  display: flex;
+  height: 100%;
+  inset: 0 auto auto 0;
   pointer-events: none;
   position: absolute;
+  width: calc(100% + var(--clients-edge));
   will-change: transform;
   z-index: 1;
+}
+
+.sceneShadeBody {
+  background: var(--miizu-ink);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.sceneShadeEdge {
+  background: linear-gradient(
+    90deg,
+    var(--miizu-ink) 0%,
+    color-mix(in srgb, var(--miizu-ink) 55%, var(--miizu-primary)) 42%,
+    var(--miizu-primary) 100%
+  );
+  flex: 0 0 var(--clients-edge);
+  height: 100%;
+}
+
+.sceneShade .clientsRail {
+  height: 100%;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sceneShade .clientMarquees {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.55rem, 1.6svh, 1rem);
+}
+
+.sceneShade .clientMarquee {
+  display: block;
+}
+
+.sceneShade .clientMarquee:nth-child(n + 2) {
+  display: block;
+}
+
+.sceneShade .clientMarquee:nth-child(2) .clientNames {
+  animation-delay: -4s;
+}
+
+.sceneShade .clientMarquee:nth-child(3) .clientNames {
+  animation-delay: -8s;
+}
+
+.sceneShade .clientMarquee:nth-child(4) .clientNames {
+  animation-delay: -12s;
+}
+
+.sceneShade .clientMarquee:nth-child(5) .clientNames {
+  animation-delay: -16s;
+}
+
+.sceneShade .clientMarquee:nth-child(6) .clientNames {
+  animation-delay: -20s;
+}
+
+.sceneShade .clientMarquee:nth-child(7) .clientNames {
+  animation-delay: -24s;
 }
 
 .workContent {
@@ -286,17 +333,6 @@
   font-size: 0.72em;
 }
 
-.clientsScene {
-  position: relative;
-}
-
-.clientsBridge {
-  background: var(--miizu-ink);
-  height: clamp(16rem, 42svh, 28rem);
-  overflow: hidden;
-  position: relative;
-}
-
 .clientsRail {
   align-items: flex-start;
   background: transparent;
@@ -337,10 +373,6 @@
   width: 100%;
 }
 
-.clientMarquee:nth-child(n + 2) {
-  display: none;
-}
-
 .clientNames {
   --client-gap: clamp(1.8rem, 3vw, 4rem);
   animation: ticker 26s linear infinite;
@@ -370,18 +402,22 @@
   }
 }
 
-.contactScene {
-  height: 280svh;
-  position: relative;
+.contactWipe {
+  height: 100svh;
+  inset: 0;
+  pointer-events: auto;
+  position: absolute;
+  width: 100%;
+  z-index: 15;
 }
 
-.contactSection {
+.contactWipe .contactSection {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(27rem, 1fr);
-  height: 100svh;
-  min-height: 100svh;
-  position: sticky;
-  top: 0;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  top: auto;
 }
 
 .contactPitch {
@@ -1078,32 +1114,15 @@
 
 @media (max-width: 760px) {
   .heroWorkScene {
-    height: 820svh;
+    height: 2350svh;
   }
 
   .header {
-    padding: 1.25rem 1.15rem;
+    padding: 0.85rem 1.15rem;
   }
 
   .header > * {
     font-size: 0.83rem;
-  }
-
-  .heroCopy {
-    left: 1.2rem;
-    top: 13svh;
-    width: calc(100vw - 2.4rem);
-  }
-
-  .heroCopy h1 {
-    font-size: clamp(4rem, 19vw, 6rem);
-    line-height: 0.86;
-  }
-
-  .handwrittenHey {
-    font-size: clamp(7rem, 31vw, 9rem);
-    left: 0.02em;
-    top: 0;
   }
 
   .scrollHint {
@@ -1136,35 +1155,16 @@
     );
   }
 
-  .clientsBridge {
-    height: 100svh;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  .clientsScene {
-    background: var(--miizu-ink);
-    height: 200svh;
-  }
-
-  .clientsRail {
+  .sceneShade .clientsRail {
     gap: clamp(1.1rem, 2.4svh, 1.5rem);
     padding-block: clamp(2.5rem, 7svh, 4rem);
   }
 
-  .clientsLabel {
+  .sceneShade .clientsLabel {
     padding-left: 1.25rem;
   }
 
-  .clientMarquees {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(0.55rem, 1.6svh, 1rem);
-  }
-
-  .clientMarquee {
-    display: block;
+  .sceneShade .clientMarquee {
     mask-image: linear-gradient(
       90deg,
       transparent 0%,
@@ -1174,70 +1174,36 @@
     );
   }
 
-  .clientMarquee:nth-child(n + 2) {
-    display: block;
-  }
-
-  .clientMarquee:nth-child(2) .clientNames {
-    animation-delay: -4s;
-  }
-
-  .clientMarquee:nth-child(3) .clientNames {
-    animation-delay: -8s;
-  }
-
-  .clientMarquee:nth-child(4) .clientNames {
-    animation-delay: -12s;
-  }
-
-  .clientMarquee:nth-child(5) .clientNames {
-    animation-delay: -16s;
-  }
-
-  .clientMarquee:nth-child(6) .clientNames {
-    animation-delay: -20s;
-  }
-
-  .clientMarquee:nth-child(7) .clientNames {
-    animation-delay: -24s;
-  }
-
-  .clientGroup span {
+  .sceneShade .clientGroup span {
     font-size: clamp(2.7rem, 14vw, 4.5rem);
   }
 
-  .contactScene {
-    height: auto;
+  .contactWipe {
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  .contactSection,
+  .contactWipe .contactSection,
   .footer {
     display: flex;
     flex-direction: column;
   }
 
-  .contactSection {
+  .contactWipe .contactSection {
     background: var(--miizu-ink);
     height: auto;
     isolation: isolate;
-    min-height: 0;
+    min-height: 100%;
     overflow: visible;
     position: relative;
     top: auto;
   }
 
-  .contactSection::after {
-    background: var(--miizu-ink);
-    content: "";
-    display: block;
-    flex: 0 0 180svh;
-  }
-
   .contactPitch {
     min-height: 100svh;
     padding: 3.2rem 1.3rem 2.4rem;
-    position: sticky;
-    top: 0;
+    position: relative;
+    top: auto;
     z-index: 1;
   }
 
@@ -1266,12 +1232,12 @@
     font-size: clamp(2.25rem, 11.5vw, 4rem);
   }
 
-  .formPanel {
-    margin-top: 100svh;
+  .contactWipe .formPanel {
+    margin-top: 0;
     min-height: 100svh;
     padding: 3.8rem 1.35rem;
-    position: sticky;
-    top: 0;
+    position: relative;
+    top: auto;
     z-index: 2;
   }
 
