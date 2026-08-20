@@ -1506,11 +1506,6 @@ export default function MiizuLanding() {
   }, [introPhase]);
 
   const scrollHintOpacity = introActive ? 0 : heroOpacity;
-  const cardLabelOpacity = useTransform(
-    scrollYProgress,
-    [0, SCROLL_WORK_REVEAL, SCROLL_WORK_REVEAL + 0.1],
-    [1, 1, 0],
-  );
   const workShadeX = useTransform(
     [scrollYProgress, viewportWidthMV],
     ([progress, width]) => {
@@ -1867,19 +1862,6 @@ export default function MiizuLanding() {
                   ))}
                 </div>
               </motion.div>
-
-              <motion.button
-                className={styles.cardLabel}
-                onClick={openWork}
-                style={{
-                  opacity: cardLabelOpacity,
-                  scaleX: cardScaleX,
-                  scaleY: cardScaleY,
-                }}
-                type="button"
-              >
-                Showreel video
-              </motion.button>
             </motion.div>
           </motion.section>
 

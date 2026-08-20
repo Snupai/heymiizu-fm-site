@@ -190,38 +190,6 @@
   width: 100%;
 }
 
-.cardLabel {
-  background: transparent;
-  border: 0;
-  color: var(--miizu-bg);
-  cursor: pointer;
-  display: grid;
-  font-size: clamp(1rem, 1.5vw, 1.7rem);
-  font-weight: 650;
-  inset: 0;
-  margin: auto;
-  padding: 1rem;
-  place-items: center;
-  position: absolute;
-  z-index: 2;
-}
-
-.cardLabel::after {
-  background: currentColor;
-  content: "";
-  display: block;
-  height: 2px;
-  margin: 0.4rem auto 0;
-  transform: scaleX(0);
-  transition: transform 250ms ease;
-  width: 7rem;
-}
-
-.cardLabel:hover::after,
-.cardLabel:focus-visible::after {
-  transform: scaleX(1);
-}
-
 .workShade {
   --work-shade-copy: 34vw;
   --work-shade-edge: 30vw;
@@ -318,6 +286,7 @@
   inset: 0;
   overflow: hidden;
   padding: clamp(2rem, 3.2vw, 4.5rem);
+  padding-left: clamp(3.2rem, 6vw, 7rem);
   pointer-events: none;
   position: absolute;
   z-index: 5;
@@ -1160,6 +1129,7 @@
   .workContent {
     align-items: flex-end;
     padding: 1.6rem;
+    padding-left: 2.25rem;
   }
 
   .workShade {
