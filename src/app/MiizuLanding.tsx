@@ -104,6 +104,7 @@ const BUDGET_ITEMS = [
 ];
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
+const SHOWREEL_RADIUS_REM = 2.6;
 const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
 
 const loadPhoneUtils = () => import("intl-tel-input/utils");
@@ -1155,16 +1156,15 @@ export default function MiizuLanding() {
   );
   const cardScaleX = useTransform(panelScaleX, (value) => 1 / value);
   const cardScaleY = useTransform(panelScaleY, (value) => 1 / value);
-  const visualRadius = useTransform(
+  const surfaceInset = useTransform(
     scrollYProgress,
     [0, 0.35, 0.54],
-    [2.6, 2.6, 0],
+    ["0rem", "0rem", `-${SHOWREEL_RADIUS_REM}rem`],
   );
   const panelRadius = useTransform(() => {
-    const radius = visualRadius.get();
     const scaleX = Math.max(panelScaleX.get(), 0.001);
     const scaleY = Math.max(panelScaleY.get(), 0.001);
-    return `${radius / scaleX}rem / ${radius / scaleY}rem`;
+    return `${SHOWREEL_RADIUS_REM / scaleX}rem / ${SHOWREEL_RADIUS_REM / scaleY}rem`;
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25, 0.39], [1, 1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 0.39], ["0vh", "-6vh"]);
@@ -1370,7 +1370,6 @@ export default function MiizuLanding() {
             className={styles.showreelPanel}
             id="work"
             style={{
-              borderRadius: panelRadius,
               scaleX: panelScaleX,
               scaleY: panelScaleY,
               x: panelX,
@@ -1378,50 +1377,58 @@ export default function MiizuLanding() {
             }}
           >
             <motion.div
-              aria-hidden="true"
-              className={styles.workShade}
-              style={{ x: workShadeX }}
-            />
-
-            <motion.button
-              className={styles.cardLabel}
-              onClick={openWork}
+              className={styles.showreelSurface}
               style={{
-                opacity: cardLabelOpacity,
-                scaleX: cardScaleX,
-                scaleY: cardScaleY,
+                borderRadius: panelRadius,
+                inset: surfaceInset,
               }}
-              type="button"
             >
-              Showreel video
-            </motion.button>
+              <motion.div
+                aria-hidden="true"
+                className={styles.workShade}
+                style={{ x: workShadeX }}
+              />
 
-            <motion.div
-              className={styles.workContent}
-              style={{ opacity: workOpacity, x: workX }}
-            >
-              <div className={styles.workList}>
-                <p>I&rsquo;ve directed</p>
-                <strong>
-                  Launches
-                  <br />
-                  Trailers
-                  <br />
-                  Keynotes
-                  <br />
-                  Placements
-                </strong>
-                <p>
-                  for brands
-                  <br />
-                  and creators
-                </p>
-              </div>
-              <h2>
+              <motion.button
+                className={styles.cardLabel}
+                onClick={openWork}
+                style={{
+                  opacity: cardLabelOpacity,
+                  scaleX: cardScaleX,
+                  scaleY: cardScaleY,
+                }}
+                type="button"
+              >
                 Showreel video
-                <br />
-                <span>(customized for web)</span>
-              </h2>
+              </motion.button>
+
+              <motion.div
+                className={styles.workContent}
+                style={{ opacity: workOpacity, x: workX }}
+              >
+                <div className={styles.workList}>
+                  <p>I&rsquo;ve directed</p>
+                  <strong>
+                    Launches
+                    <br />
+                    Trailers
+                    <br />
+                    Keynotes
+                    <br />
+                    Placements
+                  </strong>
+                  <p>
+                    for brands
+                    <br />
+                    and creators
+                  </p>
+                </div>
+                <h2>
+                  Showreel video
+                  <br />
+                  <span>(customized for web)</span>
+                </h2>
+              </motion.div>
             </motion.div>
           </motion.section>
         </div>

@@ -172,19 +172,24 @@
 
 .showreelPanel {
   backface-visibility: hidden;
-  background: var(--miizu-primary);
   color: var(--miizu-bg);
   contain: layout;
   height: 100svh;
   isolation: isolate;
-  overflow: hidden;
   position: absolute;
   right: 0;
   top: 0;
   transform-origin: 100% 0;
   width: 100vw;
-  will-change: transform, border-radius;
+  will-change: transform;
   z-index: 8;
+}
+
+.showreelSurface {
+  background: var(--miizu-primary);
+  overflow: hidden;
+  position: absolute;
+  will-change: border-radius, inset;
 }
 
 .cardLabel {
