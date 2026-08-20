@@ -8,6 +8,7 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  type MotionValue,
 } from "framer-motion";
 import IntlTelInput from "@intl-tel-input/react";
 import type { ValidationError } from "intl-tel-input";
@@ -115,15 +116,27 @@ const SCROLL_HERO_FADE_END = 0.2;
 const SCROLL_SURFACE_INSET_MID = 0.16;
 const SCROLL_WORK_REVEAL = 0.45;
 const SCROLL_WORK_SHADE_SET = 0.51;
-const SCROLL_WORK_SHADE_HOLD = 0.63;
-const SCROLL_WORK_SHADE_FULL = 0.8;
-const SCROLL_MARQUEE_HOLD_END = 0.86;
+const SCROLL_WORK_TEXT_HOLD_END = 0.63;
+const SCROLL_WORK_LINE_STAGGER = 0.015;
+const SCROLL_WORK_LINE_TRAVEL = 0.048;
+const SCROLL_MARQUEE_FULL = 0.83;
+const SCROLL_MARQUEE_HOLD_END = 0.88;
 const SCROLL_CONTACT_SET = 0.96;
 const WORK_SHADE_COPY = 0.34;
 const WORK_SHADE_EDGE = 0.3;
 const WORK_SHADE_COPY_COMPACT = 0.58;
 const WORK_SHADE_EDGE_COMPACT = 0.28;
+const WORK_LINES = [
+  { id: "directed", text: "I’ve directed", variant: "lead" },
+  { id: "launches", text: "Launches", variant: "item" },
+  { id: "trailers", text: "Trailers", variant: "item" },
+  { id: "keynotes", text: "Keynotes", variant: "item" },
+  { id: "placements", text: "Placements", variant: "itemEnd" },
+  { id: "brands", text: "for brands", variant: "close" },
+  { id: "creators", text: "and creators", variant: "close" },
+] as const;
 type IntroPhase = "video" | "revealing" | "complete";
+type WorkLineVariant = (typeof WORK_LINES)[number]["variant"];
 
 function getWorkShadeCarrierWidth(viewportWidth: number, compact: boolean) {
   const copy = viewportWidth * (compact ? WORK_SHADE_COPY_COMPACT : WORK_SHADE_COPY);
@@ -142,7 +155,6 @@ function getWorkShadeOffset(
   const exitX = viewportWidth;
 
   if (progress <= SCROLL_WORK_REVEAL) return startX;
-  if (progress >= SCROLL_WORK_SHADE_FULL) return exitX;
 
   if (progress < SCROLL_WORK_SHADE_SET) {
     const t =
@@ -151,24 +163,99 @@ function getWorkShadeOffset(
     return startX + t * (parkedX - startX);
   }
 
-  if (progress < SCROLL_WORK_SHADE_HOLD) return parkedX;
+  if (progress <= SCROLL_WORK_TEXT_HOLD_END) return parkedX;
+
+  if (progress >= SCROLL_MARQUEE_FULL) return exitX;
 
   const t =
-    (progress - SCROLL_WORK_SHADE_HOLD) /
-    (SCROLL_WORK_SHADE_FULL - SCROLL_WORK_SHADE_HOLD);
+    (progress - SCROLL_WORK_TEXT_HOLD_END) /
+    (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
 
   return parkedX + t * (exitX - parkedX);
 }
 
 function getClientsOverlayOffset(progress: number, viewportWidth: number) {
-  if (progress <= SCROLL_WORK_SHADE_HOLD) return -viewportWidth;
-  if (progress >= SCROLL_WORK_SHADE_FULL) return 0;
+  if (progress <= SCROLL_WORK_TEXT_HOLD_END) return -viewportWidth;
+  if (progress >= SCROLL_MARQUEE_FULL) return 0;
 
   const t =
-    (progress - SCROLL_WORK_SHADE_HOLD) /
-    (SCROLL_WORK_SHADE_FULL - SCROLL_WORK_SHADE_HOLD);
+    (progress - SCROLL_WORK_TEXT_HOLD_END) /
+    (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
 
   return -viewportWidth * (1 - t);
+}
+
+function getWorkLineOffset(
+  progress: number,
+  viewportWidth: number,
+  index: number,
+) {
+  const enterStart = SCROLL_WORK_REVEAL + index * SCROLL_WORK_LINE_STAGGER;
+  const enterEnd = enterStart + SCROLL_WORK_LINE_TRAVEL;
+  const offLeft = -viewportWidth * 0.55;
+
+  if (progress <= enterStart) return offLeft;
+
+  if (progress < enterEnd) {
+    const t = (progress - enterStart) / (enterEnd - enterStart);
+    const eased = 1 - (1 - t) ** 3;
+    return offLeft + eased * -offLeft;
+  }
+
+  if (progress <= SCROLL_WORK_TEXT_HOLD_END) return 0;
+
+  if (progress >= SCROLL_MARQUEE_FULL) return viewportWidth;
+
+  const t =
+    (progress - SCROLL_WORK_TEXT_HOLD_END) /
+    (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
+
+  return t * viewportWidth;
+}
+
+function workLineClassName(variant: WorkLineVariant) {
+  switch (variant) {
+    case "lead":
+      return `${styles.workLine} ${styles.workLineLead}`;
+    case "item":
+      return `${styles.workLine} ${styles.workLineItem}`;
+    case "itemEnd":
+      return `${styles.workLine} ${styles.workLineItem} ${styles.workLineItemEnd}`;
+    case "close":
+      return `${styles.workLine} ${styles.workLineClose}`;
+    default: {
+      const exhaustive: never = variant;
+      return exhaustive;
+    }
+  }
+}
+
+function WorkLine({
+  children,
+  index,
+  scrollYProgress,
+  variant,
+  viewportWidthMV,
+}: {
+  children: string;
+  index: number;
+  scrollYProgress: MotionValue<number>;
+  variant: WorkLineVariant;
+  viewportWidthMV: MotionValue<number>;
+}) {
+  const x = useTransform(
+    [scrollYProgress, viewportWidthMV],
+    ([progress, width]) => {
+      if (!width) return 0;
+      return getWorkLineOffset(progress as number, width as number, index);
+    },
+  );
+
+  return (
+    <motion.p className={workLineClassName(variant)} style={{ x }}>
+      {children}
+    </motion.p>
+  );
 }
 
 function getContactWipeOffset(progress: number, viewportWidth: number) {
@@ -1438,17 +1525,17 @@ export default function MiizuLanding() {
       return getClientsOverlayOffset(progress as number, width as number);
     },
   );
+  const clientsOverlayOpacity = useTransform(
+    scrollYProgress,
+    [0, SCROLL_WORK_TEXT_HOLD_END, SCROLL_WORK_TEXT_HOLD_END + 0.001],
+    [0, 0, 1],
+  );
   const contactWipeX = useTransform(
     [scrollYProgress, viewportWidthMV],
     ([progress, width]) => {
       if (!width) return -10000;
       return getContactWipeOffset(progress as number, width as number);
     },
-  );
-  const workOpacity = useTransform(
-    scrollYProgress,
-    [0, SCROLL_WORK_REVEAL, SCROLL_WORK_SHADE_SET],
-    [0, 0, 1],
   );
   const headline = CONTACT_HEADLINES[headlineIndex];
   const bookingUrl =
@@ -1724,7 +1811,7 @@ export default function MiizuLanding() {
                 aria-label="Selected clients"
                 className={styles.clientsOverlay}
                 id="clients"
-                style={{ x: clientsOverlayX }}
+                style={{ opacity: clientsOverlayOpacity, x: clientsOverlayX }}
               >
                 <div className={styles.clientsRail}>
                   <span className={styles.clientsLabel}>selected clients</span>
@@ -1757,34 +1844,28 @@ export default function MiizuLanding() {
               </motion.div>
 
               <motion.div
+                aria-hidden="true"
                 className={styles.workShade}
                 style={{ x: workShadeX }}
               >
-                <div className={styles.workShadeCopy}>
-                  <motion.div
-                    className={styles.workContent}
-                    style={{ opacity: workOpacity }}
-                  >
-                    <div className={styles.workList}>
-                      <p>I&rsquo;ve directed</p>
-                      <strong>
-                        Launches
-                        <br />
-                        Trailers
-                        <br />
-                        Keynotes
-                        <br />
-                        Placements
-                      </strong>
-                      <p>
-                        for brands
-                        <br />
-                        and creators
-                      </p>
-                    </div>
-                  </motion.div>
+                <div className={styles.workShadeCopy} />
+                <div className={styles.workShadeEdge} />
+              </motion.div>
+
+              <motion.div className={styles.workContent}>
+                <div className={styles.workList}>
+                  {WORK_LINES.map((line, index) => (
+                    <WorkLine
+                      index={index}
+                      key={line.id}
+                      scrollYProgress={scrollYProgress}
+                      variant={line.variant}
+                      viewportWidthMV={viewportWidthMV}
+                    >
+                      {line.text}
+                    </WorkLine>
+                  ))}
                 </div>
-                <div aria-hidden="true" className={styles.workShadeEdge} />
               </motion.div>
 
               <motion.button

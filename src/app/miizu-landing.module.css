@@ -316,31 +316,45 @@
   color: var(--miizu-bg);
   display: flex;
   inset: 0;
-  padding: clamp(1.4rem, 2.4vw, 2.8rem) clamp(1.2rem, 2vw, 2.4rem);
+  overflow: hidden;
+  padding: clamp(2rem, 3.2vw, 4.5rem);
   pointer-events: none;
   position: absolute;
-  will-change: opacity;
+  z-index: 5;
 }
 
 .workList {
   align-self: center;
   color: var(--miizu-bg);
+  display: flex;
+  flex-direction: column;
   font-size: clamp(1.5rem, 2.4vw, 3.5rem);
   letter-spacing: -0.01em;
   line-height: 0.96;
-  max-width: none;
   position: relative;
-  z-index: 3;
 }
 
-.workList p {
-  margin: 0 0 0.8em;
+.workLine {
+  margin: 0;
+  white-space: nowrap;
+  width: max-content;
+  will-change: transform;
 }
 
-.workList strong {
-  display: block;
+.workLineLead {
+  margin-bottom: 0.8em;
+}
+
+.workLineItem {
   font-weight: 720;
+}
+
+.workLineItemEnd {
   margin-bottom: 0.9em;
+}
+
+.workLineClose {
+  margin: 0;
 }
 
 .clientsRail {
@@ -936,10 +950,11 @@
 
 .footer {
   --nva-size: clamp(18rem, 37vw, 44rem);
+  --nva-crop: 0.66;
   background: var(--miizu-bg);
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
-  height: calc(var(--nva-size) * 0.66);
+  height: calc(var(--nva-size) * var(--nva-crop));
   min-height: 0;
   overflow: hidden;
   position: relative;
@@ -971,13 +986,14 @@
 }
 
 .nuviaWordmark {
-  bottom: -0.2em;
+  bottom: 0;
   cursor: default;
   flex: 0 0 auto;
   font-size: var(--nva-size);
-  height: 0.92em;
+  height: 100%;
   left: 0;
   outline: 0;
+  overflow: hidden;
   position: relative;
   top: auto;
   width: max-content;
@@ -989,10 +1005,12 @@
   font-weight: 900;
   inset: 0;
   letter-spacing: 0;
-  line-height: 0.8;
+  line-height: var(--nva-crop, 0.66);
   margin: 0;
   padding: 0;
   position: absolute;
+  text-box-edge: cap alphabetic;
+  text-box-trim: trim-both;
   text-indent: 0;
   transform: translateX(var(--nva-shift, 0px));
   transform-origin: 0 100%;
@@ -1152,7 +1170,6 @@
   .workList {
     align-self: end;
     font-size: clamp(1.4rem, 5.8vw, 2rem);
-    max-width: none;
   }
 
   .clientsOverlay .clientsRail {
@@ -1251,6 +1268,7 @@
   }
 
   .nuviaPanel {
+    --nva-crop: 0.888;
     background: var(--miizu-bg);
     height: 41.76vw;
     min-height: 0;
@@ -1263,8 +1281,9 @@
   }
 
   .nuviaWordmark {
-    bottom: -0.16em;
+    bottom: 0;
     font-size: 47vw;
+    height: 100%;
     top: auto;
   }
 
