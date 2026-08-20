@@ -75,6 +75,7 @@ const SERVICES = [
 ];
 
 const BUDGETS = ["5 - 10k", "10 - 25k", "25 - 50k", "50 - 100k", "100k+"];
+const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
 
 type ContactData = {
@@ -502,6 +503,7 @@ export default function MiizuLanding() {
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
   const representedByRef = useRef<HTMLSpanElement>(null);
   const nuviaTooltipReady = useRef(false);
+  const nuviaTooltipHoverTimer = useRef<number | null>(null);
   const lastNuviaTouchAt = useRef(-Infinity);
   const nuviaTooltipX = useMotionValue(0);
   const nuviaTooltipY = useMotionValue(0);
@@ -551,6 +553,12 @@ export default function MiizuLanding() {
 
   useEffect(() => {
     setNuviaTooltipMounted(true);
+
+    return () => {
+      if (nuviaTooltipHoverTimer.current !== null) {
+        window.clearTimeout(nuviaTooltipHoverTimer.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -666,10 +674,8 @@ export default function MiizuLanding() {
       if (!ink) return;
 
       const bleed = 1;
-      const targetWidth = Math.max(1, wordmark.clientWidth);
-      const scale = targetWidth / ink.inkWidth;
-      const shift = -ink.inkLeft * scale - bleed;
-      wordmark.style.setProperty("--nva-scale", scale.toString());
+      const shift = -ink.inkLeft - bleed;
+      wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
       wordmark.style.setProperty("--nva-shift", `${shift}px`);
 
       const label = representedByRef.current;
@@ -766,19 +772,11 @@ export default function MiizuLanding() {
   const workOpacity = useTransform(scrollYProgress, [0.47, 0.6], [0, 1]);
   const workY = useTransform(scrollYProgress, [0.47, 0.6], [42, 0]);
   const workShadeOpacity = useTransform(scrollYProgress, [0.36, 0.54], [0, 1]);
-  const railX = useTransform(
-    clientsProgress,
-    compact ? [0, 0.08, 0.28, 1] : [0, 0.18, 0.72, 1],
-    compact
-      ? ["-42vw", "-28vw", "0vw", "0vw"]
-      : ["-28vw", "-20vw", "0vw", "0vw"],
-  );
   const railOpacity = useTransform(
     clientsProgress,
-    compact ? [0, 0.1, 0.3, 1] : [0, 0.14, 0.68, 1],
-    compact ? [0, 0.04, 1, 1] : [0, 0.08, 1, 1],
+    compact ? [0, 0.025, 0.075, 1] : [0, 0.03, 0.12, 1],
+    [0, 0.35, 1, 1],
   );
-
   const headline = CONTACT_HEADLINES[headlineIndex];
   const bookingUrl =
     process.env.NEXT_PUBLIC_BOOKING_URL ??
@@ -822,12 +820,24 @@ export default function MiizuLanding() {
     )
       return;
 
+    if (nuviaTooltipHoverTimer.current !== null) {
+      window.clearTimeout(nuviaTooltipHoverTimer.current);
+    }
+
     setNuviaTooltipTouch(false);
     placeNuviaTooltip(event, true);
-    setNuviaTooltipVisible(true);
+    nuviaTooltipHoverTimer.current = window.setTimeout(() => {
+      nuviaTooltipHoverTimer.current = null;
+      setNuviaTooltipVisible(true);
+    }, NUVIA_TOOLTIP_HOVER_DELAY_MS);
   };
 
   const hideNuviaTooltip = () => {
+    if (nuviaTooltipHoverTimer.current !== null) {
+      window.clearTimeout(nuviaTooltipHoverTimer.current);
+      nuviaTooltipHoverTimer.current = null;
+    }
+
     nuviaTooltipReady.current = false;
     setNuviaTooltipTouch(false);
     setNuviaTooltipVisible(false);
@@ -855,6 +865,11 @@ export default function MiizuLanding() {
 
   const toggleNuviaTouchTooltip = (event: PointerEvent<HTMLElement>) => {
     if (event.pointerType !== "touch") return;
+
+    if (nuviaTooltipHoverTimer.current !== null) {
+      window.clearTimeout(nuviaTooltipHoverTimer.current);
+      nuviaTooltipHoverTimer.current = null;
+    }
 
     lastNuviaTouchAt.current = window.performance.now();
     event.preventDefault();
@@ -1030,7 +1045,7 @@ export default function MiizuLanding() {
         <div className={styles.clientsBridge}>
           <motion.div
             className={styles.clientsRail}
-            style={{ opacity: railOpacity, x: railX }}
+            style={{ opacity: railOpacity }}
           >
             <span className={styles.clientsLabel}>selected clients</span>
             <div className={styles.clientMarquees} ref={clientMarqueesRef}>
@@ -1169,6 +1184,11 @@ export default function MiizuLanding() {
                 NUVIA_POST_TOUCH_SUPPRESSION_MS
               )
                 return;
+
+              if (nuviaTooltipHoverTimer.current !== null) {
+                window.clearTimeout(nuviaTooltipHoverTimer.current);
+                nuviaTooltipHoverTimer.current = null;
+              }
 
               setNuviaTooltipTouch(false);
               const panel = nuviaWordmarkRef.current?.parentElement;

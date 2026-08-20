@@ -13,6 +13,9 @@ const typeCheckedRules = Object.assign(
 export default tseslint.config(
   ...nextVitals,
   {
+    ignores: [".vercel/**"],
+  },
+  {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parserOptions: {

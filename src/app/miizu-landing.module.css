@@ -321,7 +321,7 @@
   justify-content: center;
   padding: clamp(1.4rem, 2.4vw, 2.4rem) 0;
   position: absolute;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 .clientsLabel {
@@ -392,7 +392,6 @@
   grid-template-columns: minmax(0, 2fr) minmax(27rem, 1fr);
   height: 100svh;
   min-height: 100svh;
-  overflow: auto;
   position: sticky;
   top: 0;
 }
@@ -716,10 +715,10 @@
 }
 
 .footer {
-  --nva-size: clamp(18rem, 46vw, 40rem);
+  --nva-size: clamp(18rem, 37vw, 44rem);
   background: var(--miizu-bg);
   display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   height: calc(var(--nva-size) * 0.66);
   min-height: 0;
   overflow: hidden;
@@ -727,7 +726,9 @@
 }
 
 .nuviaPanel {
-  cursor: help;
+  align-items: flex-end;
+  cursor: default;
+  display: flex;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -751,14 +752,15 @@
 
 .nuviaWordmark {
   bottom: -0.2em;
-  cursor: help;
+  cursor: default;
+  flex: 0 0 auto;
   font-size: var(--nva-size);
   height: 0.92em;
   left: 0;
   outline: 0;
-  position: absolute;
+  position: relative;
   top: auto;
-  width: 100%;
+  width: max-content;
   z-index: 1;
 }
 
@@ -772,13 +774,16 @@
   padding: 0;
   position: absolute;
   text-indent: 0;
-  transform: translateX(var(--nva-shift, 0px)) scaleX(var(--nva-scale, 0.56));
+  transform: translateX(var(--nva-shift, 0px));
   transform-origin: 0 100%;
   white-space: nowrap;
 }
 
 .nuviaWordDark {
   color: var(--miizu-primary);
+  display: block;
+  inset: auto;
+  position: relative;
 }
 
 .nuviaWordLight {
@@ -800,18 +805,18 @@
     var(--font-rethink-sans),
     system-ui,
     sans-serif;
-  font-size: clamp(1.1rem, 1.7vw, 1.65rem);
+  font-size: clamp(0.8rem, 0.95vw, 1rem);
   font-weight: 700;
   isolation: isolate;
   left: 0;
   letter-spacing: 0.02em;
   line-height: 1;
   opacity: 0;
-  padding: 0.85rem 1.25rem;
+  padding: 0.5rem 0.75rem;
   pointer-events: none;
   position: fixed;
   top: 0;
-  transition: opacity 160ms ease;
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
   z-index: 50;
 }
@@ -823,8 +828,10 @@
 .nuviaTooltipTouch {
   background: #2117e6;
   color: #fbfbfe;
+  font-size: clamp(1rem, 4vw, 1.2rem);
   justify-content: center;
   max-width: calc(100vw - 2rem);
+  padding: 0.75rem 1rem;
   text-align: center;
   white-space: normal;
 }
@@ -1107,13 +1114,13 @@
 
   .nuviaWordmark {
     bottom: -0.16em;
-    font-size: 58vw;
+    font-size: 47vw;
     top: auto;
   }
 
   .nuviaWord {
     letter-spacing: 0;
-    transform: translateX(var(--nva-shift, 0px)) scaleX(var(--nva-scale, 0.97));
+    transform: translateX(var(--nva-shift, 0px));
     transform-origin: 0 100%;
   }
 
