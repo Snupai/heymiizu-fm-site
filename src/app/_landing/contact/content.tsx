@@ -1,3 +1,5 @@
+import { BUDGETS, SERVICES } from "./contact-form-model";
+
 export const CONTACT_HEADLINES = [
   <>
     You&rsquo;re launching&hellip;
@@ -25,17 +27,6 @@ export const CONTACT_HEADLINES = [
     <span>and you just need to advertise it?</span>
   </>,
 ];
-
-const SERVICES = [
-  "Launch campaign",
-  "Trailer",
-  "Keynote visuals",
-  "Brand placement",
-  "Social media content",
-  "Something else",
-];
-
-const BUDGETS = ["5 - 10k", "10 - 25k", "25 - 50k", "50 - 100k", "100k+"];
 
 export const SERVICE_ITEMS = [
   { label: "Choose a service", value: null },

@@ -1,7 +1,7 @@
 "use client";
 
 import IntlTelInput from "@intl-tel-input/react";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +48,7 @@ export function ContactForm({
     deadlineRange,
     descriptionError,
     disabled,
+    dismissResult,
     emailError,
     handleSubmit,
     markFieldTouched,
@@ -93,6 +94,14 @@ export function ContactForm({
               </>
             ) : (
               <>
+                <button
+                  aria-label="Dismiss and send another request"
+                  className={styles.successDismiss}
+                  onClick={dismissResult}
+                  type="button"
+                >
+                  <X aria-hidden="true" />
+                </button>
                 <span className={styles.pausedKicker}>sent</span>
                 <strong className={styles.pausedHeadline}>Request sent</strong>
                 <p className={styles.pausedBody}>

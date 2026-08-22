@@ -4,6 +4,23 @@ import { z } from "zod";
 
 const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
 
+export const SERVICES = [
+  "Launch campaign",
+  "Trailer",
+  "Keynote visuals",
+  "Brand placement",
+  "Social media content",
+  "Something else",
+] as const;
+
+export const BUDGETS = [
+  "5 - 10k",
+  "10 - 25k",
+  "25 - 50k",
+  "50 - 100k",
+  "100k+",
+] as const;
+
 export type ContactRegion = "local" | "international";
 
 export const DEFAULT_CONTACT_REGION: ContactRegion = "international";

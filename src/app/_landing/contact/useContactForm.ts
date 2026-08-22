@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import type { DateRange } from "react-day-picker";
 
+const SUCCESS_DISMISS_MS = 6000;
+
 import type { ContactFormStatus } from "@/lib/contact-settings";
 
 import {
@@ -69,6 +71,16 @@ export function useContactForm(region: ContactRegion) {
     void loadStatus();
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    if (result?.type !== "success") return;
+
+    const timeout = window.setTimeout(() => {
+      setResult(null);
+    }, SUCCESS_DISMISS_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [result]);
 
   const updateField = (field: keyof ContactData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
@@ -174,14 +186,11 @@ export function useContactForm(region: ContactRegion) {
           name: data.name,
           email: data.email.trim(),
           telephone: data.telephone,
-          company: data.referral
-            ? `Found via: ${data.referral}`
-            : "Not specified",
-          projectType: data.service,
-          sequenceLength: data.budget,
+          referral: data.referral.trim(),
+          service: data.service,
+          budget: data.budget,
           deadline: data.deadline,
-          assets: "To be discussed",
-          cooperation: region === "local" ? "Local (Germany)" : "International",
+          region,
           description: data.description,
         }),
       });
@@ -224,6 +233,7 @@ export function useContactForm(region: ContactRegion) {
 
   const succeeded = result?.type === "success";
   const disabled = status.paused || statusLoading || submitting || succeeded;
+  const dismissResult = () => setResult(null);
 
   return {
     budgetError,
@@ -233,6 +243,7 @@ export function useContactForm(region: ContactRegion) {
     deadlineRange,
     descriptionError,
     disabled,
+    dismissResult,
     emailError,
     handleSubmit,
     markFieldTouched,
