@@ -33,6 +33,12 @@ function crossedPauseStop(
   return null;
 }
 
+function isScrollbarPointer(event: PointerEvent) {
+  if (event.pointerType !== "mouse" && event.pointerType !== "pen") return false;
+  if (event.button !== 0) return false;
+  return event.clientX >= document.documentElement.clientWidth;
+}
+
 export function useSmoothScroll(
   enabled: boolean,
   sceneRef: RefObject<HTMLElement | null>,
@@ -42,25 +48,56 @@ export function useSmoothScroll(
   const lastProgress = useRef(0);
   const pauseUntil = useRef(0);
   const holdTimer = useRef(0);
+  const draggingScrollbar = useRef(false);
   const onPauseStopRef = useRef(onPauseStop);
   const lenis = useLenis();
   onPauseStopRef.current = onPauseStop;
 
-  useEffect(() => {
-    if (enabled) return;
-
+  const clearHold = () => {
     window.clearTimeout(holdTimer.current);
     holdTimer.current = 0;
     pauseUntil.current = 0;
+  };
+
+  useEffect(() => {
+    if (enabled) return;
+
+    clearHold();
+    draggingScrollbar.current = false;
     lenis?.start();
   }, [enabled, lenis]);
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(holdTimer.current);
-      holdTimer.current = 0;
+      clearHold();
     };
   }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!isScrollbarPointer(event)) return;
+      draggingScrollbar.current = true;
+      clearHold();
+    };
+
+    const onPointerUp = () => {
+      if (!draggingScrollbar.current) return;
+      draggingScrollbar.current = false;
+      lenis?.start();
+    };
+
+    window.addEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("pointerup", onPointerUp, true);
+    window.addEventListener("pointercancel", onPointerUp, true);
+
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("pointerup", onPointerUp, true);
+      window.removeEventListener("pointercancel", onPointerUp, true);
+    };
+  }, [enabled, lenis]);
 
   useLenis(
     (instance) => {
@@ -70,13 +107,28 @@ export function useSmoothScroll(
       if (!scene) return;
 
       const progress = sceneProgress(scene, instance.scroll);
+      const skipPauses =
+        draggingScrollbar.current ||
+        instance.isScrolling === "native" ||
+        instance.userData.skipPauses === true;
 
-      if (instance.userData.skipPauses === true) {
+      if (skipPauses) {
+        if (pauseUntil.current !== 0) {
+          clearHold();
+          instance.start();
+        }
         lastProgress.current = progress;
         return;
       }
 
-      if (window.performance.now() < pauseUntil.current) return;
+      if (window.performance.now() < pauseUntil.current) {
+        if (Math.abs(progress - lastProgress.current) > 1e-4) {
+          clearHold();
+          instance.start();
+          lastProgress.current = progress;
+        }
+        return;
+      }
 
       for (const stop of SCROLL_PAUSE_STOPS) {
         if (Math.abs(progress - stop.at) > SCROLL_PAUSE_RELEASE) {
