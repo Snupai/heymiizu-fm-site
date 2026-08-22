@@ -222,7 +222,8 @@ export function useContactForm(region: ContactRegion) {
     }
   };
 
-  const disabled = status.paused || statusLoading || submitting;
+  const succeeded = result?.type === "success";
+  const disabled = status.paused || statusLoading || submitting || succeeded;
 
   return {
     budgetError,

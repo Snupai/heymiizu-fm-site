@@ -65,32 +65,47 @@ export function ContactForm({
     updatePhone,
   } = useContactForm(region);
 
+  const succeeded = result?.type === "success";
+  const showOverlay = status.paused || succeeded;
+
   return (
     <div className={styles.formShell} id="contact-form">
-      {status.paused && (
+      {showOverlay && (
         <div className={styles.pausedNotice} role="status">
           <div className={styles.pausedNoticeCopy}>
-            <span className={styles.pausedKicker}>paused</span>
-            <strong className={styles.pausedHeadline}>
-              I&rsquo;m booked out
-            </strong>
-            <p className={styles.pausedBody}>
-              New requests reopen{" "}
-              {status.pauseUntil ? (
-                <>
-                  on <span>{formatPauseUntilDate(status.pauseUntil)}</span>
-                </>
-              ) : (
-                <span>soon</span>
-              )}
-              .
-            </p>
+            {status.paused ? (
+              <>
+                <span className={styles.pausedKicker}>paused</span>
+                <strong className={styles.pausedHeadline}>
+                  I&rsquo;m booked out
+                </strong>
+                <p className={styles.pausedBody}>
+                  New requests reopen{" "}
+                  {status.pauseUntil ? (
+                    <>
+                      on <span>{formatPauseUntilDate(status.pauseUntil)}</span>
+                    </>
+                  ) : (
+                    <span>soon</span>
+                  )}
+                  .
+                </p>
+              </>
+            ) : (
+              <>
+                <span className={styles.pausedKicker}>sent</span>
+                <strong className={styles.pausedHeadline}>Request sent</strong>
+                <p className={styles.pausedBody}>
+                  I&rsquo;ll be in touch <span>soon</span>.
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}
 
       <form
-        className={`${styles.contactForm} ${status.paused ? styles.formPaused : ""}`}
+        className={`${styles.contactForm} ${showOverlay ? styles.formPaused : ""}`}
         noValidate
         onSubmit={handleSubmit}
       >
@@ -102,6 +117,7 @@ export function ContactForm({
               aria-describedby={nameError ? "contact-name-error" : undefined}
               aria-invalid={Boolean(nameError)}
               autoComplete="name"
+              disabled={disabled}
               maxLength={60}
               onBlur={() => markFieldTouched("name")}
               onChange={(event) => updateField("name", event.target.value)}
@@ -119,6 +135,7 @@ export function ContactForm({
               aria-describedby={emailError ? "contact-email-error" : undefined}
               aria-invalid={Boolean(emailError)}
               autoComplete="email"
+              disabled={disabled}
               maxLength={120}
               onBlur={() => markFieldTouched("email")}
               onChange={(event) => updateField("email", event.target.value)}
@@ -164,6 +181,7 @@ export function ContactForm({
             <span>how did you find me?</span>
             <input
               id="contact-referral"
+              disabled={disabled}
               maxLength={80}
               onChange={(event) => updateField("referral", event.target.value)}
               placeholder="Instagram, LinkedIn, X ..."
@@ -285,6 +303,7 @@ export function ContactForm({
                   className={styles.dateRangePickerButton}
                   data-date-range-picker
                   data-empty={!deadlineRange?.from}
+                  disabled={disabled}
                   type="button"
                   variant="outline"
                 >
@@ -325,6 +344,7 @@ export function ContactForm({
                 descriptionError ? "project-description-error" : undefined
               }
               aria-invalid={Boolean(descriptionError)}
+              disabled={disabled}
               maxLength={1600}
               onBlur={() => markFieldTouched("description")}
               onChange={(event) =>
@@ -350,13 +370,8 @@ export function ContactForm({
           </button>
         </fieldset>
 
-        {result && (
-          <p
-            className={
-              result.type === "success" ? styles.formSuccess : styles.formError
-            }
-            role="status"
-          >
+        {result?.type === "error" && (
+          <p className={styles.formError} role="status">
             {result.message}
           </p>
         )}

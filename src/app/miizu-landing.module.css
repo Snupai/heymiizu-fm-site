@@ -764,6 +764,21 @@
   box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.28);
 }
 
+.contactForm input:disabled,
+.contactForm textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.phoneInput:has(:disabled) {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.phoneInput:has(:disabled) input:disabled {
+  opacity: 1;
+}
+
 .fieldError {
   color: #ff9696;
   font-size: clamp(0.72rem, 0.75vw, 0.84rem);
@@ -1017,18 +1032,11 @@
   color: #0189ff;
 }
 
-.formSuccess,
 .formError {
+  color: #ffaaa5;
   font-size: 0.9rem;
   margin: 1rem 0 0;
   text-align: center;
-}
-
-.formSuccess {
-  color: #9fffb0;
-}
-.formError {
-  color: #ffaaa5;
 }
 
 .footer {
