@@ -525,9 +525,10 @@
 .regionPill {
   background: var(--miizu-bg);
   border-radius: 999px;
-  inset: 0;
+  left: 0;
   pointer-events: none;
   position: absolute;
+  top: 0;
   z-index: 0;
 }
 
