@@ -6,7 +6,11 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-const Select = SelectPrimitive.Root;
+function Select<Value, Multiple extends boolean | undefined = false>(
+  props: SelectPrimitive.Root.Props<Value, Multiple>,
+) {
+  return <SelectPrimitive.Root modal={false} {...props} />;
+}
 
 function SelectGroup({
   className,
@@ -89,6 +93,7 @@ function SelectContent({
             "relative z-50 max-h-[var(--available-height)] w-[var(--anchor-width)] origin-[var(--transform-origin)] overflow-x-hidden overflow-y-auto outline-none",
             className,
           )}
+          data-lenis-prevent
           data-slot="select-content"
           {...props}
         >
