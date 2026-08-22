@@ -1,6 +1,11 @@
 "use client";
 
-import { animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+} from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -19,6 +24,7 @@ import styles from "../../miizu-landing.module.css";
 import { ClientsMarquee } from "./ClientsMarquee";
 import { useHeroWorkTimeline } from "./useHeroWorkTimeline";
 import { useIntroSequence } from "./useIntroSequence";
+import { useSmoothScroll } from "./useSmoothScroll";
 import { WorkLines } from "./WorkLines";
 
 export function HeroWorkScene({
@@ -28,6 +34,8 @@ export function HeroWorkScene({
 }) {
   const reduceMotion = useReducedMotion();
   const [compact, setCompact] = useState(false);
+
+  useSmoothScroll(reduceMotion !== true);
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;

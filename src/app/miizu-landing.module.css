@@ -30,7 +30,7 @@
 }
 
 .heroWorkScene {
-  height: 1150svh;
+  height: 440svh;
   position: relative;
 }
 
@@ -344,7 +344,7 @@
 }
 
 .workLineItem {
-  font-weight: 800;
+  font-weight: 750;
 }
 
 .workLineItemEnd {
@@ -1196,7 +1196,7 @@
   }
 
   .heroWorkScene {
-    height: 980svh;
+    height: 400svh;
   }
 
   .header {
