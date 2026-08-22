@@ -7,6 +7,7 @@
 - In the admin Contact settings, status copy should reflect the saved pause state, not the unsaved toggle draft.
 - Footer NVA wordmark should sit flush on the left edge: no leftover white gap, and the N must not hang off the page.
 - Footer “represented by” should stay pinned to the middle of the NVA “N” and follow the letter’s diagonal as the wordmark scales.
+- Intro showreel card should start off-screen to the right and slide in (never begin fullscreen, even if reveal delay is 0). Keep the motion fast and only slow down near the end.
 
 ## Learned Workspace Facts
 
@@ -15,4 +16,6 @@
 - Brand color tokens (`brand`, `brand-light`, `brand-dark`) are defined in Tailwind around `#0189ff`.
 - Contact/commission pause state is stored in Supabase `contact_settings` and controlled from the admin Contact tab.
 - `src/env.js` treats EMAIL_* vars as optional; contact form sending still requires them when testing email.
-- Landing page lives in `src/app/MiizuLanding.tsx` and `src/app/miizu-landing.module.css`.
+- Landing page is `src/app/MiizuLanding.tsx` composing `src/app/_landing/` (hero/work scene, contact, footer); styles live in `src/app/miizu-landing.module.css`.
+- Intro timings and scroll-progress constants live in `src/app/_landing/scene/scroll-timeline.ts`. Scroll stays locked until the intro finishes (`useIntroSequence.ts`), not via a separate lock-duration constant.
+- Looping showreel is `public/showreel_2026.mp4`.
