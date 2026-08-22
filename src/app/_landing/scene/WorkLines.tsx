@@ -1,16 +1,9 @@
 "use client";
 
-import { animate, motion, type MotionValue, useMotionValue } from "framer-motion";
-import { useEffect } from "react";
+import { motion, type MotionValue, useTransform } from "framer-motion";
 
 import { WORK_LINES, type WorkLineVariant } from "./content";
-import {
-  INTRO_SLIDE_EASE,
-  SCROLL_WORK_EXIT_START,
-  WORK_LINE_ENTRY_DURATION_S,
-  WORK_LINE_ENTRY_LEAD_S,
-  WORK_LINE_STAGGER_S,
-} from "./scroll-timeline";
+import { getWorkLineEntryX } from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
 
 function workLineClassName(variant: WorkLineVariant) {
@@ -33,52 +26,19 @@ function workLineClassName(variant: WorkLineVariant) {
 function WorkLine({
   children,
   index,
-  reduceMotion,
-  scrollYProgress,
-  sequenceStarted,
   variant,
   workExitX,
+  workSequenceTime,
 }: {
   children: string;
   index: number;
-  reduceMotion: boolean;
-  scrollYProgress: MotionValue<number>;
-  sequenceStarted: boolean;
   variant: WorkLineVariant;
   workExitX: MotionValue<string>;
+  workSequenceTime: MotionValue<number>;
 }) {
-  const entryX = useMotionValue("-55vw");
-
-  useEffect(() => {
-    if (!sequenceStarted) {
-      entryX.jump("-55vw");
-      return;
-    }
-
-    if (reduceMotion || scrollYProgress.get() >= SCROLL_WORK_EXIT_START) {
-      entryX.jump("0vw");
-      return;
-    }
-
-    const controls = animate(entryX, "0vw", {
-      delay: WORK_LINE_ENTRY_LEAD_S + index * WORK_LINE_STAGGER_S,
-      duration: WORK_LINE_ENTRY_DURATION_S,
-      ease: INTRO_SLIDE_EASE,
-    });
-
-    const unsub = scrollYProgress.on("change", (progress) => {
-      if (progress < SCROLL_WORK_EXIT_START) return;
-
-      controls.stop();
-      entryX.jump("0vw");
-      unsub();
-    });
-
-    return () => {
-      controls.stop();
-      unsub();
-    };
-  }, [entryX, index, reduceMotion, scrollYProgress, sequenceStarted]);
+  const entryX = useTransform(workSequenceTime, (time) =>
+    getWorkLineEntryX(time, index),
+  );
 
   return (
     <motion.p className={workLineClassName(variant)} style={{ x: workExitX }}>
@@ -90,17 +50,11 @@ function WorkLine({
 }
 
 export function WorkLines({
-  reduceMotion,
-  scrollYProgress,
-  sequenceRun,
-  sequenceStarted,
   workExitX,
+  workSequenceTime,
 }: {
-  reduceMotion: boolean;
-  scrollYProgress: MotionValue<number>;
-  sequenceRun: number;
-  sequenceStarted: boolean;
   workExitX: MotionValue<string>;
+  workSequenceTime: MotionValue<number>;
 }) {
   return (
     <motion.div className={styles.workContent}>
@@ -108,12 +62,10 @@ export function WorkLines({
         {WORK_LINES.map((line, index) => (
           <WorkLine
             index={index}
-            key={`${sequenceRun}-${line.id}`}
-            reduceMotion={reduceMotion}
-            scrollYProgress={scrollYProgress}
-            sequenceStarted={sequenceStarted}
+            key={line.id}
             variant={line.variant}
             workExitX={workExitX}
+            workSequenceTime={workSequenceTime}
           >
             {line.text}
           </WorkLine>

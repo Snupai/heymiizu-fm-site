@@ -6,6 +6,7 @@ import {
   useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
+  useTransform,
 } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -14,12 +15,13 @@ import type { ContactRegion } from "../contact/contact-form-model";
 import { ContactSection } from "../contact/ContactSection";
 import {
   getIntroPanelRest,
+  getWorkShadeEntryX,
   INTRO_CARD_SLIDE_DURATION_S,
   INTRO_CARD_SLIDE_EASE,
   INTRO_HEADER_SLIDE_DURATION_S,
   INTRO_SLIDE_EASE,
   SCROLL_WORK_EXIT_START,
-  WORK_SHADE_ENTRY_DURATION_S,
+  WORK_SEQUENCE_DURATION_S,
 } from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
 import { ClientsMarquee } from "./ClientsMarquee";
@@ -88,12 +90,12 @@ export function HeroWorkScene({
     sceneRef,
     scrollYProgress,
     surfaceInset,
+    handlePauseStop,
     workExitX,
-    workSequenceRun,
     workSequenceStarted,
   } = useHeroWorkTimeline(compact);
 
-  useSmoothScroll(reduceMotion !== true, sceneRef);
+  useSmoothScroll(reduceMotion !== true, sceneRef, handlePauseStop);
 
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
     const hud = scrollHudRef.current;
@@ -114,29 +116,45 @@ export function HeroWorkScene({
     scaleY: panelRest.scaleY,
   };
   const scrollHintOpacity = introActive ? 0 : heroOpacity;
-  const workShadeEntryX = useMotionValue("-100%");
+  const workSequenceTime = useMotionValue(0);
+  const workShadeEntryX = useTransform(workSequenceTime, getWorkShadeEntryX);
 
   useEffect(() => {
-    if (!workSequenceStarted) {
-      workShadeEntryX.jump("-100%");
+    const target = workSequenceStarted ? WORK_SEQUENCE_DURATION_S : 0;
+
+    if (reduceMotion) {
+      workSequenceTime.jump(target);
       return;
     }
 
-    if (reduceMotion || scrollYProgress.get() >= SCROLL_WORK_EXIT_START) {
-      workShadeEntryX.jump("0%");
+    if (workSequenceStarted && scrollYProgress.get() >= SCROLL_WORK_EXIT_START) {
+      workSequenceTime.jump(WORK_SEQUENCE_DURATION_S);
       return;
     }
 
-    const controls = animate(workShadeEntryX, "0%", {
-      duration: WORK_SHADE_ENTRY_DURATION_S,
-      ease: INTRO_SLIDE_EASE,
+    const current = workSequenceTime.get();
+    const delta = Math.abs(target - current);
+    if (delta < 0.001) {
+      workSequenceTime.jump(target);
+      return;
+    }
+
+    const controls = animate(workSequenceTime, target, {
+      duration: delta,
+      ease: "linear",
     });
+
+    if (!workSequenceStarted) {
+      return () => {
+        controls.stop();
+      };
+    }
 
     const unsub = scrollYProgress.on("change", (progress) => {
       if (progress < SCROLL_WORK_EXIT_START) return;
 
       controls.stop();
-      workShadeEntryX.jump("0%");
+      workSequenceTime.jump(WORK_SEQUENCE_DURATION_S);
       unsub();
     });
 
@@ -144,7 +162,7 @@ export function HeroWorkScene({
       controls.stop();
       unsub();
     };
-  }, [reduceMotion, scrollYProgress, workSequenceStarted, workShadeEntryX]);
+  }, [reduceMotion, scrollYProgress, workSequenceStarted, workSequenceTime]);
 
   return (
     <div
@@ -303,11 +321,8 @@ export function HeroWorkScene({
             </motion.div>
 
             <WorkLines
-              reduceMotion={Boolean(reduceMotion)}
-              scrollYProgress={scrollYProgress}
-              sequenceRun={workSequenceRun}
-              sequenceStarted={workSequenceStarted}
               workExitX={workExitX}
+              workSequenceTime={workSequenceTime}
             />
           </motion.div>
         </motion.section>

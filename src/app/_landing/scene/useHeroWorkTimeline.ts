@@ -1,9 +1,10 @@
 "use client";
 
-import { useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { useLenis } from "lenis/react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
+import { sceneProgress } from "./scene-scroll";
 import {
   getClientsContactFadeOpacity,
   getClientsContactFadeScaleX,
@@ -14,15 +15,22 @@ import {
   SCROLL_PANEL_EXPANDED,
   SCROLL_PANEL_HOLD,
   SCROLL_SURFACE_INSET_MID,
+  SCROLL_WORK_PAUSE,
+  SCROLL_WORK_UP_PAUSE,
   SCROLL_WORK_RESET,
   SCROLL_WORK_REVEAL,
   SHOWREEL_RADIUS_REM,
+  type ScrollPauseStop,
 } from "./scroll-timeline";
+
+type WorkSequencePhase = "idle" | "in" | "out";
+type ScrollDir = "up" | "down";
 
 export function useHeroWorkTimeline(compact: boolean) {
   const sceneRef = useRef<HTMLDivElement>(null);
-  const workSequenceTriggered = useRef(false);
-  const [workSequenceRun, setWorkSequenceRun] = useState(0);
+  const workSequencePhase = useRef<WorkSequencePhase>("idle");
+  const lastWorkProgress = useRef(0);
+  const lastScrollDir = useRef<ScrollDir>("down");
   const [workSequenceStarted, setWorkSequenceStarted] = useState(false);
   const lenis = useLenis();
 
@@ -31,17 +39,67 @@ export function useHeroWorkTimeline(compact: boolean) {
     offset: ["start start", "end end"],
   });
 
-  useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    if (progress >= SCROLL_WORK_REVEAL && !workSequenceTriggered.current) {
-      workSequenceTriggered.current = true;
-      setWorkSequenceRun((run) => run + 1);
-      setWorkSequenceStarted(true);
+  const reverseWorkSequence = useCallback(() => {
+    if (workSequencePhase.current !== "in") return;
+    workSequencePhase.current = "out";
+    setWorkSequenceStarted(false);
+  }, []);
+
+  const playWorkSequence = useCallback(() => {
+    workSequencePhase.current = "in";
+    setWorkSequenceStarted(true);
+  }, []);
+
+  const handlePauseStop = useCallback(
+    (stop: ScrollPauseStop) => {
+      switch (stop.dir) {
+        case "down":
+          if (stop.at === SCROLL_WORK_PAUSE) playWorkSequence();
+          return;
+        case "up":
+          if (stop.at === SCROLL_WORK_UP_PAUSE) reverseWorkSequence();
+          return;
+        default: {
+          const exhaustive: never = stop.dir;
+          return exhaustive;
+        }
+      }
+    },
+    [playWorkSequence, reverseWorkSequence],
+  );
+
+  useLenis((instance) => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    const progress = sceneProgress(scene, instance.scroll);
+    const last = lastWorkProgress.current;
+
+    if (progress < last - 1e-6) lastScrollDir.current = "up";
+    else if (progress > last + 1e-6) lastScrollDir.current = "down";
+
+    lastWorkProgress.current = progress;
+
+    const phase = workSequencePhase.current;
+    const goingDown = lastScrollDir.current === "down";
+
+    if (phase === "idle" && goingDown && progress >= SCROLL_WORK_REVEAL) {
+      playWorkSequence();
       return;
     }
 
-    if (progress < SCROLL_WORK_RESET && workSequenceTriggered.current) {
-      workSequenceTriggered.current = false;
-      setWorkSequenceStarted(false);
+    if (phase === "in" && progress < SCROLL_WORK_RESET) {
+      reverseWorkSequence();
+      return;
+    }
+
+    if (phase === "out" && progress < SCROLL_WORK_RESET) {
+      workSequencePhase.current = "idle";
+      return;
+    }
+
+    if (phase === "out" && goingDown && progress >= SCROLL_WORK_REVEAL) {
+      playWorkSequence();
     }
   });
 
@@ -156,8 +214,8 @@ export function useHeroWorkTimeline(compact: boolean) {
     sceneRef,
     scrollYProgress,
     surfaceInset,
+    handlePauseStop,
     workExitX,
-    workSequenceRun,
     workSequenceStarted,
   };
 }

@@ -3,31 +3,31 @@
 import { useLenis } from "lenis/react";
 import { useEffect, useRef, type RefObject } from "react";
 
-import { SCROLL_PAUSE_RELEASE, SCROLL_PAUSE_STOPS } from "./scroll-timeline";
+import { sceneProgress, sceneScrollY } from "./scene-scroll";
+import {
+  SCROLL_PAUSE_RELEASE,
+  SCROLL_PAUSE_STOPS,
+  type ScrollPauseStop,
+} from "./scroll-timeline";
 
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
+function pauseKey(stop: ScrollPauseStop) {
+  return `${stop.dir}:${stop.at}`;
 }
 
-function sceneTravel(scene: HTMLElement) {
-  return Math.max(0, scene.offsetHeight - window.innerHeight);
-}
+function crossedPauseStop(
+  from: number,
+  to: number,
+  consumed: Set<string>,
+): ScrollPauseStop | null {
+  if (to === from) return null;
 
-function sceneProgress(scene: HTMLElement, scrollY: number) {
-  const travel = Math.max(1, sceneTravel(scene));
-  return clamp((scrollY - scene.offsetTop) / travel, 0, 1);
-}
-
-function sceneScrollY(scene: HTMLElement, progress: number) {
-  return scene.offsetTop + sceneTravel(scene) * progress;
-}
-
-function crossedPauseStop(from: number, to: number, consumed: Set<number>) {
-  if (to <= from) return null;
+  const dir = to > from ? "down" : "up";
 
   for (const stop of SCROLL_PAUSE_STOPS) {
-    if (consumed.has(stop.at)) continue;
-    if (from < stop.at && stop.at <= to) return stop;
+    if (stop.dir !== dir || consumed.has(pauseKey(stop))) continue;
+
+    if (dir === "down" && from < stop.at && stop.at <= to) return stop;
+    if (dir === "up" && to <= stop.at && stop.at < from) return stop;
   }
 
   return null;
@@ -36,12 +36,15 @@ function crossedPauseStop(from: number, to: number, consumed: Set<number>) {
 export function useSmoothScroll(
   enabled: boolean,
   sceneRef: RefObject<HTMLElement | null>,
+  onPauseStop?: (stop: ScrollPauseStop) => void,
 ) {
-  const consumed = useRef(new Set<number>());
+  const consumed = useRef(new Set<string>());
   const lastProgress = useRef(0);
   const pauseUntil = useRef(0);
   const holdTimer = useRef(0);
+  const onPauseStopRef = useRef(onPauseStop);
   const lenis = useLenis();
+  onPauseStopRef.current = onPauseStop;
 
   useEffect(() => {
     if (enabled) return;
@@ -59,52 +62,56 @@ export function useSmoothScroll(
     };
   }, []);
 
-  useLenis((instance) => {
-    if (!enabled) return;
+  useLenis(
+    (instance) => {
+      if (!enabled) return;
 
-    const scene = sceneRef.current;
-    if (!scene) return;
+      const scene = sceneRef.current;
+      if (!scene) return;
 
-    const progress = sceneProgress(scene, instance.scroll);
+      const progress = sceneProgress(scene, instance.scroll);
 
-    if (instance.userData.skipPauses === true) {
-      lastProgress.current = progress;
-      return;
-    }
-
-    if (window.performance.now() < pauseUntil.current) return;
-
-    for (const stop of SCROLL_PAUSE_STOPS) {
-      if (Math.abs(progress - stop.at) > SCROLL_PAUSE_RELEASE) {
-        consumed.current.delete(stop.at);
+      if (instance.userData.skipPauses === true) {
+        lastProgress.current = progress;
+        return;
       }
-    }
 
-    const pauseAt = crossedPauseStop(
-      lastProgress.current,
-      progress,
-      consumed.current,
-    );
+      if (window.performance.now() < pauseUntil.current) return;
 
-    lastProgress.current = progress;
+      for (const stop of SCROLL_PAUSE_STOPS) {
+        if (Math.abs(progress - stop.at) > SCROLL_PAUSE_RELEASE) {
+          consumed.current.delete(pauseKey(stop));
+        }
+      }
 
-    if (pauseAt === null) return;
+      const pauseAt = crossedPauseStop(
+        lastProgress.current,
+        progress,
+        consumed.current,
+      );
 
-    const now = window.performance.now();
-    consumed.current.add(pauseAt.at);
-    lastProgress.current = pauseAt.at;
-    pauseUntil.current = now + pauseAt.holdMs;
+      lastProgress.current = progress;
 
-    instance.scrollTo(sceneScrollY(scene, pauseAt.at), {
-      force: true,
-      immediate: true,
-    });
-    instance.stop();
+      if (pauseAt === null) return;
 
-    window.clearTimeout(holdTimer.current);
-    holdTimer.current = window.setTimeout(() => {
-      holdTimer.current = 0;
-      instance.start();
-    }, pauseAt.holdMs);
-  }, [enabled]);
+      const now = window.performance.now();
+      consumed.current.add(pauseKey(pauseAt));
+      lastProgress.current = pauseAt.at;
+      pauseUntil.current = now + pauseAt.holdMs;
+
+      instance.scrollTo(sceneScrollY(scene, pauseAt.at), {
+        force: true,
+        immediate: true,
+      });
+      instance.stop();
+      onPauseStopRef.current?.(pauseAt);
+
+      window.clearTimeout(holdTimer.current);
+      holdTimer.current = window.setTimeout(() => {
+        holdTimer.current = 0;
+        instance.start();
+      }, pauseAt.holdMs);
+    },
+    [enabled],
+  );
 }
