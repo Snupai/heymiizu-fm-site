@@ -87,9 +87,14 @@
 html {
   overflow-y: scroll;
   position: relative;
+  /* Standard properties keep overlay scrollbars (pill only).
+     ::-webkit-scrollbar width/track rules force the classic white channel. */
+  scrollbar-color: #888 transparent;
+  scrollbar-width: thin;
 }
 
-/* Keep the scrollbar gutter while Lenis is stopped (intro lock, scene pauses). */
+/* Keep overflow while Lenis is stopped (intro lock, scene pauses). Overlay
+   scrollbars do not take layout width, so showing/hiding them does not jump. */
 html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-x: clip;
   overflow-y: scroll;
@@ -101,52 +106,10 @@ html body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 
-/* Custom scrollbar styling for a more polished look */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Hide the bar visually without changing its width. Fully transparent
-   colors make some engines drop the classic scrollbar and collapse the
-   gutter, which is what caused the jump. */
-html[data-intro-lock]::-webkit-scrollbar,
-html:has([data-intro-lock])::-webkit-scrollbar {
-  width: 10px;
-  background: rgba(0, 0, 0, 0.001);
-}
-
-html[data-intro-lock]::-webkit-scrollbar-track,
-html[data-intro-lock]::-webkit-scrollbar-thumb,
-html[data-intro-lock]::-webkit-scrollbar-thumb:hover,
-html:has([data-intro-lock])::-webkit-scrollbar-track,
-html:has([data-intro-lock])::-webkit-scrollbar-thumb,
-html:has([data-intro-lock])::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.001);
-}
-
-@supports (-moz-appearance: none) {
-  html {
-    scrollbar-color: #888 #f1f1f1;
-    scrollbar-width: thin;
-  }
-
-  html[data-intro-lock],
-  html:has([data-intro-lock]) {
-    scrollbar-color: rgba(0, 0, 0, 0.001) rgba(0, 0, 0, 0.001);
-  }
+html[data-intro-lock],
+html:has([data-intro-lock]) {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: none;
 }
 
 html,
