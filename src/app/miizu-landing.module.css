@@ -952,49 +952,69 @@
 }
 
 .formPaused {
-  filter: blur(2px) saturate(0.45);
-  opacity: 0.3;
+  filter: blur(2px);
+  opacity: 0.42;
   pointer-events: none;
   user-select: none;
 }
 
 .pausedNotice {
   align-items: center;
-  background: rgba(251, 251, 254, 0.94);
-  border-radius: 2rem;
-  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.35);
-  color: var(--miizu-ink);
+  color: var(--miizu-bg);
   display: flex;
-  flex-direction: column;
-  inset: 50% auto auto 50%;
-  max-width: 28rem;
-  padding: clamp(2rem, 4vw, 3.7rem);
+  inset: 0;
+  justify-content: center;
+  padding: 0.5rem;
+  pointer-events: none;
   position: absolute;
   text-align: center;
-  transform: translate(-50%, -50%);
-  width: min(90%, 28rem);
   z-index: 5;
 }
 
-.pausedNotice span {
-  color: var(--miizu-primary);
-  font-size: 0.75rem;
-  font-weight: 750;
-  letter-spacing: 0.12em;
+.pausedNoticeCopy {
+  align-items: center;
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+  backdrop-filter: blur(18px) saturate(1.45);
+  background: rgba(251, 251, 254, 0.1);
+  border: 1px solid rgba(251, 251, 254, 0.16);
+  border-radius: 1.5rem;
+  box-shadow: 0 1.25rem 2.8rem rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.6rem, 3vw, 2.4rem) clamp(1.4rem, 2.8vw, 2.2rem);
+}
+
+.pausedKicker {
+  background: var(--miizu-bg);
+  border-radius: 999px;
+  color: #0189ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  padding: 0.48em 0.82em 0.42em;
   text-transform: uppercase;
 }
 
-.pausedNotice strong {
-  font-size: clamp(2rem, 3.2vw, 3.4rem);
-  letter-spacing: -0.02em;
-  line-height: 0.95;
-  margin-top: 1rem;
+.pausedHeadline {
+  font-size: clamp(2.4rem, 4.2vw, 3.7rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.88;
+  margin-top: 0.85rem;
 }
 
-.pausedNotice p {
-  color: rgba(5, 3, 21, 0.68);
-  line-height: 1.4;
+.pausedBody {
+  color: rgba(251, 251, 254, 0.78);
+  font-size: clamp(1rem, 1.25vw, 1.28rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
   margin: 1rem 0 0;
+}
+
+.pausedBody span {
+  color: #0189ff;
 }
 
 .formSuccess,
@@ -1184,6 +1204,14 @@
 
   .submitButton {
     margin-top: clamp(0.35rem, 0.7svh, 0.6rem);
+  }
+
+  .pausedHeadline {
+    font-size: clamp(2rem, 3.2vw, 2.8rem);
+  }
+
+  .pausedBody {
+    margin-top: 0.7rem;
   }
 }
 

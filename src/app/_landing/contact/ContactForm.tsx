@@ -69,15 +69,23 @@ export function ContactForm({
     <div className={styles.formShell} id="contact-form">
       {status.paused && (
         <div className={styles.pausedNotice} role="status">
-          <span>Commissions paused</span>
-          <strong>I&rsquo;m currently booked out.</strong>
-          <p>
-            New requests will reopen
-            {status.pauseUntil
-              ? ` on ${formatPauseUntilDate(status.pauseUntil)}`
-              : " soon"}
-            .
-          </p>
+          <div className={styles.pausedNoticeCopy}>
+            <span className={styles.pausedKicker}>paused</span>
+            <strong className={styles.pausedHeadline}>
+              I&rsquo;m booked out
+            </strong>
+            <p className={styles.pausedBody}>
+              New requests reopen{" "}
+              {status.pauseUntil ? (
+                <>
+                  on <span>{formatPauseUntilDate(status.pauseUntil)}</span>
+                </>
+              ) : (
+                <span>soon</span>
+              )}
+              .
+            </p>
+          </div>
         </div>
       )}
 
