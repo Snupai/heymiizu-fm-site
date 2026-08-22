@@ -20,23 +20,19 @@ export function ClientsMarquee({
 
     if (!tracks || reduceMotion) return;
 
-    let animations: Animation[] = [];
     let lastScrollY = window.scrollY;
     let lastScrollAt = window.performance.now();
     let decelerationFrame = 0;
     let idleTimer = 0;
 
-    const getAnimations = () => {
-      if (animations.length === 0) {
-        animations = tracks.getAnimations({ subtree: true });
-      }
-
-      return animations;
-    };
+    const getAnimations = () =>
+      Array.from(tracks.querySelectorAll(`.${styles.clientNames}`)).flatMap(
+        (track) => track.getAnimations(),
+      );
 
     const updateRate = (rate: number) => {
       for (const animation of getAnimations()) {
-        animation.updatePlaybackRate(rate);
+        animation.playbackRate = rate;
       }
     };
 
@@ -69,7 +65,7 @@ export function ClientsMarquee({
       const distance = Math.abs(window.scrollY - lastScrollY);
       const elapsed = Math.max(16, Math.min(64, now - lastScrollAt));
       const velocity = distance / elapsed;
-      const boostedRate = Math.min(6, 1 + velocity * 1.4);
+      const boostedRate = Math.min(1.3, 1 + velocity * 0.35);
 
       lastScrollY = window.scrollY;
       lastScrollAt = now;
@@ -94,8 +90,8 @@ export function ClientsMarquee({
       window.removeEventListener("scroll", accelerateMarquee);
       window.cancelAnimationFrame(decelerationFrame);
       window.clearTimeout(idleTimer);
-      for (const animation of animations) {
-        animation.updatePlaybackRate(1);
+      for (const animation of getAnimations()) {
+        animation.playbackRate = 1;
       }
     };
   }, [reduceMotion]);
@@ -113,7 +109,9 @@ export function ClientsMarquee({
           {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
             <div
               aria-hidden={row > 0}
-              className={styles.clientMarquee}
+              className={`${styles.clientMarquee} ${
+                row % 2 === 1 ? styles.clientMarqueeReverse : ""
+              }`}
               key={row}
             >
               <div className={styles.clientNames}>
