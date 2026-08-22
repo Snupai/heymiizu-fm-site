@@ -22,10 +22,10 @@ export const SCROLL_MARQUEE_FULL = 0.44;
 export const SCROLL_CONTACT_START = 0.52;
 export const SCROLL_CONTACT_SET = 0.75;
 
-export const SCROLL_SHOWREEL_PAUSE_MS = 1_400;
-export const SCROLL_WORK_PAUSE_MS = 2_000;
+export const SCROLL_SHOWREEL_PAUSE_MS = 600;
+export const SCROLL_WORK_PAUSE_MS = 1_700;
 export const SCROLL_CLIENTS_PAUSE_MS = 600;
-export const SCROLL_CONTACT_PAUSE_MS = 1_000;
+export const SCROLL_CONTACT_PAUSE_MS = 600;
 
 export const SCROLL_PAUSE_STOPS = [
   { at: SCROLL_PANEL_EXPANDED, holdMs: SCROLL_SHOWREEL_PAUSE_MS },
@@ -34,12 +34,6 @@ export const SCROLL_PAUSE_STOPS = [
   { at: SCROLL_CONTACT_SET, holdMs: SCROLL_CONTACT_PAUSE_MS },
 ] as const;
 export const SCROLL_PAUSE_RELEASE = 0.016;
-
-export const SCROLL_SMOOTH_ACCEL_S = 0.1;
-export const SCROLL_SMOOTH_FOLLOW_S = 0.06;
-export const SCROLL_SMOOTH_BRAKE_S = 0.24;
-export const SCROLL_SMOOTH_COAST_S = 0.46;
-export const SCROLL_MAX_SPEED_VH_PER_S = 5;
 
 export const WORK_SHADE_ENTRY_DURATION_S = 1.05;
 export const WORK_LINE_ENTRY_LEAD_S = 0.22;

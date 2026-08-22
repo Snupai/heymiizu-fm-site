@@ -1,6 +1,7 @@
 "use client";
 
 import { useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { useLenis } from "lenis/react";
 import { useRef, useState } from "react";
 
 import {
@@ -23,6 +24,7 @@ export function useHeroWorkTimeline(compact: boolean) {
   const workSequenceTriggered = useRef(false);
   const [workSequenceRun, setWorkSequenceRun] = useState(0);
   const [workSequenceStarted, setWorkSequenceStarted] = useState(false);
+  const lenis = useLenis();
 
   const { scrollYProgress } = useScroll({
     target: sceneRef,
@@ -114,8 +116,15 @@ export function useHeroWorkTimeline(compact: boolean) {
     if (!scene) return;
 
     const travel = Math.max(0, scene.offsetHeight - window.innerHeight);
+    const top = scene.offsetTop + travel * progress;
+
+    if (lenis) {
+      lenis.scrollTo(top, { userData: { skipPauses: true } });
+      return;
+    }
+
     window.scrollTo({
-      top: scene.offsetTop + travel * progress,
+      top,
       behavior: "smooth",
     });
   };

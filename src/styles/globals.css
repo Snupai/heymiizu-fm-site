@@ -89,6 +89,12 @@ html {
   position: relative;
 }
 
+/* Keep the scrollbar gutter while Lenis is stopped (intro lock, scene pauses). */
+html.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow-x: clip;
+  overflow-y: scroll;
+}
+
 /* Radix overlays already hide overflow while open. Keep its scrollbar
    compensation from changing the page width and triggering scroll anchoring. */
 html body[data-scroll-locked] {
