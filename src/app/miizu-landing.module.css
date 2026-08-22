@@ -969,7 +969,7 @@
 }
 
 .footer {
-  --nva-size: clamp(18rem, 37vw, 44rem);
+  --nva-size: max(18rem, 37vw);
   --nva-crop: 0.66;
   background: var(--miizu-bg);
   display: grid;

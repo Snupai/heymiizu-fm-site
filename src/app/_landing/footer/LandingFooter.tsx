@@ -53,6 +53,9 @@ export function LandingFooter() {
 
     if (!wordmark) return;
 
+    const footer = wordmark.closest("footer");
+    const compactQuery = window.matchMedia("(max-width: 760px)");
+
     const fitWordmark = () => {
       const words = [
         ...wordmark.querySelectorAll<HTMLElement>(`.${styles.nuviaWord}`),
@@ -62,6 +65,36 @@ export function LandingFooter() {
         words[0];
 
       if (!word) return;
+
+      if (compactQuery.matches) {
+        footer?.style.removeProperty("--nva-size");
+      } else if (footer && footer.clientWidth > 0) {
+        const current = window.getComputedStyle(word);
+        const currentSize = Number.parseFloat(current.fontSize);
+
+        if (Number.isFinite(currentSize) && currentSize > 0) {
+          const currentInk = measureNvaInk(current, currentSize);
+
+          if (currentInk) {
+            const linksReserve = Math.min(
+              Math.max(footer.clientWidth * 0.2, 240),
+              480,
+            );
+            const nextSize = Math.round(
+              currentSize *
+                ((footer.clientWidth - linksReserve) / currentInk.inkWidth),
+            );
+
+            if (
+              Number.isFinite(nextSize) &&
+              nextSize > 0 &&
+              Math.abs(nextSize - currentSize) > 1
+            ) {
+              footer.style.setProperty("--nva-size", `${nextSize}px`);
+            }
+          }
+        }
+      }
 
       const computed = window.getComputedStyle(word);
       const fontSize = Number.parseFloat(computed.fontSize);
@@ -81,7 +114,8 @@ export function LandingFooter() {
     };
 
     const resizeObserver = new ResizeObserver(fitWordmark);
-    resizeObserver.observe(wordmark);
+    if (footer) resizeObserver.observe(footer);
+    compactQuery.addEventListener("change", fitWordmark);
     window.addEventListener("resize", fitWordmark);
     void document.fonts.ready.then(fitWordmark);
     fitWordmark();
@@ -92,6 +126,7 @@ export function LandingFooter() {
     return () => {
       window.cancelAnimationFrame(layoutFrame);
       resizeObserver.disconnect();
+      compactQuery.removeEventListener("change", fitWordmark);
       window.removeEventListener("resize", fitWordmark);
     };
   }, []);
