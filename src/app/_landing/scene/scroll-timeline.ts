@@ -16,10 +16,20 @@ export const SCROLL_HERO_FADE_END = 0.1;
 export const SCROLL_SURFACE_INSET_MID = 0.08;
 export const SCROLL_WORK_REVEAL = 0.22;
 export const SCROLL_WORK_RESET = 0.19;
+export const SCROLL_WORK_PAUSE = 0.25;
 export const SCROLL_WORK_EXIT_START = 0.34;
 export const SCROLL_MARQUEE_FULL = 0.44;
 export const SCROLL_CONTACT_START = 0.52;
 export const SCROLL_CONTACT_SET = 0.75;
+
+export const SCROLL_PAUSE_POINTS = [
+  SCROLL_PANEL_EXPANDED,
+  SCROLL_WORK_PAUSE,
+  SCROLL_MARQUEE_FULL,
+  SCROLL_CONTACT_SET,
+] as const;
+export const SCROLL_PAUSE_MS = 700;
+export const SCROLL_PAUSE_RELEASE = 0.016;
 
 export const SCROLL_SMOOTH_FOLLOW_S = 0.15;
 export const SCROLL_SMOOTH_BRAKE_S = 0.24;

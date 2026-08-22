@@ -140,6 +140,19 @@
   transform-origin: center;
 }
 
+.scrollProgressHud {
+  bottom: 1.15rem;
+  color: color-mix(in srgb, var(--miizu-ink) 42%, transparent);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  left: 1.2rem;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  position: fixed;
+  z-index: 40;
+}
+
 .scrollHint {
   background: transparent;
   border: 0;

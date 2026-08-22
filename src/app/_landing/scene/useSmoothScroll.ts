@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type RefObject } from "react";
 
 import {
   SCROLL_MAX_SPEED_VH_PER_S,
+  SCROLL_PAUSE_MS,
+  SCROLL_PAUSE_POINTS,
+  SCROLL_PAUSE_RELEASE,
   SCROLL_SMOOTH_BRAKE_S,
   SCROLL_SMOOTH_COAST_S,
   SCROLL_SMOOTH_FOLLOW_S,
@@ -26,6 +29,30 @@ function maxScrollY() {
     0,
     document.documentElement.scrollHeight - window.innerHeight,
   );
+}
+
+function sceneTravel(scene: HTMLElement) {
+  return Math.max(0, scene.offsetHeight - window.innerHeight);
+}
+
+function sceneProgress(scene: HTMLElement, scrollY: number) {
+  const travel = Math.max(1, sceneTravel(scene));
+  return clamp((scrollY - scene.offsetTop) / travel, 0, 1);
+}
+
+function sceneScrollY(scene: HTMLElement, progress: number) {
+  return scene.offsetTop + sceneTravel(scene) * progress;
+}
+
+function crossedPausePoint(from: number, to: number, consumed: Set<number>) {
+  if (to <= from) return null;
+
+  for (const point of SCROLL_PAUSE_POINTS) {
+    if (consumed.has(point)) continue;
+    if (from < point && point <= to) return point;
+  }
+
+  return null;
 }
 
 function canNestedScroll(target: EventTarget | null, deltaY: number) {
@@ -59,7 +86,10 @@ function canNestedScroll(target: EventTarget | null, deltaY: number) {
   return false;
 }
 
-export function useSmoothScroll(enabled: boolean) {
+export function useSmoothScroll(
+  enabled: boolean,
+  sceneRef: RefObject<HTMLElement | null>,
+) {
   useEffect(() => {
     if (!enabled) return;
 
@@ -67,7 +97,12 @@ export function useSmoothScroll(enabled: boolean) {
     let velocity = 0;
     let lastWheelAt = 0;
     let lastFrameAt = 0;
+    let lastProgress = sceneRef.current
+      ? sceneProgress(sceneRef.current, current)
+      : 0;
+    let pauseUntil = 0;
     let frame = 0;
+    const consumed = new Set<number>();
 
     const apply = (y: number) => {
       window.scrollTo(window.scrollX, y);
@@ -78,6 +113,16 @@ export function useSmoothScroll(enabled: boolean) {
       lastFrameAt = now;
 
       const maxY = maxScrollY();
+      const scene = sceneRef.current;
+      const holding = now < pauseUntil;
+
+      if (holding) {
+        velocity = 0;
+        apply(current);
+        frame = window.requestAnimationFrame(tick);
+        return;
+      }
+
       const maxSpeed = SCROLL_MAX_SPEED_VH_PER_S * window.innerHeight;
       const idle = now - lastWheelAt > 90;
 
@@ -91,6 +136,30 @@ export function useSmoothScroll(enabled: boolean) {
 
       velocity = clamp(velocity, -maxSpeed, maxSpeed);
       current = clamp(current + velocity * dt, 0, maxY);
+
+      if (scene) {
+        const progress = sceneProgress(scene, current);
+
+        for (const point of SCROLL_PAUSE_POINTS) {
+          if (Math.abs(progress - point) > SCROLL_PAUSE_RELEASE) {
+            consumed.delete(point);
+          }
+        }
+
+        const pauseAt = crossedPausePoint(lastProgress, progress, consumed);
+        if (pauseAt !== null) {
+          current = clamp(sceneScrollY(scene, pauseAt), 0, maxY);
+          velocity = 0;
+          pauseUntil = now + SCROLL_PAUSE_MS;
+          consumed.add(pauseAt);
+          lastProgress = pauseAt;
+          apply(current);
+          frame = window.requestAnimationFrame(tick);
+          return;
+        }
+
+        lastProgress = progress;
+      }
 
       if (current === 0 || current === maxY) velocity = 0;
 
@@ -120,6 +189,8 @@ export function useSmoothScroll(enabled: boolean) {
 
       event.preventDefault();
 
+      if (window.performance.now() < pauseUntil) return;
+
       const now = window.performance.now();
       const eventDt = lastWheelAt
         ? clamp((now - lastWheelAt) / 1000, 1 / 120, 1 / 20)
@@ -138,6 +209,9 @@ export function useSmoothScroll(enabled: boolean) {
       if (frame) return;
       current = window.scrollY;
       velocity = 0;
+      if (sceneRef.current) {
+        lastProgress = sceneProgress(sceneRef.current, current);
+      }
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
@@ -148,5 +222,5 @@ export function useSmoothScroll(enabled: boolean) {
       window.removeEventListener("scroll", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [enabled]);
+  }, [enabled, sceneRef]);
 }

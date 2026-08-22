@@ -4,10 +4,11 @@ import {
   animate,
   motion,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
 } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { ContactRegion } from "../contact/contact-form-model";
 import { ContactSection } from "../contact/ContactSection";
@@ -34,8 +35,7 @@ export function HeroWorkScene({
 }) {
   const reduceMotion = useReducedMotion();
   const [compact, setCompact] = useState(false);
-
-  useSmoothScroll(reduceMotion !== true);
+  const scrollHudRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -93,6 +93,13 @@ export function HeroWorkScene({
     workSequenceStarted,
   } = useHeroWorkTimeline(compact);
 
+  useSmoothScroll(reduceMotion !== true, sceneRef);
+
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    const hud = scrollHudRef.current;
+    if (hud) hud.textContent = `${(progress * 100).toFixed(1)}%`;
+  });
+
   const panelRest = getIntroPanelRest(compact);
   const introPanelOffscreen = {
     x: "100vw",
@@ -148,6 +155,13 @@ export function HeroWorkScene({
       ref={sceneRef}
     >
       <div className={styles.stickyStage}>
+        <div
+          aria-hidden="true"
+          className={styles.scrollProgressHud}
+          ref={scrollHudRef}
+        >
+          0.0%
+        </div>
         {!reduceMotion ? (
           <motion.video
             ref={introVideoRef}
