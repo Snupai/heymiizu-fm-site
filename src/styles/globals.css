@@ -85,7 +85,7 @@
 }
 
 html {
-  overflow-y: scroll;
+  overflow-y: overlay;
   position: relative;
   /* Standard properties keep overlay scrollbars (pill only).
      ::-webkit-scrollbar width/track rules force the classic white channel. */
@@ -93,11 +93,40 @@ html {
   scrollbar-width: thin;
 }
 
+@supports not (overflow-y: overlay) {
+  html {
+    overflow-y: scroll;
+  }
+}
+
+/* Keep this narrower than `thin` (~8px) without painting a track. */
+::-webkit-scrollbar {
+  background: transparent;
+  height: 5px;
+  width: 5px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 999px;
+}
+
 /* Keep overflow while Lenis is stopped (intro lock, scene pauses). Overlay
    scrollbars do not take layout width, so showing/hiding them does not jump. */
 html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-x: clip;
-  overflow-y: scroll;
+  overflow-y: overlay;
+}
+
+@supports not (overflow-y: overlay) {
+  html.lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow-y: scroll;
+  }
 }
 
 /* Radix overlays already hide overflow while open. Keep its scrollbar
@@ -110,6 +139,13 @@ html[data-intro-lock],
 html:has([data-intro-lock]) {
   scrollbar-color: transparent transparent;
   scrollbar-width: none;
+}
+
+html[data-intro-lock]::-webkit-scrollbar,
+html:has([data-intro-lock])::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
 }
 
 html,
