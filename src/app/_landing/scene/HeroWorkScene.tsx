@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -12,6 +12,7 @@ import {
   INTRO_CARD_SLIDE_EASE,
   INTRO_HEADER_SLIDE_DURATION_S,
   INTRO_SLIDE_EASE,
+  SCROLL_WORK_EXIT_START,
   WORK_SHADE_ENTRY_DURATION_S,
 } from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
@@ -77,6 +78,7 @@ export function HeroWorkScene({
     panelX,
     panelY,
     sceneRef,
+    scrollYProgress,
     surfaceInset,
     workExitX,
     workSequenceRun,
@@ -98,15 +100,37 @@ export function HeroWorkScene({
     scaleY: panelRest.scaleY,
   };
   const scrollHintOpacity = introActive ? 0 : heroOpacity;
-  const workShadeEntryX = workSequenceStarted ? "0%" : "-100%";
-  const workShadeEntryTransition = reduceMotion
-    ? { duration: 0 }
-    : workSequenceStarted
-      ? {
-          duration: WORK_SHADE_ENTRY_DURATION_S,
-          ease: INTRO_SLIDE_EASE,
-        }
-      : { duration: 0 };
+  const workShadeEntryX = useMotionValue("-100%");
+
+  useEffect(() => {
+    if (!workSequenceStarted) {
+      workShadeEntryX.jump("-100%");
+      return;
+    }
+
+    if (reduceMotion || scrollYProgress.get() >= SCROLL_WORK_EXIT_START) {
+      workShadeEntryX.jump("0%");
+      return;
+    }
+
+    const controls = animate(workShadeEntryX, "0%", {
+      duration: WORK_SHADE_ENTRY_DURATION_S,
+      ease: INTRO_SLIDE_EASE,
+    });
+
+    const unsub = scrollYProgress.on("change", (progress) => {
+      if (progress < SCROLL_WORK_EXIT_START) return;
+
+      controls.stop();
+      workShadeEntryX.jump("0%");
+      unsub();
+    });
+
+    return () => {
+      controls.stop();
+      unsub();
+    };
+  }, [reduceMotion, scrollYProgress, workSequenceStarted, workShadeEntryX]);
 
   return (
     <div className={styles.heroWorkScene} id="hero" ref={sceneRef}>
@@ -240,11 +264,8 @@ export function HeroWorkScene({
               style={{ opacity: workShadeOpacity, x: workExitX }}
             >
               <motion.div
-                animate={{ x: workShadeEntryX }}
                 className={styles.workShadeMotion}
-                initial={{ x: "-100%" }}
-                key={`shade-${workSequenceRun}`}
-                transition={workShadeEntryTransition}
+                style={{ x: workShadeEntryX }}
               >
                 <div className={styles.workShadeCopy} />
                 <div className={styles.workShadeEdge} />
@@ -253,6 +274,7 @@ export function HeroWorkScene({
 
             <WorkLines
               reduceMotion={Boolean(reduceMotion)}
+              scrollYProgress={scrollYProgress}
               sequenceRun={workSequenceRun}
               sequenceStarted={workSequenceStarted}
               workExitX={workExitX}
