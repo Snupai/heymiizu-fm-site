@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import type { ContactRegion } from "../contact/contact-form-model";
 import { ContactSection } from "../contact/ContactSection";
 import {
   getIntroPanelRest,
@@ -19,7 +20,11 @@ import { useHeroWorkTimeline } from "./useHeroWorkTimeline";
 import { useIntroSequence } from "./useIntroSequence";
 import { WorkLines } from "./WorkLines";
 
-export function HeroWorkScene() {
+export function HeroWorkScene({
+  initialRegion,
+}: {
+  initialRegion: ContactRegion;
+}) {
   const reduceMotion = useReducedMotion();
   const [compact, setCompact] = useState(false);
 
@@ -269,7 +274,11 @@ export function HeroWorkScene() {
           />
         </motion.div>
 
-        <ContactSection compact={compact} wipeX={contactWipeX} />
+        <ContactSection
+          compact={compact}
+          initialRegion={initialRegion}
+          wipeX={contactWipeX}
+        />
       </div>
     </div>
   );

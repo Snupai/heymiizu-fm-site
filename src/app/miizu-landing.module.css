@@ -584,8 +584,29 @@
   transform: scale(1.06);
 }
 
+.bookCallSoon {
+  cursor: default;
+  pointer-events: none;
+}
+
+.bookCallSoon .bookCallText {
+  opacity: 0.78;
+}
+
+.comingSoon {
+  background: var(--miizu-bg);
+  border-radius: 999px;
+  color: var(--miizu-primary);
+  font-size: max(0.72rem, 0.24em);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 0.48em 0.82em 0.42em;
+  text-transform: uppercase;
+}
+
 .directContact p {
-  color: var(--miizu-ink);
+  color: #15107f;
   font-size: clamp(1.35rem, 2vw, 2.4rem);
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -593,7 +614,7 @@
 }
 
 .emailLink {
-  color: var(--miizu-ink);
+  color: #15107f;
   display: block;
   font-size: clamp(2.6rem, 5.3vw, 7.2rem);
   font-weight: 700;

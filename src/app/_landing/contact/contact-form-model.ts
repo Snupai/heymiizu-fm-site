@@ -6,6 +6,45 @@ const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
 
 export type ContactRegion = "local" | "international";
 
+export const DEFAULT_CONTACT_REGION: ContactRegion = "international";
+
+const UNKNOWN_COUNTRY_CODES = new Set(["", "XX", "T1", "ZZ"]);
+
+export function getContactRegionFromCountry(
+  country: string | null | undefined,
+): ContactRegion | null {
+  const code = country?.trim().toUpperCase() ?? "";
+  if (UNKNOWN_COUNTRY_CODES.has(code)) return null;
+  return code === "DE" ? "local" : "international";
+}
+
+export function getContactRegionFromAcceptLanguage(
+  acceptLanguage: string | null | undefined,
+): ContactRegion | null {
+  const primary = acceptLanguage
+    ?.split(",")[0]
+    ?.trim()
+    .split(";")[0]
+    ?.toLowerCase();
+
+  if (primary === "de" || primary === "de-de") return "local";
+  return null;
+}
+
+export function getContactRegionFromRequest({
+  country,
+  acceptLanguage,
+}: {
+  country: string | null | undefined;
+  acceptLanguage: string | null | undefined;
+}): ContactRegion {
+  return (
+    getContactRegionFromCountry(country) ??
+    getContactRegionFromAcceptLanguage(acceptLanguage) ??
+    DEFAULT_CONTACT_REGION
+  );
+}
+
 export type ContactData = {
   name: string;
   email: string;

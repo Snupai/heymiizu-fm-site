@@ -1,7 +1,7 @@
 "use client";
 
 import { LayoutGroup, motion, type MotionValue } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+// import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { CONTACT_HEADLINES } from "./content";
@@ -11,12 +11,14 @@ import type { ContactRegion } from "./contact-form-model";
 
 export function ContactSection({
   compact,
+  initialRegion,
   wipeX,
 }: {
   compact: boolean;
+  initialRegion: ContactRegion;
   wipeX: MotionValue<string>;
 }) {
-  const [region, setRegion] = useState<ContactRegion>("international");
+  const [region, setRegion] = useState<ContactRegion>(initialRegion);
   const [headlineIndex, setHeadlineIndex] = useState(0);
 
   useEffect(() => {
@@ -24,9 +26,9 @@ export function ContactSection({
   }, []);
 
   const headline = CONTACT_HEADLINES[headlineIndex];
-  const bookingUrl =
-    process.env.NEXT_PUBLIC_BOOKING_URL ??
-    "mailto:hey@miizumelon.com?subject=Let%27s%20book%20a%20call";
+  // const bookingUrl =
+  //   process.env.NEXT_PUBLIC_BOOKING_URL ??
+  //   "mailto:hey@miizumelon.com?subject=Let%27s%20book%20a%20call";
 
   return (
     <motion.div
@@ -97,6 +99,8 @@ export function ContactSection({
           </div>
 
           <div className={styles.directContact}>
+            {/* Restore book-a-call: uncomment the <a>, ArrowUpRight import, and bookingUrl. Comment out the coming-soon <div>. */}
+            {/*
             <a
               className={styles.bookCall}
               href={bookingUrl}
@@ -108,6 +112,14 @@ export function ContactSection({
                 <ArrowUpRight />
               </span>
             </a>
+            */}
+            <div
+              aria-label="Book a call, coming soon"
+              className={`${styles.bookCall} ${styles.bookCallSoon}`}
+            >
+              <span className={styles.bookCallText}>book a call</span>
+              <span className={styles.comingSoon}>coming soon</span>
+            </div>
             <p>or just say hello</p>
             <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
               hey@miizumelon.com

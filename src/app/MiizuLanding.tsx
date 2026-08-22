@@ -1,14 +1,19 @@
 "use client";
 
+import type { ContactRegion } from "./_landing/contact/contact-form-model";
 import { LandingFooter } from "./_landing/footer/LandingFooter";
 import { HeroWorkScene } from "./_landing/scene/HeroWorkScene";
 
 import styles from "./miizu-landing.module.css";
 
-export default function MiizuLanding() {
+export default function MiizuLanding({
+  initialRegion,
+}: {
+  initialRegion: ContactRegion;
+}) {
   return (
     <main className={styles.site}>
-      <HeroWorkScene />
+      <HeroWorkScene initialRegion={initialRegion} />
       <LandingFooter />
     </main>
   );
