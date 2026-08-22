@@ -17,13 +17,13 @@ export const SCROLL_SURFACE_INSET_MID = 0.08;
 export const SCROLL_WORK_REVEAL = 0.22;
 export const SCROLL_WORK_RESET = 0.19;
 export const SCROLL_WORK_PAUSE = 0.25;
-export const SCROLL_WORK_EXIT_START = 0.34;
-export const SCROLL_MARQUEE_FULL = 0.44;
-export const SCROLL_CONTACT_START = 0.52;
-export const SCROLL_CONTACT_SET = 0.75;
+export const SCROLL_WORK_EXIT_START = 0.3;
+export const SCROLL_MARQUEE_FULL = 0.58;
+export const SCROLL_CONTACT_START = 0.66;
+export const SCROLL_CONTACT_SET = 0.83;
 
 export const SCROLL_SHOWREEL_PAUSE_MS = 600;
-export const SCROLL_WORK_PAUSE_MS = 1_700;
+export const SCROLL_WORK_PAUSE_MS = 1_600;
 export const SCROLL_CLIENTS_PAUSE_MS = 600;
 export const SCROLL_CONTACT_PAUSE_MS = 600;
 
@@ -49,6 +49,11 @@ function easeInOutSine(t: number) {
   return -(Math.cos(Math.PI * t) - 1) / 2;
 }
 
+function easeInOutMarquee(t: number) {
+  const sine = easeInOutSine(t);
+  return t * 0.55 + sine * 0.45;
+}
+
 export function getMarqueeHandoffProgress(progress: number) {
   if (progress <= SCROLL_WORK_EXIT_START) return 0;
   if (progress >= SCROLL_MARQUEE_FULL) return 1;
@@ -57,7 +62,7 @@ export function getMarqueeHandoffProgress(progress: number) {
     (progress - SCROLL_WORK_EXIT_START) /
     (SCROLL_MARQUEE_FULL - SCROLL_WORK_EXIT_START);
 
-  return easeInOutSine(t);
+  return easeInOutMarquee(t);
 }
 
 export function getClientsContactFadeOpacity(progress: number) {
