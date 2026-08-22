@@ -58,6 +58,8 @@ export function HeroWorkScene() {
   const {
     cardScaleX,
     cardScaleY,
+    clientsContactFadeOpacity,
+    clientsContactFadeScaleX,
     clientsOverlayX,
     contactWipeX,
     heroExitY,
@@ -74,6 +76,7 @@ export function HeroWorkScene() {
     workExitX,
     workSequenceRun,
     workSequenceStarted,
+    workShadeOpacity,
   } = useHeroWorkTimeline(compact);
 
   const panelRest = getIntroPanelRest(compact);
@@ -229,7 +232,7 @@ export function HeroWorkScene() {
             <motion.div
               aria-hidden="true"
               className={styles.workShade}
-              style={{ x: workExitX }}
+              style={{ opacity: workShadeOpacity, x: workExitX }}
             >
               <motion.div
                 animate={{ x: workShadeEntryX }}
@@ -251,6 +254,20 @@ export function HeroWorkScene() {
             />
           </motion.div>
         </motion.section>
+
+        <motion.div
+          aria-hidden="true"
+          className={styles.marqueeContactFadeCarrier}
+          style={{ x: contactWipeX }}
+        >
+          <motion.div
+            className={styles.marqueeContactFade}
+            style={{
+              opacity: clientsContactFadeOpacity,
+              scaleX: clientsContactFadeScaleX,
+            }}
+          />
+        </motion.div>
 
         <ContactSection compact={compact} wipeX={contactWipeX} />
       </div>

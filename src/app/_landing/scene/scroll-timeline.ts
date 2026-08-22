@@ -25,6 +25,66 @@ export const WORK_LINE_ENTRY_LEAD_S = 0.22;
 export const WORK_LINE_ENTRY_DURATION_S = 1.05;
 export const WORK_LINE_STAGGER_S = 0.16;
 
+const MARQUEE_HANDOFF_RANGE = SCROLL_MARQUEE_FULL - SCROLL_WORK_EXIT_START;
+const SCROLL_MARQUEE_SHADE_FADE_START =
+  SCROLL_WORK_EXIT_START + MARQUEE_HANDOFF_RANGE * 0.75;
+const SCROLL_CLIENTS_CONTACT_FADE_START =
+  SCROLL_WORK_EXIT_START + MARQUEE_HANDOFF_RANGE * 0.8;
+const CLIENTS_CONTACT_FADE_REST_SCALE = 0.35;
+
+function easeInOutSine(t: number) {
+  return -(Math.cos(Math.PI * t) - 1) / 2;
+}
+
+export function getMarqueeHandoffProgress(progress: number) {
+  if (progress <= SCROLL_WORK_EXIT_START) return 0;
+  if (progress >= SCROLL_MARQUEE_FULL) return 1;
+
+  const t =
+    (progress - SCROLL_WORK_EXIT_START) /
+    (SCROLL_MARQUEE_FULL - SCROLL_WORK_EXIT_START);
+
+  return easeInOutSine(t);
+}
+
+export function getWorkShadeOpacity(progress: number) {
+  if (progress <= SCROLL_MARQUEE_SHADE_FADE_START) return 1;
+  if (progress >= SCROLL_MARQUEE_FULL) return 0;
+
+  const t =
+    (progress - SCROLL_MARQUEE_SHADE_FADE_START) /
+    (SCROLL_MARQUEE_FULL - SCROLL_MARQUEE_SHADE_FADE_START);
+
+  return 1 - easeInOutSine(t);
+}
+
+export function getClientsContactFadeOpacity(progress: number) {
+  if (progress <= SCROLL_CLIENTS_CONTACT_FADE_START) return 0;
+  if (progress >= SCROLL_MARQUEE_FULL) return 1;
+
+  const t =
+    (progress - SCROLL_CLIENTS_CONTACT_FADE_START) /
+    (SCROLL_MARQUEE_FULL - SCROLL_CLIENTS_CONTACT_FADE_START);
+
+  return easeInOutSine(t);
+}
+
+export function getClientsContactFadeScaleX(progress: number) {
+  if (progress <= SCROLL_CONTACT_START) {
+    return CLIENTS_CONTACT_FADE_REST_SCALE;
+  }
+  if (progress >= SCROLL_CONTACT_SET) return 1;
+
+  const t =
+    (progress - SCROLL_CONTACT_START) /
+    (SCROLL_CONTACT_SET - SCROLL_CONTACT_START);
+
+  return (
+    CLIENTS_CONTACT_FADE_REST_SCALE +
+    easeInOutSine(t) * (1 - CLIENTS_CONTACT_FADE_REST_SCALE)
+  );
+}
+
 export function getIntroPanelRest(compact: boolean) {
   return compact
     ? {

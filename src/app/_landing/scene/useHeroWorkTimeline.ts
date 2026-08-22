@@ -4,14 +4,16 @@ import { useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 
 import {
+  getClientsContactFadeOpacity,
+  getClientsContactFadeScaleX,
+  getMarqueeHandoffProgress,
+  getWorkShadeOpacity,
   SCROLL_CONTACT_SET,
   SCROLL_CONTACT_START,
   SCROLL_HERO_FADE_END,
-  SCROLL_MARQUEE_FULL,
   SCROLL_PANEL_EXPANDED,
   SCROLL_PANEL_HOLD,
   SCROLL_SURFACE_INSET_MID,
-  SCROLL_WORK_EXIT_START,
   SCROLL_WORK_RESET,
   SCROLL_WORK_REVEAL,
   SHOWREEL_RADIUS_REM,
@@ -88,18 +90,25 @@ export function useHeroWorkTimeline(compact: boolean) {
   );
   const workExitX = useTransform(
     scrollYProgress,
-    [0, SCROLL_WORK_EXIT_START, SCROLL_MARQUEE_FULL, 1],
-    ["0vw", "0vw", "100vw", "100vw"],
+    (progress) => `${getMarqueeHandoffProgress(progress) * 100}vw`,
   );
+  const workShadeOpacity = useTransform(scrollYProgress, getWorkShadeOpacity);
   const clientsOverlayX = useTransform(
     scrollYProgress,
-    [0, SCROLL_WORK_EXIT_START, SCROLL_MARQUEE_FULL, 1],
-    ["-100%", "-100%", "0%", "0%"],
+    (progress) => `${(getMarqueeHandoffProgress(progress) - 1) * 100}%`,
   );
   const contactWipeX = useTransform(
     scrollYProgress,
     [0, SCROLL_CONTACT_START, SCROLL_CONTACT_SET, 1],
     ["-100vw", "-100vw", "0vw", "0vw"],
+  );
+  const clientsContactFadeOpacity = useTransform(
+    scrollYProgress,
+    getClientsContactFadeOpacity,
+  );
+  const clientsContactFadeScaleX = useTransform(
+    scrollYProgress,
+    getClientsContactFadeScaleX,
   );
 
   const scrollToProgress = (progress: number) => {
@@ -124,6 +133,8 @@ export function useHeroWorkTimeline(compact: boolean) {
   return {
     cardScaleX,
     cardScaleY,
+    clientsContactFadeOpacity,
+    clientsContactFadeScaleX,
     clientsOverlayX,
     contactWipeX,
     heroExitY,
@@ -141,5 +152,6 @@ export function useHeroWorkTimeline(compact: boolean) {
     workExitX,
     workSequenceRun,
     workSequenceStarted,
+    workShadeOpacity,
   };
 }
