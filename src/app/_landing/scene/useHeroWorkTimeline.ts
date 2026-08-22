@@ -60,7 +60,7 @@ export function useHeroWorkTimeline(compact: boolean) {
           if (stop.at === SCROLL_WORK_UP_PAUSE) reverseWorkSequence();
           return;
         default: {
-          const exhaustive: never = stop.dir;
+          const exhaustive: never = stop;
           return exhaustive;
         }
       }
