@@ -2,7 +2,7 @@ import { WORK_LINES } from "./content";
 
 export const SHOWREEL_RADIUS_REM = 2.6;
 export const INTRO_REVEAL_DELAY_MS = 2_500;
-export const INTRO_SCROLL_UNLOCK_LEAD_MS = 6_000;
+export const INTRO_SCROLL_UNLOCK_LEAD_MS = 7_000;
 export const INTRO_HEADER_SLIDE_DURATION_S = 4;
 export const INTRO_CARD_SLIDE_DURATION_S = 3;
 export const INTRO_SLIDE_EASE: [number, number, number, number] = [
