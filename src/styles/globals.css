@@ -85,8 +85,8 @@
 }
 
 html {
+  overflow-y: scroll;
   position: relative;
-  scrollbar-gutter: stable;
 }
 
 /* Radix overlays already hide overflow while open. Keep its scrollbar
@@ -113,11 +113,41 @@ html body[data-scroll-locked] {
   background: #555;
 }
 
+/* Hide the bar visually without changing its width. Fully transparent
+   colors make some engines drop the classic scrollbar and collapse the
+   gutter, which is what caused the jump. */
+html[data-intro-lock]::-webkit-scrollbar,
+html:has([data-intro-lock])::-webkit-scrollbar {
+  width: 10px;
+  background: rgba(0, 0, 0, 0.001);
+}
+
+html[data-intro-lock]::-webkit-scrollbar-track,
+html[data-intro-lock]::-webkit-scrollbar-thumb,
+html[data-intro-lock]::-webkit-scrollbar-thumb:hover,
+html:has([data-intro-lock])::-webkit-scrollbar-track,
+html:has([data-intro-lock])::-webkit-scrollbar-thumb,
+html:has([data-intro-lock])::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.001);
+}
+
+@supports (-moz-appearance: none) {
+  html {
+    scrollbar-color: #888 #f1f1f1;
+    scrollbar-width: thin;
+  }
+
+  html[data-intro-lock],
+  html:has([data-intro-lock]) {
+    scrollbar-color: rgba(0, 0, 0, 0.001) rgba(0, 0, 0, 0.001);
+  }
+}
+
 html,
 body {
   font-weight: 600;
   letter-spacing: 0.02em;
-  max-width: 100vw;
+  max-width: 100%;
   overflow-x: clip;
 }
 

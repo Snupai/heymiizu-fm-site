@@ -133,7 +133,13 @@ export function HeroWorkScene({
   }, [reduceMotion, scrollYProgress, workSequenceStarted, workShadeEntryX]);
 
   return (
-    <div className={styles.heroWorkScene} id="hero" ref={sceneRef}>
+    <div
+      className={styles.heroWorkScene}
+      data-intro-lock={introActive ? "" : undefined}
+      data-intro-phase={introActive ? introPhase : undefined}
+      id="hero"
+      ref={sceneRef}
+    >
       <div className={styles.stickyStage}>
         {!reduceMotion ? (
           <motion.video
@@ -164,13 +170,16 @@ export function HeroWorkScene({
             introActive ? { y: introPhase === "video" ? "-120%" : "0%" } : false
           }
           className={styles.header}
+          initial={introPhase === "complete" ? false : { y: "-120%" }}
           onAnimationComplete={handleIntroSlideComplete}
-          style={{
-            opacity: introActive ? 1 : heroOpacity,
-            y: introPhase === "complete" ? heroExitY : undefined,
-          }}
+          style={
+            introPhase === "complete"
+              ? { opacity: heroOpacity, y: heroExitY }
+              : { opacity: 1 }
+          }
           transition={{
-            duration: INTRO_HEADER_SLIDE_DURATION_S,
+            duration:
+              introPhase === "video" ? 0 : INTRO_HEADER_SLIDE_DURATION_S,
             ease: INTRO_SLIDE_EASE,
           }}
         >

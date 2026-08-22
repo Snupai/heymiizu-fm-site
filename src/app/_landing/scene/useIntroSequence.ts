@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
   INTRO_REVEAL_DELAY_MS,
@@ -79,7 +79,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     void showreelVideoRef.current?.play().catch(() => undefined);
   }, [introPhase]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (introPhase === "complete") return;
 
     const html = document.documentElement;
@@ -99,10 +99,8 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       "Spacebar",
     ]);
     const previousStyles = {
-      bodyOverflow: body.style.overflow,
       bodyOverscrollBehavior: body.style.overscrollBehavior,
       bodyTouchAction: body.style.touchAction,
-      htmlOverflow: html.style.overflow,
       htmlOverscrollBehavior: html.style.overscrollBehavior,
       htmlTouchAction: html.style.touchAction,
     };
@@ -114,10 +112,9 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       window.scrollTo(lockedScrollX, lockedScrollY);
     };
 
-    html.style.overflow = "hidden";
+    html.dataset.introLock = "";
     html.style.overscrollBehavior = "none";
     html.style.touchAction = "none";
-    body.style.overflow = "hidden";
     body.style.overscrollBehavior = "none";
     body.style.touchAction = "none";
     window.addEventListener("keydown", preventScrollKeys);
@@ -130,10 +127,9 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       window.removeEventListener("scroll", keepScrollPosition);
       window.removeEventListener("touchmove", preventScroll);
       window.removeEventListener("wheel", preventScroll);
-      html.style.overflow = previousStyles.htmlOverflow;
+      delete html.dataset.introLock;
       html.style.overscrollBehavior = previousStyles.htmlOverscrollBehavior;
       html.style.touchAction = previousStyles.htmlTouchAction;
-      body.style.overflow = previousStyles.bodyOverflow;
       body.style.overscrollBehavior = previousStyles.bodyOverscrollBehavior;
       body.style.touchAction = previousStyles.bodyTouchAction;
     };
