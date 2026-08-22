@@ -736,7 +736,6 @@
 .contactForm [data-contact-select][data-placeholder],
 .contactForm [data-date-range-picker][data-empty="true"] {
   color: rgba(251, 251, 254, 0.53);
-  opacity: 1;
 }
 
 .contactForm input:focus,
@@ -765,7 +764,10 @@
 }
 
 .contactForm input:disabled,
-.contactForm textarea:disabled {
+.contactForm textarea:disabled,
+.contactForm [data-contact-select]:disabled,
+.contactForm [data-contact-select][data-disabled],
+.contactForm [data-date-range-picker]:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
