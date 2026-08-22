@@ -192,8 +192,8 @@
 }
 
 .workShade {
-  --work-shade-copy: 34vw;
-  --work-shade-edge: 30vw;
+  --work-shade-copy: 24vw;
+  --work-shade-edge: 36vw;
   display: flex;
   height: 100%;
   inset: 0 auto auto 0;
@@ -222,10 +222,21 @@
 .workShadeEdge {
   background: linear-gradient(
     90deg,
-    #000 0%,
-    rgba(0, 0, 0, 0.88) 26%,
-    rgba(0, 0, 0, 0.5) 52%,
-    rgba(0, 0, 0, 0.12) 78%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.99) 8%,
+    rgba(0, 0, 0, 0.95) 16%,
+    rgba(0, 0, 0, 0.9) 23%,
+    rgba(0, 0, 0, 0.83) 30%,
+    rgba(0, 0, 0, 0.74) 36%,
+    rgba(0, 0, 0, 0.65) 42%,
+    rgba(0, 0, 0, 0.55) 48%,
+    rgba(0, 0, 0, 0.45) 54%,
+    rgba(0, 0, 0, 0.35) 60%,
+    rgba(0, 0, 0, 0.26) 66%,
+    rgba(0, 0, 0, 0.18) 73%,
+    rgba(0, 0, 0, 0.11) 80%,
+    rgba(0, 0, 0, 0.05) 87%,
+    rgba(0, 0, 0, 0.01) 94%,
     rgba(0, 0, 0, 0) 100%
   );
   flex: 0 0 var(--work-shade-edge);
@@ -305,7 +316,7 @@
 }
 
 .workLineItem {
-  font-weight: 720;
+  font-weight: 800;
 }
 
 .workLineItemEnd {
