@@ -4,6 +4,7 @@ import {
   LayoutGroup,
   motion,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -14,7 +15,7 @@ import IntlTelInput from "@intl-tel-input/react";
 import type { ValidationError } from "intl-tel-input";
 import { ArrowUpRight, CalendarIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { FormEvent, PointerEvent } from "react";
 import type { DateRange } from "react-day-picker";
@@ -110,23 +111,23 @@ const INTRO_REVEAL_DELAY_MS = 1_000;
 const INTRO_HEADER_SLIDE_DURATION_S = 2;
 const INTRO_CARD_SLIDE_DURATION_S = 6;
 const INTRO_SLIDE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const INTRO_CARD_SLIDE_EASE: [number, number, number, number] = [0.18, 0.9, 0.08, 1];
-const SCROLL_PANEL_HOLD = 0.04;
-const SCROLL_PANEL_EXPANDED = 0.28;
-const SCROLL_HERO_FADE_END = 0.2;
-const SCROLL_SURFACE_INSET_MID = 0.16;
-const SCROLL_WORK_REVEAL = 0.45;
-const SCROLL_WORK_SHADE_SET = 0.51;
-const SCROLL_WORK_TEXT_HOLD_END = 0.63;
-const SCROLL_WORK_LINE_STAGGER = 0.015;
-const SCROLL_WORK_LINE_TRAVEL = 0.048;
-const SCROLL_MARQUEE_FULL = 0.83;
-const SCROLL_MARQUEE_HOLD_END = 0.88;
-const SCROLL_CONTACT_SET = 0.96;
-const WORK_SHADE_COPY = 0.34;
-const WORK_SHADE_EDGE = 0.3;
-const WORK_SHADE_COPY_COMPACT = 0.58;
-const WORK_SHADE_EDGE_COMPACT = 0.28;
+const INTRO_CARD_SLIDE_EASE: [number, number, number, number] = [
+  0.18, 0.9, 0.08, 1,
+];
+const SCROLL_PANEL_HOLD = 0.025;
+const SCROLL_PANEL_EXPANDED = 0.18;
+const SCROLL_HERO_FADE_END = 0.125;
+const SCROLL_SURFACE_INSET_MID = 0.1;
+const SCROLL_WORK_REVEAL = 0.27;
+const SCROLL_WORK_RESET = 0.24;
+const SCROLL_WORK_EXIT_START = 0.4;
+const SCROLL_MARQUEE_FULL = 0.51;
+const SCROLL_CONTACT_START = 0.6;
+const SCROLL_CONTACT_SET = 0.82;
+const WORK_SHADE_ENTRY_DURATION_S = 1.05;
+const WORK_LINE_ENTRY_LEAD_S = 0.22;
+const WORK_LINE_ENTRY_DURATION_S = 1.05;
+const WORK_LINE_STAGGER_S = 0.16;
 const WORK_LINES = [
   { id: "directed", text: "I’ve directed", variant: "lead" },
   { id: "launches", text: "Launches", variant: "item" },
@@ -138,81 +139,6 @@ const WORK_LINES = [
 ] as const;
 type IntroPhase = "video" | "revealing" | "complete";
 type WorkLineVariant = (typeof WORK_LINES)[number]["variant"];
-
-function getWorkShadeCarrierWidth(viewportWidth: number, compact: boolean) {
-  const copy = viewportWidth * (compact ? WORK_SHADE_COPY_COMPACT : WORK_SHADE_COPY);
-  const edge = viewportWidth * (compact ? WORK_SHADE_EDGE_COMPACT : WORK_SHADE_EDGE);
-  return copy + edge;
-}
-
-function getWorkShadeOffset(
-  progress: number,
-  viewportWidth: number,
-  compact: boolean,
-) {
-  const carrier = getWorkShadeCarrierWidth(viewportWidth, compact);
-  const startX = -carrier;
-  const parkedX = 0;
-  const exitX = viewportWidth;
-
-  if (progress <= SCROLL_WORK_REVEAL) return startX;
-
-  if (progress < SCROLL_WORK_SHADE_SET) {
-    const t =
-      (progress - SCROLL_WORK_REVEAL) /
-      (SCROLL_WORK_SHADE_SET - SCROLL_WORK_REVEAL);
-    return startX + t * (parkedX - startX);
-  }
-
-  if (progress <= SCROLL_WORK_TEXT_HOLD_END) return parkedX;
-
-  if (progress >= SCROLL_MARQUEE_FULL) return exitX;
-
-  const t =
-    (progress - SCROLL_WORK_TEXT_HOLD_END) /
-    (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
-
-  return parkedX + t * (exitX - parkedX);
-}
-
-function getClientsOverlayOffset(progress: number, viewportWidth: number) {
-  if (progress <= SCROLL_WORK_TEXT_HOLD_END) return -viewportWidth;
-  if (progress >= SCROLL_MARQUEE_FULL) return 0;
-
-  const t =
-    (progress - SCROLL_WORK_TEXT_HOLD_END) /
-    (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
-
-  return -viewportWidth * (1 - t);
-}
-
-function getWorkLineOffset(
-  progress: number,
-  viewportWidth: number,
-  index: number,
-) {
-  const enterStart = SCROLL_WORK_REVEAL + index * SCROLL_WORK_LINE_STAGGER;
-  const enterEnd = enterStart + SCROLL_WORK_LINE_TRAVEL;
-  const offLeft = -viewportWidth * 0.55;
-
-  if (progress <= enterStart) return offLeft;
-
-  if (progress < enterEnd) {
-    const t = (progress - enterStart) / (enterEnd - enterStart);
-    const eased = 1 - (1 - t) ** 3;
-    return offLeft + eased * -offLeft;
-  }
-
-  if (progress <= SCROLL_WORK_TEXT_HOLD_END) return 0;
-
-  if (progress >= SCROLL_MARQUEE_FULL) return viewportWidth;
-
-  const t =
-    (progress - SCROLL_WORK_TEXT_HOLD_END) /
-    (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
-
-  return t * viewportWidth;
-}
 
 function workLineClassName(variant: WorkLineVariant) {
   switch (variant) {
@@ -234,40 +160,41 @@ function workLineClassName(variant: WorkLineVariant) {
 function WorkLine({
   children,
   index,
-  scrollYProgress,
+  reduceMotion,
+  sequenceStarted,
   variant,
-  viewportWidthMV,
+  workExitX,
 }: {
   children: string;
   index: number;
-  scrollYProgress: MotionValue<number>;
+  reduceMotion: boolean;
+  sequenceStarted: boolean;
   variant: WorkLineVariant;
-  viewportWidthMV: MotionValue<number>;
+  workExitX: MotionValue<string>;
 }) {
-  const x = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return 0;
-      return getWorkLineOffset(progress as number, width as number, index);
-    },
-  );
+  const entryX = sequenceStarted ? "0vw" : "-55vw";
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : sequenceStarted
+      ? {
+          delay: WORK_LINE_ENTRY_LEAD_S + index * WORK_LINE_STAGGER_S,
+          duration: WORK_LINE_ENTRY_DURATION_S,
+          ease: INTRO_SLIDE_EASE,
+        }
+      : { duration: 0 };
 
   return (
-    <motion.p className={workLineClassName(variant)} style={{ x }}>
-      {children}
+    <motion.p className={workLineClassName(variant)} style={{ x: workExitX }}>
+      <motion.span
+        animate={{ x: entryX }}
+        className={styles.workLineMotion}
+        initial={{ x: "-55vw" }}
+        transition={transition}
+      >
+        {children}
+      </motion.span>
     </motion.p>
   );
-}
-
-function getContactWipeOffset(progress: number, viewportWidth: number) {
-  if (progress <= SCROLL_MARQUEE_HOLD_END) return -viewportWidth;
-  if (progress >= SCROLL_CONTACT_SET) return 0;
-
-  const t =
-    (progress - SCROLL_MARQUEE_HOLD_END) /
-    (SCROLL_CONTACT_SET - SCROLL_MARQUEE_HOLD_END);
-
-  return -viewportWidth * (1 - t);
 }
 
 function getIntroPanelRest(compact: boolean) {
@@ -1107,6 +1034,7 @@ export default function MiizuLanding() {
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const showreelVideoRef = useRef<HTMLVideoElement>(null);
   const introSlideCompletions = useRef(0);
+  const workSequenceTriggered = useRef(false);
   const clientMarqueesRef = useRef<HTMLDivElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
   const representedByRef = useRef<HTMLSpanElement>(null);
@@ -1115,7 +1043,6 @@ export default function MiizuLanding() {
   const lastNuviaTouchAt = useRef(-Infinity);
   const nuviaTooltipX = useMotionValue(0);
   const nuviaTooltipY = useMotionValue(0);
-  const viewportWidthMV = useMotionValue(0);
   const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
     stiffness: 420,
     damping: 32,
@@ -1139,6 +1066,8 @@ export default function MiizuLanding() {
   );
   const [introSlidesDone, setIntroSlidesDone] = useState(false);
   const [introVideoEnded, setIntroVideoEnded] = useState(false);
+  const [workSequenceRun, setWorkSequenceRun] = useState(0);
+  const [workSequenceStarted, setWorkSequenceStarted] = useState(false);
 
   const introActive = introPhase !== "complete";
   const panelRest = getIntroPanelRest(compact);
@@ -1178,13 +1107,6 @@ export default function MiizuLanding() {
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
   }, []);
-
-  useLayoutEffect(() => {
-    const syncViewport = () => viewportWidthMV.set(window.innerWidth);
-    syncViewport();
-    window.addEventListener("resize", syncViewport);
-    return () => window.removeEventListener("resize", syncViewport);
-  }, [viewportWidthMV]);
 
   useEffect(() => {
     setNuviaTooltipMounted(true);
@@ -1243,7 +1165,8 @@ export default function MiizuLanding() {
   }, [introPhase]);
 
   useEffect(() => {
-    if (introPhase !== "revealing" || !introSlidesDone || !introVideoEnded) return;
+    if (introPhase !== "revealing" || !introSlidesDone || !introVideoEnded)
+      return;
     setIntroPhase("complete");
   }, [introPhase, introSlidesDone, introVideoEnded]);
 
@@ -1469,12 +1392,24 @@ export default function MiizuLanding() {
     offset: ["start start", "end end"],
   });
 
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    if (progress >= SCROLL_WORK_REVEAL && !workSequenceTriggered.current) {
+      workSequenceTriggered.current = true;
+      setWorkSequenceRun((run) => run + 1);
+      setWorkSequenceStarted(true);
+      return;
+    }
+
+    if (progress < SCROLL_WORK_RESET && workSequenceTriggered.current) {
+      workSequenceTriggered.current = false;
+      setWorkSequenceStarted(false);
+    }
+  });
+
   const panelX = useTransform(
     scrollYProgress,
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
-    compact
-      ? ["-5vw", "-5vw", "0vw", "0vw"]
-      : ["-3vw", "-3vw", "0vw", "0vw"],
+    compact ? ["-5vw", "-5vw", "0vw", "0vw"] : ["-3vw", "-3vw", "0vw", "0vw"],
   );
   const panelY = useTransform(
     scrollYProgress,
@@ -1538,31 +1473,29 @@ export default function MiizuLanding() {
   }, [introPhase]);
 
   const scrollHintOpacity = introActive ? 0 : heroOpacity;
-  const workShadeX = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return -10000;
-      return getWorkShadeOffset(progress as number, width as number, compact);
-    },
+  const workExitX = useTransform(
+    scrollYProgress,
+    [0, SCROLL_WORK_EXIT_START, SCROLL_MARQUEE_FULL, 1],
+    ["0vw", "0vw", "100vw", "100vw"],
   );
   const clientsOverlayX = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return -10000;
-      return getClientsOverlayOffset(progress as number, width as number);
-    },
-  );
-  const clientsOverlayOpacity = useTransform(
     scrollYProgress,
-    [0, SCROLL_WORK_TEXT_HOLD_END, SCROLL_WORK_TEXT_HOLD_END + 0.001],
-    [0, 0, 1],
+    [0, SCROLL_WORK_EXIT_START, SCROLL_MARQUEE_FULL, 1],
+    ["-100%", "-100%", "0%", "0%"],
   );
+  const workShadeEntryX = workSequenceStarted ? "0%" : "-100%";
+  const workShadeEntryTransition = reduceMotion
+    ? { duration: 0 }
+    : workSequenceStarted
+      ? {
+          duration: WORK_SHADE_ENTRY_DURATION_S,
+          ease: INTRO_SLIDE_EASE,
+        }
+      : { duration: 0 };
   const contactWipeX = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return -10000;
-      return getContactWipeOffset(progress as number, width as number);
-    },
+    scrollYProgress,
+    [0, SCROLL_CONTACT_START, SCROLL_CONTACT_SET, 1],
+    ["-100vw", "-100vw", "0vw", "0vw"],
   );
   const headline = CONTACT_HEADLINES[headlineIndex];
   const bookingUrl =
@@ -1575,7 +1508,7 @@ export default function MiizuLanding() {
 
     const travel = Math.max(0, scene.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: scene.offsetTop + travel * (SCROLL_PANEL_EXPANDED + 0.14),
+      top: scene.offsetTop + travel * (SCROLL_WORK_REVEAL + 0.01),
       behavior: "smooth",
     });
   };
@@ -1833,11 +1766,14 @@ export default function MiizuLanding() {
                 aria-label="Selected clients"
                 className={styles.clientsOverlay}
                 id="clients"
-                style={{ opacity: clientsOverlayOpacity, x: clientsOverlayX }}
+                style={{ x: clientsOverlayX }}
               >
                 <div className={styles.clientsRail}>
                   <span className={styles.clientsLabel}>selected clients</span>
-                  <div className={styles.clientMarquees} ref={clientMarqueesRef}>
+                  <div
+                    className={styles.clientMarquees}
+                    ref={clientMarqueesRef}
+                  >
                     {Array.from({ length: CLIENT_MARQUEE_ROWS }, (_, row) => (
                       <div
                         aria-hidden={row > 0}
@@ -1868,10 +1804,18 @@ export default function MiizuLanding() {
               <motion.div
                 aria-hidden="true"
                 className={styles.workShade}
-                style={{ x: workShadeX }}
+                style={{ x: workExitX }}
               >
-                <div className={styles.workShadeCopy} />
-                <div className={styles.workShadeEdge} />
+                <motion.div
+                  animate={{ x: workShadeEntryX }}
+                  className={styles.workShadeMotion}
+                  initial={{ x: "-100%" }}
+                  key={`shade-${workSequenceRun}`}
+                  transition={workShadeEntryTransition}
+                >
+                  <div className={styles.workShadeCopy} />
+                  <div className={styles.workShadeEdge} />
+                </motion.div>
               </motion.div>
 
               <motion.div className={styles.workContent}>
@@ -1879,10 +1823,11 @@ export default function MiizuLanding() {
                   {WORK_LINES.map((line, index) => (
                     <WorkLine
                       index={index}
-                      key={line.id}
-                      scrollYProgress={scrollYProgress}
+                      key={`${workSequenceRun}-${line.id}`}
+                      reduceMotion={Boolean(reduceMotion)}
+                      sequenceStarted={workSequenceStarted}
                       variant={line.variant}
-                      viewportWidthMV={viewportWidthMV}
+                      workExitX={workExitX}
                     >
                       {line.text}
                     </WorkLine>
@@ -1935,9 +1880,7 @@ export default function MiizuLanding() {
                       <button
                         aria-pressed={region === "international"}
                         className={
-                          region === "international"
-                            ? styles.regionActive
-                            : ""
+                          region === "international" ? styles.regionActive : ""
                         }
                         onClick={() => setRegion("international")}
                         type="button"
