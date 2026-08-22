@@ -30,7 +30,7 @@
 }
 
 .heroWorkScene {
-  height: 2800svh;
+  height: 1150svh;
   position: relative;
 }
 
@@ -204,6 +204,14 @@
   z-index: 3;
 }
 
+.workShadeMotion {
+  display: flex;
+  flex: 0 0 100%;
+  height: 100%;
+  width: 100%;
+  will-change: transform;
+}
+
 .workShadeCopy {
   background: #000;
   flex: 0 0 var(--work-shade-copy);
@@ -295,6 +303,11 @@
   margin: 0;
   white-space: nowrap;
   width: max-content;
+  will-change: transform;
+}
+
+.workLineMotion {
+  display: block;
   will-change: transform;
 }
 
@@ -547,7 +560,7 @@
 
 .formPanel {
   align-items: center;
-  background: var(--miizu-ink);
+  background: #000;
   color: var(--miizu-bg);
   display: flex;
   min-width: 0;
@@ -1103,7 +1116,7 @@
   }
 
   .heroWorkScene {
-    height: 2350svh;
+    height: 980svh;
   }
 
   .header {
@@ -1169,7 +1182,7 @@
   }
 
   .contactWipe .contactSection {
-    background: var(--miizu-ink);
+    background: #000;
     height: auto;
     isolation: isolate;
     min-height: 100%;

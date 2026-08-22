@@ -1,35 +1,45 @@
 "use client";
 
-import { useMotionValue, useScroll, useTransform } from "framer-motion";
-import { useLayoutEffect, useRef } from "react";
+import { useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
 
 import {
-  getClientsOverlayOffset,
-  getContactWipeOffset,
-  getWorkShadeOffset,
   SCROLL_CONTACT_SET,
+  SCROLL_CONTACT_START,
   SCROLL_HERO_FADE_END,
+  SCROLL_MARQUEE_FULL,
   SCROLL_PANEL_EXPANDED,
   SCROLL_PANEL_HOLD,
   SCROLL_SURFACE_INSET_MID,
-  SCROLL_WORK_TEXT_HOLD_END,
+  SCROLL_WORK_EXIT_START,
+  SCROLL_WORK_RESET,
+  SCROLL_WORK_REVEAL,
   SHOWREEL_RADIUS_REM,
 } from "./scroll-timeline";
 
 export function useHeroWorkTimeline(compact: boolean) {
   const sceneRef = useRef<HTMLDivElement>(null);
-  const viewportWidthMV = useMotionValue(0);
-
-  useLayoutEffect(() => {
-    const syncViewport = () => viewportWidthMV.set(window.innerWidth);
-    syncViewport();
-    window.addEventListener("resize", syncViewport);
-    return () => window.removeEventListener("resize", syncViewport);
-  }, [viewportWidthMV]);
+  const workSequenceTriggered = useRef(false);
+  const [workSequenceRun, setWorkSequenceRun] = useState(0);
+  const [workSequenceStarted, setWorkSequenceStarted] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: sceneRef,
     offset: ["start start", "end end"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    if (progress >= SCROLL_WORK_REVEAL && !workSequenceTriggered.current) {
+      workSequenceTriggered.current = true;
+      setWorkSequenceRun((run) => run + 1);
+      setWorkSequenceStarted(true);
+      return;
+    }
+
+    if (progress < SCROLL_WORK_RESET && workSequenceTriggered.current) {
+      workSequenceTriggered.current = false;
+      setWorkSequenceStarted(false);
+    }
   });
 
   const panelX = useTransform(
@@ -76,31 +86,20 @@ export function useHeroWorkTimeline(compact: boolean) {
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED],
     ["0%", "0%", "-100%"],
   );
-  const workShadeX = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return -10000;
-      return getWorkShadeOffset(progress as number, width as number, compact);
-    },
+  const workExitX = useTransform(
+    scrollYProgress,
+    [0, SCROLL_WORK_EXIT_START, SCROLL_MARQUEE_FULL, 1],
+    ["0vw", "0vw", "100vw", "100vw"],
   );
   const clientsOverlayX = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return -10000;
-      return getClientsOverlayOffset(progress as number, width as number);
-    },
-  );
-  const clientsOverlayOpacity = useTransform(
     scrollYProgress,
-    [0, SCROLL_WORK_TEXT_HOLD_END, SCROLL_WORK_TEXT_HOLD_END + 0.001],
-    [0, 0, 1],
+    [0, SCROLL_WORK_EXIT_START, SCROLL_MARQUEE_FULL, 1],
+    ["-100%", "-100%", "0%", "0%"],
   );
   const contactWipeX = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return -10000;
-      return getContactWipeOffset(progress as number, width as number);
-    },
+    scrollYProgress,
+    [0, SCROLL_CONTACT_START, SCROLL_CONTACT_SET, 1],
+    ["-100vw", "-100vw", "0vw", "0vw"],
   );
 
   const scrollToProgress = (progress: number) => {
@@ -115,7 +114,7 @@ export function useHeroWorkTimeline(compact: boolean) {
   };
 
   const openWork = () => {
-    scrollToProgress(SCROLL_PANEL_EXPANDED + 0.14);
+    scrollToProgress(SCROLL_WORK_REVEAL + 0.01);
   };
 
   const openContact = () => {
@@ -125,7 +124,6 @@ export function useHeroWorkTimeline(compact: boolean) {
   return {
     cardScaleX,
     cardScaleY,
-    clientsOverlayOpacity,
     clientsOverlayX,
     contactWipeX,
     heroExitY,
@@ -140,7 +138,8 @@ export function useHeroWorkTimeline(compact: boolean) {
     sceneRef,
     scrollYProgress,
     surfaceInset,
-    viewportWidthMV,
-    workShadeX,
+    workExitX,
+    workSequenceRun,
+    workSequenceStarted,
   };
 }
