@@ -1,34 +1,126 @@
 .imprintMain {
-  padding-top: 7rem;
-  padding-bottom: 3rem;
-  max-width: 48rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  --miizu-bg: #fbfbfe;
+  --miizu-ink: #050315;
+  --miizu-primary: #2117e6;
+  background: var(--miizu-bg);
+  color: var(--miizu-ink);
+  font-family:
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    var(--font-rethink-sans),
+    system-ui,
+    sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  min-height: 100svh;
 }
+
+.header {
+  align-items: center;
+  display: flex;
+  padding: clamp(0.75rem, 1.2vw, 1.25rem) clamp(1.35rem, 3vw, 3.8rem);
+}
+
+.backLink {
+  align-items: center;
+  color: var(--miizu-ink);
+  display: inline-flex;
+  font-size: clamp(0.95rem, 1.35vw, 1.55rem);
+  font-weight: 620;
+  gap: 0.35em;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backLink svg {
+  height: 1em;
+  width: 1em;
+}
+
+.backLinkText::after {
+  background: currentColor;
+  content: "";
+  display: block;
+  height: 0.1em;
+  margin-top: 0.1em;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 260ms ease;
+}
+
+.backLink:hover .backLinkText::after,
+.backLink:focus-visible .backLinkText::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.imprintMain :focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 5px;
+}
+
+.content {
+  margin: 0 auto;
+  max-width: 44rem;
+  padding: clamp(2.5rem, 7svh, 5rem) clamp(1.35rem, 3vw, 3.8rem) 6rem;
+}
+
+.notice {
+  border: 1px solid color-mix(in srgb, var(--miizu-primary) 30%, transparent);
+  border-radius: 1rem;
+  color: color-mix(in srgb, var(--miizu-ink) 75%, transparent);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.55;
+  margin: 0 0 3.5rem;
+  padding: 1.1rem 1.3rem;
+}
+
 .imprintH1 {
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 2rem;
-  color: #111;
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0 0 2.2rem;
 }
+
 .imprintH2 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  margin-top: 2.5rem;
-  margin-bottom: 1.2rem;
-  color: #111;
+  margin: 0 0 0.6rem;
 }
+
+.imprintSection {
+  margin-bottom: 2.4rem;
+}
+
+.imprintSection p,
+.imprintAddress {
+  color: color-mix(in srgb, var(--miizu-ink) 78%, transparent);
+  font-weight: 500;
+  line-height: 1.65;
+  margin: 0 0 0.9em;
+}
+
 .imprintAddress {
   font-style: normal;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
 }
-.imprintSection {
-  margin-bottom: 2.5rem;
-}
+
 .imprintItalic {
   font-style: italic;
-  margin-bottom: 1rem;
+}
+
+.imprintSection a,
+.notice a {
+  border-bottom: 1px solid currentColor;
+  color: var(--miizu-primary);
+  text-decoration: none;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--miizu-ink) 12%, transparent);
+  margin: 3.5rem 0;
 }

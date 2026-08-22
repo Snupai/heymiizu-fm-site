@@ -1,9 +1,14 @@
 "use client";
 
-import { motion, useTransform, type MotionValue } from "framer-motion";
+import { motion, type MotionValue } from "framer-motion";
 
 import { WORK_LINES, type WorkLineVariant } from "./content";
-import { getWorkLineOffset } from "./scroll-timeline";
+import {
+  INTRO_SLIDE_EASE,
+  WORK_LINE_ENTRY_DURATION_S,
+  WORK_LINE_ENTRY_LEAD_S,
+  WORK_LINE_STAGGER_S,
+} from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
 
 function workLineClassName(variant: WorkLineVariant) {
@@ -26,37 +31,53 @@ function workLineClassName(variant: WorkLineVariant) {
 function WorkLine({
   children,
   index,
-  scrollYProgress,
+  reduceMotion,
+  sequenceStarted,
   variant,
-  viewportWidthMV,
+  workExitX,
 }: {
   children: string;
   index: number;
-  scrollYProgress: MotionValue<number>;
+  reduceMotion: boolean;
+  sequenceStarted: boolean;
   variant: WorkLineVariant;
-  viewportWidthMV: MotionValue<number>;
+  workExitX: MotionValue<string>;
 }) {
-  const x = useTransform(
-    [scrollYProgress, viewportWidthMV],
-    ([progress, width]) => {
-      if (!width) return 0;
-      return getWorkLineOffset(progress as number, width as number, index);
-    },
-  );
+  const entryX = sequenceStarted ? "0vw" : "-55vw";
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : sequenceStarted
+      ? {
+          delay: WORK_LINE_ENTRY_LEAD_S + index * WORK_LINE_STAGGER_S,
+          duration: WORK_LINE_ENTRY_DURATION_S,
+          ease: INTRO_SLIDE_EASE,
+        }
+      : { duration: 0 };
 
   return (
-    <motion.p className={workLineClassName(variant)} style={{ x }}>
-      {children}
+    <motion.p className={workLineClassName(variant)} style={{ x: workExitX }}>
+      <motion.span
+        animate={{ x: entryX }}
+        className={styles.workLineMotion}
+        initial={{ x: "-55vw" }}
+        transition={transition}
+      >
+        {children}
+      </motion.span>
     </motion.p>
   );
 }
 
 export function WorkLines({
-  scrollYProgress,
-  viewportWidthMV,
+  reduceMotion,
+  sequenceRun,
+  sequenceStarted,
+  workExitX,
 }: {
-  scrollYProgress: MotionValue<number>;
-  viewportWidthMV: MotionValue<number>;
+  reduceMotion: boolean;
+  sequenceRun: number;
+  sequenceStarted: boolean;
+  workExitX: MotionValue<string>;
 }) {
   return (
     <motion.div className={styles.workContent}>
@@ -64,10 +85,11 @@ export function WorkLines({
         {WORK_LINES.map((line, index) => (
           <WorkLine
             index={index}
-            key={line.id}
-            scrollYProgress={scrollYProgress}
+            key={`${sequenceRun}-${line.id}`}
+            reduceMotion={reduceMotion}
+            sequenceStarted={sequenceStarted}
             variant={line.variant}
-            viewportWidthMV={viewportWidthMV}
+            workExitX={workExitX}
           >
             {line.text}
           </WorkLine>

@@ -15,9 +15,10 @@ const Toaster = dynamic(() =>
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const usesEditorialShell = pathname === "/";
+  // Landing and imprint render their own minimal chrome.
+  const usesBareShell = pathname === "/" || pathname === "/imprint";
 
-  if (usesEditorialShell) return <>{children}</>;
+  if (usesBareShell) return <>{children}</>;
 
   return (
     <>

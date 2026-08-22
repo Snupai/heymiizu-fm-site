@@ -14,7 +14,7 @@ export function ContactSection({
   wipeX,
 }: {
   compact: boolean;
-  wipeX: MotionValue<number>;
+  wipeX: MotionValue<string>;
 }) {
   const [region, setRegion] = useState<ContactRegion>("international");
   const [headlineIndex, setHeadlineIndex] = useState(0);

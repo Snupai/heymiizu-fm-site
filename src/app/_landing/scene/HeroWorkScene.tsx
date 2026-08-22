@@ -11,6 +11,7 @@ import {
   INTRO_CARD_SLIDE_EASE,
   INTRO_HEADER_SLIDE_DURATION_S,
   INTRO_SLIDE_EASE,
+  WORK_SHADE_ENTRY_DURATION_S,
 } from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
 import { ClientsMarquee } from "./ClientsMarquee";
@@ -59,7 +60,6 @@ export function HeroWorkScene() {
     cardScaleY,
     clientsContactFadeOpacity,
     clientsContactFadeScaleX,
-    clientsOverlayOpacity,
     clientsOverlayX,
     contactWipeX,
     heroExitY,
@@ -72,11 +72,11 @@ export function HeroWorkScene() {
     panelX,
     panelY,
     sceneRef,
-    scrollYProgress,
     surfaceInset,
-    viewportWidthMV,
+    workExitX,
+    workSequenceRun,
+    workSequenceStarted,
     workShadeOpacity,
-    workShadeX,
   } = useHeroWorkTimeline(compact);
 
   const panelRest = getIntroPanelRest(compact);
@@ -93,6 +93,15 @@ export function HeroWorkScene() {
     scaleY: panelRest.scaleY,
   };
   const scrollHintOpacity = introActive ? 0 : heroOpacity;
+  const workShadeEntryX = workSequenceStarted ? "0%" : "-100%";
+  const workShadeEntryTransition = reduceMotion
+    ? { duration: 0 }
+    : workSequenceStarted
+      ? {
+          duration: WORK_SHADE_ENTRY_DURATION_S,
+          ease: INTRO_SLIDE_EASE,
+        }
+      : { duration: 0 };
 
   return (
     <div className={styles.heroWorkScene} id="hero" ref={sceneRef}>
@@ -218,24 +227,30 @@ export function HeroWorkScene() {
               </video>
             </motion.div>
 
-            <ClientsMarquee
-              opacity={clientsOverlayOpacity}
-              reduceMotion={reduceMotion}
-              x={clientsOverlayX}
-            />
+            <ClientsMarquee reduceMotion={reduceMotion} x={clientsOverlayX} />
 
             <motion.div
               aria-hidden="true"
               className={styles.workShade}
-              style={{ opacity: workShadeOpacity, x: workShadeX }}
+              style={{ opacity: workShadeOpacity, x: workExitX }}
             >
-              <div className={styles.workShadeCopy} />
-              <div className={styles.workShadeEdge} />
+              <motion.div
+                animate={{ x: workShadeEntryX }}
+                className={styles.workShadeMotion}
+                initial={{ x: "-100%" }}
+                key={`shade-${workSequenceRun}`}
+                transition={workShadeEntryTransition}
+              >
+                <div className={styles.workShadeCopy} />
+                <div className={styles.workShadeEdge} />
+              </motion.div>
             </motion.div>
 
             <WorkLines
-              scrollYProgress={scrollYProgress}
-              viewportWidthMV={viewportWidthMV}
+              reduceMotion={Boolean(reduceMotion)}
+              sequenceRun={workSequenceRun}
+              sequenceStarted={workSequenceStarted}
+              workExitX={workExitX}
             />
           </motion.div>
         </motion.section>
