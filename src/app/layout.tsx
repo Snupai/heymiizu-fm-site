@@ -1,6 +1,5 @@
 import { Rethink_Sans } from "next/font/google";
 import "../styles/globals.css";
-import "../styles/special-gradient-outline.css";
 import type { Metadata } from "next";
 import React from "react";
 import Script from "next/script";

@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import React from "react";
 import styles from "./imprint.module.css";
 
 export default function ImprintPage() {
   return (
     <main className={styles.imprintMain}>
-      {/* Disclaimer: The person and contact details listed below are NOT Miizu, but only the website administrator. To contact Miizu directly, please use the /contact page. */}
+      {/* Disclaimer: The person and contact details listed below are NOT Miizu, but only the website administrator. To contact Miizu directly, please use the homepage contact form. */}
       <div
         style={{
           border: "2px solid #ff9800",
@@ -21,13 +22,14 @@ export default function ImprintPage() {
         <p>
           Disclaimer: The person and contact details below are <u>not</u> Miizu,
           but only the website administrator. To contact Miizu directly, please
-          use the <a href="/contact">/contact</a> page.
+          use the <Link href="/#contact">contact form</Link> on the homepage.
         </p>
         <p style={{ marginTop: "0.5em" }}>
           Hinweis: Die unten aufgeführte Person und die Kontaktdaten sind{" "}
           <u>nicht</u> Miizu, sondern ausschließlich der Webseiten-Verwalter /
-          Administrator. Miizu selbst kann ausschließlich über die{" "}
-          <a href="/contact">/contact</a>-Seite kontaktiert werden.
+          Administrator. Miizu selbst kann ausschließlich über das{" "}
+          <Link href="/#contact">Kontaktformular</Link> auf der Startseite
+          kontaktiert werden.
         </p>
       </div>
       {/* ENGLISH VERSION */}

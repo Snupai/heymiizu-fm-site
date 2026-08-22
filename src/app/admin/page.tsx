@@ -92,10 +92,10 @@ const AdminPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push("/projects")}
+            onClick={() => router.push("/")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Gallery
+            Back to Home
           </Button>
           <h1 className="text-2xl font-bold">
             <span className="text-gradient">Admin Dashboard</span>

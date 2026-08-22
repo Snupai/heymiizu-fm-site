@@ -68,14 +68,14 @@ function NavbarContent() {
               Home
             </Link>
             <Link
-              href="/projects"
+              href="/#work"
               className="block w-full py-2 text-center text-lg"
               onClick={() => setMenuOpen(false)}
             >
-              Projects
+              Work
             </Link>
             <Link
-              href="/contact"
+              href="/#contact"
               className="block w-full py-2 text-center text-lg"
               onClick={() => setMenuOpen(false)}
             >
@@ -238,14 +238,12 @@ function NavbarContent() {
                   className="group relative"
                 >
                   <Link
-                    href="/projects"
+                    href="/#work"
                     className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/projects")}
+                    onClick={(e) => handleLinkClick(e, "/#work")}
                   >
-                    <span
-                      className={`relative z-10 transition-colors duration-200 ${pathname === "/projects" ? "text-brand" : ""}`}
-                    >
-                      Projects
+                    <span className="relative z-10 transition-colors duration-200">
+                      Work
                       <motion.span
                         className="absolute bottom-0 left-0 block h-[2px] bg-brand"
                         style={{ width: "100%" }}
@@ -265,13 +263,11 @@ function NavbarContent() {
                   className="group relative"
                 >
                   <Link
-                    href="/contact"
+                    href="/#contact"
                     className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/contact")}
+                    onClick={(e) => handleLinkClick(e, "/#contact")}
                   >
-                    <span
-                      className={`relative z-10 transition-colors duration-200 ${pathname === "/contact" ? "text-brand" : ""}`}
-                    >
+                    <span className="relative z-10 transition-colors duration-200">
                       Contact Me
                       <motion.span
                         className="absolute bottom-0 left-0 block h-[2px] bg-brand"
