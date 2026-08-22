@@ -64,7 +64,7 @@ export function HeroWorkScene({
   }, []);
 
   const {
-    handleIntroSlideComplete,
+    handleIntroCardSlideComplete,
     handleIntroVideoEnded,
     introActive,
     introPhase,
@@ -210,7 +210,6 @@ export function HeroWorkScene({
           }
           className={styles.header}
           initial={introPhase === "complete" ? false : { y: "-120%" }}
-          onAnimationComplete={handleIntroSlideComplete}
           style={
             introPhase === "complete"
               ? { opacity: heroOpacity, y: heroExitY }
@@ -255,7 +254,7 @@ export function HeroWorkScene({
           className={styles.showreelPanel}
           id="work"
           initial={introActive ? introPanelOffscreen : false}
-          onAnimationComplete={handleIntroSlideComplete}
+          onAnimationComplete={handleIntroCardSlideComplete}
           style={
             introActive
               ? undefined

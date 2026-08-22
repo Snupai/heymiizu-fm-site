@@ -3,6 +3,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
+  INTRO_CARD_SLIDE_DURATION_S,
+  INTRO_CARD_UNLOCK_LEAD_MS,
   INTRO_REVEAL_DELAY_MS,
   INTRO_SCROLL_UNLOCK_LEAD_MS,
 } from "./scroll-timeline";
@@ -12,11 +14,10 @@ export type IntroPhase = "video" | "revealing" | "complete";
 export function useIntroSequence(reduceMotion: boolean | null) {
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const showreelVideoRef = useRef<HTMLVideoElement>(null);
-  const introSlideCompletions = useRef(0);
   const [introPhase, setIntroPhase] = useState<IntroPhase>(
     reduceMotion ? "complete" : "video",
   );
-  const [introSlidesDone, setIntroSlidesDone] = useState(false);
+  const [introCardIn, setIntroCardIn] = useState(false);
   const [introCanComplete, setIntroCanComplete] = useState(false);
 
   const introActive = introPhase !== "complete";
@@ -59,15 +60,23 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   useEffect(() => {
     if (introPhase !== "revealing") return;
 
-    introSlideCompletions.current = 0;
-    setIntroSlidesDone(false);
+    setIntroCardIn(false);
+
+    const timer = window.setTimeout(
+      () => setIntroCardIn(true),
+      Math.max(
+        0,
+        INTRO_CARD_SLIDE_DURATION_S * 1_000 - INTRO_CARD_UNLOCK_LEAD_MS,
+      ),
+    );
+
+    return () => window.clearTimeout(timer);
   }, [introPhase]);
 
   useEffect(() => {
-    if (introPhase !== "revealing" || !introSlidesDone || !introCanComplete)
-      return;
+    if (introPhase !== "revealing" || !introCardIn || !introCanComplete) return;
     setIntroPhase("complete");
-  }, [introPhase, introSlidesDone, introCanComplete]);
+  }, [introPhase, introCardIn, introCanComplete]);
 
   useEffect(() => {
     if (introPhase === "complete" || reduceMotion) return;
@@ -167,13 +176,9 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     };
   }, [introPhase, reduceMotion]);
 
-  const handleIntroSlideComplete = () => {
+  const handleIntroCardSlideComplete = () => {
     if (introPhase !== "revealing") return;
-
-    introSlideCompletions.current += 1;
-    if (introSlideCompletions.current >= 2) {
-      setIntroSlidesDone(true);
-    }
+    setIntroCardIn(true);
   };
 
   const handleIntroVideoEnded = () => {
@@ -189,7 +194,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   };
 
   return {
-    handleIntroSlideComplete,
+    handleIntroCardSlideComplete,
     handleIntroVideoEnded,
     introActive,
     introPhase,
