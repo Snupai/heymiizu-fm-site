@@ -4,9 +4,12 @@ import { useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useLayoutEffect, useRef } from "react";
 
 import {
+  getClientsContactFadeOpacity,
+  getClientsContactFadeScaleX,
   getClientsOverlayOffset,
   getContactWipeOffset,
   getWorkShadeOffset,
+  getWorkShadeOpacity,
   SCROLL_CONTACT_SET,
   SCROLL_HERO_FADE_END,
   SCROLL_PANEL_EXPANDED,
@@ -83,6 +86,7 @@ export function useHeroWorkTimeline(compact: boolean) {
       return getWorkShadeOffset(progress as number, width as number, compact);
     },
   );
+  const workShadeOpacity = useTransform(scrollYProgress, getWorkShadeOpacity);
   const clientsOverlayX = useTransform(
     [scrollYProgress, viewportWidthMV],
     ([progress, width]) => {
@@ -101,6 +105,14 @@ export function useHeroWorkTimeline(compact: boolean) {
       if (!width) return -10000;
       return getContactWipeOffset(progress as number, width as number);
     },
+  );
+  const clientsContactFadeOpacity = useTransform(
+    scrollYProgress,
+    getClientsContactFadeOpacity,
+  );
+  const clientsContactFadeScaleX = useTransform(
+    scrollYProgress,
+    getClientsContactFadeScaleX,
   );
 
   const scrollToProgress = (progress: number) => {
@@ -125,6 +137,8 @@ export function useHeroWorkTimeline(compact: boolean) {
   return {
     cardScaleX,
     cardScaleY,
+    clientsContactFadeOpacity,
+    clientsContactFadeScaleX,
     clientsOverlayOpacity,
     clientsOverlayX,
     contactWipeX,
@@ -141,6 +155,7 @@ export function useHeroWorkTimeline(compact: boolean) {
     scrollYProgress,
     surfaceInset,
     viewportWidthMV,
+    workShadeOpacity,
     workShadeX,
   };
 }

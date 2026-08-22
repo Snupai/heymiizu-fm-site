@@ -18,12 +18,19 @@ export const SCROLL_WORK_TEXT_HOLD_END = 0.63;
 const SCROLL_WORK_LINE_STAGGER = 0.015;
 const SCROLL_WORK_LINE_TRAVEL = 0.048;
 const SCROLL_MARQUEE_FULL = 0.83;
+const SCROLL_MARQUEE_SHADE_FADE_START = 0.78;
+const SCROLL_CLIENTS_LEFT_FADE_START = 0.79;
 const SCROLL_MARQUEE_HOLD_END = 0.88;
+const CLIENTS_LEFT_FADE_REST_SCALE = 0.35;
 export const SCROLL_CONTACT_SET = 0.96;
 const WORK_SHADE_COPY = 0.34;
 const WORK_SHADE_EDGE = 0.3;
 const WORK_SHADE_COPY_COMPACT = 0.58;
 const WORK_SHADE_EDGE_COMPACT = 0.28;
+
+function easeInOutSine(t: number) {
+  return -(Math.cos(Math.PI * t) - 1) / 2;
+}
 
 function getWorkShadeCarrierWidth(viewportWidth: number, compact: boolean) {
   const copy =
@@ -60,7 +67,45 @@ export function getWorkShadeOffset(
     (progress - SCROLL_WORK_TEXT_HOLD_END) /
     (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
 
-  return parkedX + t * (exitX - parkedX);
+  return parkedX + easeInOutSine(t) * (exitX - parkedX);
+}
+
+export function getWorkShadeOpacity(progress: number) {
+  if (progress <= SCROLL_MARQUEE_SHADE_FADE_START) return 1;
+  if (progress >= SCROLL_MARQUEE_FULL) return 0;
+
+  const t =
+    (progress - SCROLL_MARQUEE_SHADE_FADE_START) /
+    (SCROLL_MARQUEE_FULL - SCROLL_MARQUEE_SHADE_FADE_START);
+
+  return 1 - easeInOutSine(t);
+}
+
+export function getClientsContactFadeOpacity(progress: number) {
+  if (progress <= SCROLL_CLIENTS_LEFT_FADE_START) return 0;
+  if (progress >= SCROLL_MARQUEE_FULL) return 1;
+
+  const t =
+    (progress - SCROLL_CLIENTS_LEFT_FADE_START) /
+    (SCROLL_MARQUEE_FULL - SCROLL_CLIENTS_LEFT_FADE_START);
+
+  return easeInOutSine(t);
+}
+
+export function getClientsContactFadeScaleX(progress: number) {
+  if (progress <= SCROLL_MARQUEE_HOLD_END) {
+    return CLIENTS_LEFT_FADE_REST_SCALE;
+  }
+  if (progress >= SCROLL_CONTACT_SET) return 1;
+
+  const t =
+    (progress - SCROLL_MARQUEE_HOLD_END) /
+    (SCROLL_CONTACT_SET - SCROLL_MARQUEE_HOLD_END);
+
+  return (
+    CLIENTS_LEFT_FADE_REST_SCALE +
+    easeInOutSine(t) * (1 - CLIENTS_LEFT_FADE_REST_SCALE)
+  );
 }
 
 export function getClientsOverlayOffset(
@@ -74,7 +119,7 @@ export function getClientsOverlayOffset(
     (progress - SCROLL_WORK_TEXT_HOLD_END) /
     (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
 
-  return -viewportWidth * (1 - t);
+  return -viewportWidth * (1 - easeInOutSine(t));
 }
 
 export function getWorkLineOffset(
@@ -102,7 +147,7 @@ export function getWorkLineOffset(
     (progress - SCROLL_WORK_TEXT_HOLD_END) /
     (SCROLL_MARQUEE_FULL - SCROLL_WORK_TEXT_HOLD_END);
 
-  return t * viewportWidth;
+  return easeInOutSine(t) * viewportWidth;
 }
 
 export function getContactWipeOffset(progress: number, viewportWidth: number) {

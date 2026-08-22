@@ -57,6 +57,8 @@ export function HeroWorkScene() {
   const {
     cardScaleX,
     cardScaleY,
+    clientsContactFadeOpacity,
+    clientsContactFadeScaleX,
     clientsOverlayOpacity,
     clientsOverlayX,
     contactWipeX,
@@ -73,6 +75,7 @@ export function HeroWorkScene() {
     scrollYProgress,
     surfaceInset,
     viewportWidthMV,
+    workShadeOpacity,
     workShadeX,
   } = useHeroWorkTimeline(compact);
 
@@ -224,7 +227,7 @@ export function HeroWorkScene() {
             <motion.div
               aria-hidden="true"
               className={styles.workShade}
-              style={{ x: workShadeX }}
+              style={{ opacity: workShadeOpacity, x: workShadeX }}
             >
               <div className={styles.workShadeCopy} />
               <div className={styles.workShadeEdge} />
@@ -236,6 +239,20 @@ export function HeroWorkScene() {
             />
           </motion.div>
         </motion.section>
+
+        <motion.div
+          aria-hidden="true"
+          className={styles.marqueeContactFadeCarrier}
+          style={{ x: contactWipeX }}
+        >
+          <motion.div
+            className={styles.marqueeContactFade}
+            style={{
+              opacity: clientsContactFadeOpacity,
+              scaleX: clientsContactFadeScaleX,
+            }}
+          />
+        </motion.div>
 
         <ContactSection compact={compact} wipeX={contactWipeX} />
       </div>
