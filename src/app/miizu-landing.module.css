@@ -390,11 +390,13 @@
 }
 
 .clientsLabel {
-  align-self: flex-start;
+  align-self: center;
   font-size: clamp(0.8rem, 1vw, 1rem);
   font-weight: 650;
   letter-spacing: 0.08em;
-  padding-left: clamp(1.3rem, 3vw, 3.8rem);
+  /* Remove left padding, use centered text instead */
+  padding-left: 0;
+  text-align: center;
   text-transform: uppercase;
 }
 

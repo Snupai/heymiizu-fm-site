@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { INTRO_REVEAL_DELAY_MS } from "./scroll-timeline";
+import {
+  INTRO_REVEAL_DELAY_MS,
+  INTRO_SCROLL_UNLOCK_LEAD_MS,
+} from "./scroll-timeline";
 
 export type IntroPhase = "video" | "revealing" | "complete";
 
@@ -14,7 +17,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     reduceMotion ? "complete" : "video",
   );
   const [introSlidesDone, setIntroSlidesDone] = useState(false);
-  const [introVideoEnded, setIntroVideoEnded] = useState(false);
+  const [introCanComplete, setIntroCanComplete] = useState(false);
 
   const introActive = introPhase !== "complete";
 
@@ -61,10 +64,10 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [introPhase]);
 
   useEffect(() => {
-    if (introPhase !== "revealing" || !introSlidesDone || !introVideoEnded)
+    if (introPhase !== "revealing" || !introSlidesDone || !introCanComplete)
       return;
     setIntroPhase("complete");
-  }, [introPhase, introSlidesDone, introVideoEnded]);
+  }, [introPhase, introSlidesDone, introCanComplete]);
 
   useEffect(() => {
     if (introPhase === "complete" || reduceMotion) return;
@@ -137,26 +140,36 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [introPhase]);
 
   useEffect(() => {
-    if (introPhase !== "complete") return;
+    if (introPhase === "complete" || reduceMotion) return;
 
     const video = introVideoRef.current;
     if (!video) return;
 
-    const freezeLastFrame = () => {
-      if (Number.isFinite(video.duration) && video.duration > 0) {
-        video.currentTime = Math.max(0, video.duration - 0.04);
-      }
-      video.pause();
+    let timer: number | undefined;
+
+    const markReady = () => setIntroCanComplete(true);
+    const scheduleUnlock = () => {
+      if (timer !== undefined) return;
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+
+      const remainingMs =
+        (video.duration - video.currentTime) * 1000 -
+        INTRO_SCROLL_UNLOCK_LEAD_MS;
+      timer = window.setTimeout(markReady, Math.max(0, remainingMs));
     };
 
-    if (video.readyState >= 1) {
-      freezeLastFrame();
-      return;
-    }
+    if (video.readyState >= 1) scheduleUnlock();
+    video.addEventListener("loadedmetadata", scheduleUnlock);
+    video.addEventListener("playing", scheduleUnlock);
+    video.addEventListener("ended", markReady);
 
-    video.addEventListener("loadedmetadata", freezeLastFrame, { once: true });
-    return () => video.removeEventListener("loadedmetadata", freezeLastFrame);
-  }, [introPhase]);
+    return () => {
+      video.removeEventListener("loadedmetadata", scheduleUnlock);
+      video.removeEventListener("playing", scheduleUnlock);
+      video.removeEventListener("ended", markReady);
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, [introPhase, reduceMotion]);
 
   const handleIntroSlideComplete = () => {
     if (introPhase !== "revealing") return;
@@ -168,8 +181,15 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   };
 
   const handleIntroVideoEnded = () => {
-    setIntroVideoEnded(true);
-    introVideoRef.current?.pause();
+    setIntroCanComplete(true);
+
+    const video = introVideoRef.current;
+    if (!video) return;
+
+    if (Number.isFinite(video.duration) && video.duration > 0) {
+      video.currentTime = Math.max(0, video.duration - 0.04);
+    }
+    video.pause();
   };
 
   return {
