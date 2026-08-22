@@ -6,6 +6,7 @@ import {
   SCROLL_MAX_SPEED_VH_PER_S,
   SCROLL_PAUSE_RELEASE,
   SCROLL_PAUSE_STOPS,
+  SCROLL_SMOOTH_ACCEL_S,
   SCROLL_SMOOTH_BRAKE_S,
   SCROLL_SMOOTH_COAST_S,
   SCROLL_SMOOTH_FOLLOW_S,
@@ -94,6 +95,7 @@ export function useSmoothScroll(
 
     let current = window.scrollY;
     let velocity = 0;
+    let intent = 0;
     let lastWheelAt = 0;
     let lastFrameAt = 0;
     let lastProgress = sceneRef.current
@@ -108,7 +110,10 @@ export function useSmoothScroll(
     };
 
     const tick = (now: number) => {
-      const dt = Math.min(0.048, (now - lastFrameAt) / 1000 || 1 / 60);
+      const dt =
+        lastFrameAt === 0
+          ? 1 / 60
+          : Math.min(0.048, (now - lastFrameAt) / 1000);
       lastFrameAt = now;
 
       const maxY = maxScrollY();
@@ -117,6 +122,7 @@ export function useSmoothScroll(
 
       if (holding) {
         velocity = 0;
+        intent = 0;
         apply(current);
         frame = window.requestAnimationFrame(tick);
         return;
@@ -126,11 +132,20 @@ export function useSmoothScroll(
       const idle = now - lastWheelAt > 90;
 
       if (idle) {
+        intent = 0;
         const fast = clamp(Math.abs(velocity) / (maxSpeed * 0.22), 0, 1);
         const tau =
           SCROLL_SMOOTH_COAST_S * (1 - fast) + SCROLL_SMOOTH_BRAKE_S * fast;
         velocity *= Math.exp(-dt / tau);
         if (Math.abs(velocity) < 22) velocity = 0;
+      } else {
+        const fromRest = Math.abs(velocity) < maxSpeed * 0.22;
+        const catchingUp = Math.abs(intent) > Math.abs(velocity);
+        const tau =
+          fromRest && catchingUp
+            ? SCROLL_SMOOTH_ACCEL_S
+            : SCROLL_SMOOTH_FOLLOW_S;
+        velocity += (intent - velocity) * (1 - Math.exp(-dt / tau));
       }
 
       velocity = clamp(velocity, -maxSpeed, maxSpeed);
@@ -197,9 +212,7 @@ export function useSmoothScroll(
       lastWheelAt = now;
 
       const maxSpeed = SCROLL_MAX_SPEED_VH_PER_S * window.innerHeight;
-      const impulse = clamp(dy / eventDt, -maxSpeed, maxSpeed);
-      const follow = 1 - Math.exp(-eventDt / SCROLL_SMOOTH_FOLLOW_S);
-      velocity += (impulse - velocity) * Math.min(1, follow + 0.22);
+      intent = clamp(dy / eventDt, -maxSpeed, maxSpeed);
 
       start();
     };
@@ -208,6 +221,7 @@ export function useSmoothScroll(
       if (frame) return;
       current = window.scrollY;
       velocity = 0;
+      intent = 0;
       if (sceneRef.current) {
         lastProgress = sceneProgress(sceneRef.current, current);
       }

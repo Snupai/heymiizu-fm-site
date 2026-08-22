@@ -35,7 +35,8 @@ export const SCROLL_PAUSE_STOPS = [
 ] as const;
 export const SCROLL_PAUSE_RELEASE = 0.016;
 
-export const SCROLL_SMOOTH_FOLLOW_S = 0.15;
+export const SCROLL_SMOOTH_ACCEL_S = 0.1;
+export const SCROLL_SMOOTH_FOLLOW_S = 0.06;
 export const SCROLL_SMOOTH_BRAKE_S = 0.24;
 export const SCROLL_SMOOTH_COAST_S = 0.46;
 export const SCROLL_MAX_SPEED_VH_PER_S = 5;
