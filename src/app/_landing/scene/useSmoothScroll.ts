@@ -4,9 +4,8 @@ import { useEffect, type RefObject } from "react";
 
 import {
   SCROLL_MAX_SPEED_VH_PER_S,
-  SCROLL_PAUSE_MS,
-  SCROLL_PAUSE_POINTS,
   SCROLL_PAUSE_RELEASE,
+  SCROLL_PAUSE_STOPS,
   SCROLL_SMOOTH_BRAKE_S,
   SCROLL_SMOOTH_COAST_S,
   SCROLL_SMOOTH_FOLLOW_S,
@@ -44,12 +43,12 @@ function sceneScrollY(scene: HTMLElement, progress: number) {
   return scene.offsetTop + sceneTravel(scene) * progress;
 }
 
-function crossedPausePoint(from: number, to: number, consumed: Set<number>) {
+function crossedPauseStop(from: number, to: number, consumed: Set<number>) {
   if (to <= from) return null;
 
-  for (const point of SCROLL_PAUSE_POINTS) {
-    if (consumed.has(point)) continue;
-    if (from < point && point <= to) return point;
+  for (const stop of SCROLL_PAUSE_STOPS) {
+    if (consumed.has(stop.at)) continue;
+    if (from < stop.at && stop.at <= to) return stop;
   }
 
   return null;
@@ -140,19 +139,19 @@ export function useSmoothScroll(
       if (scene) {
         const progress = sceneProgress(scene, current);
 
-        for (const point of SCROLL_PAUSE_POINTS) {
-          if (Math.abs(progress - point) > SCROLL_PAUSE_RELEASE) {
-            consumed.delete(point);
+        for (const stop of SCROLL_PAUSE_STOPS) {
+          if (Math.abs(progress - stop.at) > SCROLL_PAUSE_RELEASE) {
+            consumed.delete(stop.at);
           }
         }
 
-        const pauseAt = crossedPausePoint(lastProgress, progress, consumed);
+        const pauseAt = crossedPauseStop(lastProgress, progress, consumed);
         if (pauseAt !== null) {
-          current = clamp(sceneScrollY(scene, pauseAt), 0, maxY);
+          current = clamp(sceneScrollY(scene, pauseAt.at), 0, maxY);
           velocity = 0;
-          pauseUntil = now + SCROLL_PAUSE_MS;
-          consumed.add(pauseAt);
-          lastProgress = pauseAt;
+          pauseUntil = now + pauseAt.holdMs;
+          consumed.add(pauseAt.at);
+          lastProgress = pauseAt.at;
           apply(current);
           frame = window.requestAnimationFrame(tick);
           return;
