@@ -21,9 +21,9 @@ export const SCROLL_MARQUEE_FULL = 0.44;
 export const SCROLL_CONTACT_START = 0.52;
 export const SCROLL_CONTACT_SET = 0.75;
 
-export const SCROLL_SMOOTH_FOLLOW_S = 0.12;
-export const SCROLL_SMOOTH_BRAKE_S = 0.37;
-export const SCROLL_SMOOTH_COAST_S = 0.67;
+export const SCROLL_SMOOTH_FOLLOW_S = 0.15;
+export const SCROLL_SMOOTH_BRAKE_S = 0.24;
+export const SCROLL_SMOOTH_COAST_S = 0.46;
 export const SCROLL_MAX_SPEED_VH_PER_S = 42;
 
 export const WORK_SHADE_ENTRY_DURATION_S = 1.05;
@@ -32,8 +32,6 @@ export const WORK_LINE_ENTRY_DURATION_S = 1.05;
 export const WORK_LINE_STAGGER_S = 0.16;
 
 const MARQUEE_HANDOFF_RANGE = SCROLL_MARQUEE_FULL - SCROLL_WORK_EXIT_START;
-const SCROLL_MARQUEE_SHADE_FADE_START =
-  SCROLL_WORK_EXIT_START + MARQUEE_HANDOFF_RANGE * 0.75;
 const SCROLL_CLIENTS_CONTACT_FADE_START =
   SCROLL_WORK_EXIT_START + MARQUEE_HANDOFF_RANGE * 0.8;
 const CLIENTS_CONTACT_FADE_REST_SCALE = 0.35;
@@ -51,17 +49,6 @@ export function getMarqueeHandoffProgress(progress: number) {
     (SCROLL_MARQUEE_FULL - SCROLL_WORK_EXIT_START);
 
   return easeInOutSine(t);
-}
-
-export function getWorkShadeOpacity(progress: number) {
-  if (progress <= SCROLL_MARQUEE_SHADE_FADE_START) return 1;
-  if (progress >= SCROLL_MARQUEE_FULL) return 0;
-
-  const t =
-    (progress - SCROLL_MARQUEE_SHADE_FADE_START) /
-    (SCROLL_MARQUEE_FULL - SCROLL_MARQUEE_SHADE_FADE_START);
-
-  return 1 - easeInOutSine(t);
 }
 
 export function getClientsContactFadeOpacity(progress: number) {

@@ -209,7 +209,7 @@
   pointer-events: none;
   position: absolute;
   width: calc(var(--work-shade-copy) + var(--work-shade-edge));
-  will-change: opacity, transform;
+  will-change: transform;
   z-index: 3;
 }
 

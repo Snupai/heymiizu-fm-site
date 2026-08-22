@@ -91,7 +91,6 @@ export function HeroWorkScene({
     workExitX,
     workSequenceRun,
     workSequenceStarted,
-    workShadeOpacity,
   } = useHeroWorkTimeline(compact);
 
   const panelRest = getIntroPanelRest(compact);
@@ -278,7 +277,7 @@ export function HeroWorkScene({
             <motion.div
               aria-hidden="true"
               className={styles.workShade}
-              style={{ opacity: workShadeOpacity, x: workExitX }}
+              style={{ x: workExitX }}
             >
               <motion.div
                 className={styles.workShadeMotion}

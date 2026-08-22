@@ -86,7 +86,7 @@ export function useSmoothScroll(enabled: boolean) {
         const tau =
           SCROLL_SMOOTH_COAST_S * (1 - fast) + SCROLL_SMOOTH_BRAKE_S * fast;
         velocity *= Math.exp(-dt / tau);
-        if (Math.abs(velocity) < 15) velocity = 0;
+        if (Math.abs(velocity) < 22) velocity = 0;
       }
 
       velocity = clamp(velocity, -maxSpeed, maxSpeed);

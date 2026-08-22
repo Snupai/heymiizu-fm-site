@@ -7,7 +7,6 @@ import {
   getClientsContactFadeOpacity,
   getClientsContactFadeScaleX,
   getMarqueeHandoffProgress,
-  getWorkShadeOpacity,
   SCROLL_CONTACT_SET,
   SCROLL_CONTACT_START,
   SCROLL_HERO_FADE_END,
@@ -92,7 +91,6 @@ export function useHeroWorkTimeline(compact: boolean) {
     scrollYProgress,
     (progress) => `${getMarqueeHandoffProgress(progress) * 100}vw`,
   );
-  const workShadeOpacity = useTransform(scrollYProgress, getWorkShadeOpacity);
   const clientsOverlayX = useTransform(
     scrollYProgress,
     (progress) => `${(getMarqueeHandoffProgress(progress) - 1) * 100}%`,
@@ -152,6 +150,5 @@ export function useHeroWorkTimeline(compact: boolean) {
     workExitX,
     workSequenceRun,
     workSequenceStarted,
-    workShadeOpacity,
   };
 }
