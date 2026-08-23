@@ -10,8 +10,12 @@ export const INTRO_SLIDE_EASE: [number, number, number, number] = [
   0.22, 1, 0.36, 1,
 ];
 export const INTRO_CARD_SLIDE_EASE: [number, number, number, number] = [
-  0.18, 0.9, 0.08, 1,
+  0.16, 1, 0.3, 1,
 ];
+export const INTRO_CARD_SLIDE_TRANSITION = {
+  duration: INTRO_CARD_SLIDE_DURATION_S,
+  ease: INTRO_CARD_SLIDE_EASE,
+} as const;
 
 export const SCROLL_PANEL_HOLD = 0.02;
 export const SCROLL_PANEL_EXPANDED = 0.15;

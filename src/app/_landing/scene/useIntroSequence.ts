@@ -18,9 +18,13 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     reduceMotion ? "complete" : "video",
   );
   const [introCardIn, setIntroCardIn] = useState(false);
+  const [introCardSettled, setIntroCardSettled] = useState(false);
   const [introCanComplete, setIntroCanComplete] = useState(false);
+  const revealStartedAtRef = useRef(0);
 
   const introActive = introPhase !== "complete";
+  const introScrollLocked =
+    introActive && !(introCardIn && introCanComplete);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -61,22 +65,31 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     if (introPhase !== "revealing") return;
 
     setIntroCardIn(false);
+    setIntroCardSettled(false);
 
-    const timer = window.setTimeout(
+    const slideMs = INTRO_CARD_SLIDE_DURATION_S * 1_000;
+    revealStartedAtRef.current = performance.now();
+    const unlockTimer = window.setTimeout(
       () => setIntroCardIn(true),
-      Math.max(
-        0,
-        INTRO_CARD_SLIDE_DURATION_S * 1_000 - INTRO_CARD_UNLOCK_LEAD_MS,
-      ),
+      Math.max(0, slideMs - INTRO_CARD_UNLOCK_LEAD_MS),
+    );
+    const settleTimer = window.setTimeout(
+      () => setIntroCardSettled(true),
+      slideMs + 80,
     );
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(unlockTimer);
+      window.clearTimeout(settleTimer);
+    };
   }, [introPhase]);
 
   useEffect(() => {
-    if (introPhase !== "revealing" || !introCardIn || !introCanComplete) return;
+    if (introPhase !== "revealing" || !introCardSettled || !introCanComplete) {
+      return;
+    }
     setIntroPhase("complete");
-  }, [introPhase, introCardIn, introCanComplete]);
+  }, [introPhase, introCardSettled, introCanComplete]);
 
   useEffect(() => {
     if (introPhase === "complete" || reduceMotion) return;
@@ -89,7 +102,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [introPhase]);
 
   useLayoutEffect(() => {
-    if (introPhase === "complete") return;
+    if (!introScrollLocked) return;
 
     const html = document.documentElement;
     const body = document.body;
@@ -142,7 +155,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       body.style.overscrollBehavior = previousStyles.bodyOverscrollBehavior;
       body.style.touchAction = previousStyles.bodyTouchAction;
     };
-  }, [introPhase]);
+  }, [introScrollLocked]);
 
   useEffect(() => {
     if (introPhase === "complete" || reduceMotion) return;
@@ -178,7 +191,9 @@ export function useIntroSequence(reduceMotion: boolean | null) {
 
   const handleIntroCardSlideComplete = () => {
     if (introPhase !== "revealing") return;
+    if (performance.now() - revealStartedAtRef.current < 250) return;
     setIntroCardIn(true);
+    setIntroCardSettled(true);
   };
 
   const handleIntroVideoEnded = () => {
@@ -198,6 +213,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     handleIntroVideoEnded,
     introActive,
     introPhase,
+    introScrollLocked,
     introVideoRef,
     showreelVideoRef,
   };

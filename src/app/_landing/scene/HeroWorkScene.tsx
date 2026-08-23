@@ -15,8 +15,7 @@ import { ContactSection } from "../contact/ContactSection";
 import {
   getIntroPanelRest,
   getWorkShadeEntryX,
-  INTRO_CARD_SLIDE_DURATION_S,
-  INTRO_CARD_SLIDE_EASE,
+  INTRO_CARD_SLIDE_TRANSITION,
   INTRO_HEADER_SLIDE_DURATION_S,
   INTRO_SLIDE_EASE,
   SCROLL_WORK_EXIT_START,
@@ -66,6 +65,7 @@ export function HeroWorkScene({
     handleIntroVideoEnded,
     introActive,
     introPhase,
+    introScrollLocked,
     introVideoRef,
     showreelVideoRef,
   } = useIntroSequence(reduceMotion);
@@ -160,7 +160,7 @@ export function HeroWorkScene({
   return (
     <div
       className={styles.heroWorkScene}
-      data-intro-lock={introActive ? "" : undefined}
+      data-intro-lock={introScrollLocked ? "" : undefined}
       data-intro-phase={introActive ? introPhase : undefined}
       id="hero"
       ref={sceneRef}
@@ -253,10 +253,7 @@ export function HeroWorkScene({
           }
           transition={
             introPhase === "revealing"
-              ? {
-                  duration: INTRO_CARD_SLIDE_DURATION_S,
-                  ease: INTRO_CARD_SLIDE_EASE,
-                }
+              ? INTRO_CARD_SLIDE_TRANSITION
               : { duration: 0 }
           }
         >
