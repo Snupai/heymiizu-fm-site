@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
   fitMobileNvaInk,
+  fitSvgNvaInk,
   mobileNvaViewportWidth,
 } from "./nva-measurement";
 
@@ -17,6 +18,14 @@ describe("mobile NVA full-width fit", () => {
   test("rejects empty ink or target widths", () => {
     expect(fitMobileNvaInk({ inkLeft: 0, inkWidth: 0 }, 390)).toBeNull();
     expect(fitMobileNvaInk({ inkLeft: 0, inkWidth: 200 }, 0)).toBeNull();
+  });
+
+  test("maps SVG glyph ink onto the viewBox", () => {
+    expect(fitSvgNvaInk(18, 362, 390)).toEqual({
+      scale: 390 / (362 - 18),
+      translate: -18,
+    });
+    expect(fitSvgNvaInk(0, 0, 390)).toBeNull();
   });
 
   test("prefers the visual viewport when it is available", () => {

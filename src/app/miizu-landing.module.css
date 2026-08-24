@@ -1234,6 +1234,28 @@
   display: none;
 }
 
+.nuviaSvg {
+  display: none;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  width: 100%;
+}
+
+.nuviaSvgText {
+  fill: var(--miizu-primary);
+  font-family:
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    var(--font-rethink-sans),
+    system-ui,
+    sans-serif;
+  font-size: 320px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
 .nuviaTooltip {
   background: #fbfbfe;
   border-radius: 999px;
@@ -1796,9 +1818,10 @@
 
   .footer {
     height: auto;
+    margin-left: calc(50% - 50vw);
     min-height: 0;
     overflow-x: clip;
-    width: 100%;
+    width: 100vw;
   }
 
   .nuviaPanel {
@@ -1806,12 +1829,12 @@
     background: var(--miizu-bg);
     height: calc(var(--nva-size, 47vw) * var(--nva-crop));
     left: 0;
-    margin-left: calc(50% - 50vw);
+    margin-left: 0;
     max-width: none;
     min-height: 0;
     overflow: hidden;
     position: relative;
-    width: 100vw;
+    width: 100%;
   }
 
   .representedBy {
@@ -1829,19 +1852,19 @@
     width: 100%;
   }
 
-  .nuviaWord {
-    letter-spacing: 0;
-    transform: scaleX(var(--nva-scale, 1)) translateX(var(--nva-shift, 0px));
-    transform-origin: 0 100%;
-  }
-
+  .nuviaWord,
+  .nuviaWordDark,
   .nuviaWordLight {
-    clip-path: none;
     display: none;
   }
 
-  .nuviaWordDark {
+  .nuviaSvg {
     display: block;
+    height: 100%;
+    margin-left: -8%;
+    overflow: visible;
+    transform: none;
+    width: 116%;
   }
 
   .footerLinks {

@@ -18,7 +18,7 @@ import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
 import { useIntroLayout } from "../scene/useIntroLayout";
 import {
   anchorRepresentedBy,
-  fitMobileNvaInk,
+  anchorRepresentedBySvg,
   measureNvaInk,
   mobileNvaViewportWidth,
 } from "./nva-measurement";
@@ -111,40 +111,18 @@ export function LandingFooter() {
         if (!footer || target <= 0) return;
 
         wordmark.style.width = `${target}px`;
-        wordmark.style.setProperty("--nva-scale", "1");
-        wordmark.style.setProperty("--nva-shift", "0px");
+        wordmark.style.removeProperty("--nva-scale");
+        wordmark.style.removeProperty("--nva-shift");
+        footer.style.setProperty("--nva-size", `${Math.round(target * 0.48)}px`);
 
-        const computed = window.getComputedStyle(word);
-        const fontSize = Number.parseFloat(computed.fontSize);
-        if (!Number.isFinite(fontSize) || fontSize <= 0) return;
-
-        const ink = measureNvaInk(computed, fontSize);
-        if (!ink) return;
-
-        const nextSize = fontSize * (target / ink.inkWidth);
-        if (
-          Number.isFinite(nextSize) &&
-          nextSize > 0 &&
-          Math.abs(nextSize - fontSize) > 0.45
-        ) {
-          footer.style.setProperty("--nva-size", `${nextSize}px`);
-          wordmark.style.setProperty(
-            "--nva-shift",
-            `${-ink.inkLeft * (nextSize / fontSize)}px`,
-          );
+        const svgText = wordmark.querySelector("text");
+        if (svgText instanceof SVGTextElement) {
+          svgText.removeAttribute("transform");
+          svgText.setAttribute("textLength", "1000");
+          svgText.setAttribute("lengthAdjust", "spacingAndGlyphs");
           const label = representedByRef.current;
-          if (label) anchorRepresentedBy(word, label);
-          return;
+          if (label) anchorRepresentedBySvg(svgText, label);
         }
-
-        const fit = fitMobileNvaInk(ink, target + 0.75);
-        if (!fit) return;
-
-        wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
-        wordmark.style.setProperty("--nva-scale", String(fit.scale));
-
-        const label = representedByRef.current;
-        if (label) anchorRepresentedBy(word, label);
         return;
       }
 
@@ -396,6 +374,22 @@ export function LandingFooter() {
             >
               {"NVA"}
             </span>
+            <svg
+              aria-hidden="true"
+              className={styles.nuviaSvg}
+              preserveAspectRatio="none"
+              viewBox="0 0 1000 320"
+            >
+              <text
+                className={styles.nuviaSvgText}
+                lengthAdjust="spacingAndGlyphs"
+                textLength={1000}
+                x={0}
+                y={312}
+              >
+                NVA
+              </text>
+            </svg>
           </div>
         </div>
         <motion.nav

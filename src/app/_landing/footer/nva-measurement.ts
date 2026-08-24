@@ -106,6 +106,20 @@ export function mobileNvaViewportWidth(
   return Math.round(raw);
 }
 
+export function fitSvgNvaInk(
+  inkLeft: number,
+  inkRight: number,
+  viewBoxWidth: number,
+) {
+  const inkWidth = inkRight - inkLeft;
+  if (!(inkWidth > 0) || !(viewBoxWidth > 0)) return null;
+
+  return {
+    scale: viewBoxWidth / inkWidth,
+    translate: -inkLeft,
+  };
+}
+
 export function fitMobileNvaInk(
   ink: { inkLeft: number; inkWidth: number },
   targetWidth: number,
@@ -117,6 +131,45 @@ export function fitMobileNvaInk(
     shift: -ink.inkLeft,
     width: targetWidth,
   };
+}
+
+export function anchorRepresentedBySvg(
+  text: SVGTextElement,
+  label: HTMLElement,
+) {
+  const svg = text.ownerSVGElement;
+  const panel = svg?.parentElement?.parentElement;
+  if (!svg || !panel || text.getNumberOfChars() < 1) return;
+
+  let n: SVGRect;
+  try {
+    n = text.getExtentOfChar(0);
+  } catch {
+    return;
+  }
+
+  const viewBox = svg.viewBox.baseVal;
+  const panelRect = panel.getBoundingClientRect();
+  const svgRect = svg.getBoundingClientRect();
+  if (n.width < 0.5 || viewBox.width < 1 || svgRect.width < 2) return;
+
+  const scaleX = svgRect.width / viewBox.width;
+  const scaleY = svgRect.height / viewBox.height;
+  const nLeft = svgRect.left + n.x * scaleX;
+  const nTop = svgRect.top + n.y * scaleY;
+  const nWidth = Math.max(1, n.width * scaleX);
+  const nHeight = Math.max(1, n.height * scaleY);
+  const yAbs = panelRect.top + panelRect.height * 0.28;
+  const alongGlyph = (yAbs - nTop) / nHeight;
+  const xAbs = nLeft + nWidth * alongGlyph;
+
+  label.style.setProperty("--n-x", `${xAbs - panelRect.left}px`);
+  label.style.setProperty("--n-y", `${yAbs - panelRect.top}px`);
+  label.style.setProperty(
+    "--n-angle",
+    `${(Math.atan2(nHeight, nWidth) * 180) / Math.PI}deg`,
+  );
+  label.style.fontSize = `${Math.min(16, Math.max(11, panelRect.height * 0.048))}px`;
 }
 
 export function anchorRepresentedBy(word: HTMLElement, label: HTMLElement) {
