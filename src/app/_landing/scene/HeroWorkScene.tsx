@@ -8,18 +8,20 @@ import {
   useTransform,
 } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 import type { ContactRegion } from "../contact/contact-form-model";
 import { ContactSection } from "../contact/ContactSection";
 import {
+  getIntroCardSlideTransition,
+  getIntroHeaderSlideDurationS,
+  getIntroLayout,
   getIntroPanelRest,
   getWorkShadeEntryX,
-  INTRO_CARD_SLIDE_TRANSITION,
-  INTRO_HEADER_SLIDE_DURATION_S,
   INTRO_SLIDE_EASE,
   SCROLL_WORK_EXIT_START,
   WORK_SEQUENCE_DURATION_S,
+  type IntroLayout,
 } from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
 import { ClientsMarquee } from "./ClientsMarquee";
@@ -34,7 +36,7 @@ export function HeroWorkScene({
   initialRegion: ContactRegion;
 }) {
   const reduceMotion = useReducedMotion();
-  const [compact, setCompact] = useState(false);
+  const [layout, setLayout] = useState<IntroLayout>("desktop");
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -52,14 +54,14 @@ export function HeroWorkScene({
     };
   }, []);
 
-  useEffect(() => {
-    const query = window.matchMedia("(max-width: 760px)");
-    const sync = () => setCompact(query.matches);
+  useLayoutEffect(() => {
+    const sync = () => setLayout(getIntroLayout(window.innerWidth));
     sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
   }, []);
 
+  const isCompact = layout === "compact";
   const {
     handleIntroCardSlideComplete,
     handleIntroVideoEnded,
@@ -69,7 +71,7 @@ export function HeroWorkScene({
     introScrollLocked,
     introVideoRef,
     showreelVideoRef,
-  } = useIntroSequence(reduceMotion);
+  } = useIntroSequence(reduceMotion, isCompact);
   const {
     cardScaleX,
     cardScaleY,
@@ -92,11 +94,11 @@ export function HeroWorkScene({
     handlePauseStop,
     workExitX,
     workSequenceStarted,
-  } = useHeroWorkTimeline(compact);
+  } = useHeroWorkTimeline(layout);
 
   useSmoothScroll(reduceMotion !== true, sceneRef, handlePauseStop);
 
-  const panelRest = getIntroPanelRest(compact);
+  const panelRest = getIntroPanelRest(layout);
   const introPanelOffscreen = {
     x: "100vw",
     y: panelRest.y,
@@ -162,6 +164,7 @@ export function HeroWorkScene({
   }, [reduceMotion, scrollYProgress, workSequenceStarted, workSequenceTime]);
 
   return (
+    <>
     <div
       className={styles.heroWorkScene}
       data-intro-lock={introScrollLocked ? "" : undefined}
@@ -170,7 +173,7 @@ export function HeroWorkScene({
       ref={sceneRef}
     >
       <div className={styles.stickyStage}>
-        {!reduceMotion ? (
+        {!reduceMotion && !isCompact ? (
           <motion.video
             ref={introVideoRef}
             aria-hidden="true"
@@ -194,6 +197,25 @@ export function HeroWorkScene({
           </motion.video>
         ) : null}
 
+        <motion.div
+          className={styles.heroCopy}
+          style={
+            introPhase === "complete"
+              ? { opacity: heroOpacity, y: heroExitY }
+              : { opacity: 1 }
+          }
+        >
+          <h1>
+            <span className={styles.printHey}>
+              Hey
+              <span aria-hidden="true" className={styles.handwrittenHey}>
+                Hey!
+              </span>
+            </span>
+            <span>I&rsquo;m Miizu</span>
+          </h1>
+        </motion.div>
+
         <motion.header
           animate={
             introActive ? { y: introPhase === "video" ? "-120%" : "0%" } : false
@@ -207,7 +229,9 @@ export function HeroWorkScene({
           }
           transition={{
             duration:
-              introPhase === "video" ? 0 : INTRO_HEADER_SLIDE_DURATION_S,
+              introPhase === "video"
+                ? 0
+                : getIntroHeaderSlideDurationS(isCompact),
             ease: INTRO_SLIDE_EASE,
           }}
         >
@@ -257,7 +281,7 @@ export function HeroWorkScene({
           }
           transition={
             introPhase === "revealing"
-              ? INTRO_CARD_SLIDE_TRANSITION
+              ? getIntroCardSlideTransition(isCompact)
               : { duration: 0 }
           }
         >
@@ -327,12 +351,22 @@ export function HeroWorkScene({
           />
         </motion.div>
 
-        <ContactSection
-          compact={compact}
-          initialRegion={initialRegion}
-          wipeX={contactWipeX}
-        />
+        {isCompact ? null : (
+          <ContactSection
+            compact={false}
+            initialRegion={initialRegion}
+            wipeX={contactWipeX}
+          />
+        )}
       </div>
     </div>
+    {isCompact ? (
+      <ContactSection
+        compact
+        initialRegion={initialRegion}
+        wipeX={contactWipeX}
+      />
+    ) : null}
+    </>
   );
 }

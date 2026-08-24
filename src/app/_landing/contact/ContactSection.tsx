@@ -123,7 +123,7 @@ export function ContactSection({
     <motion.div
       className={styles.contactWipe}
       id="contact"
-      style={{ x: wipeX }}
+      style={compact ? undefined : { x: wipeX }}
     >
       <div className={styles.contactSection}>
         <div className={styles.contactPitch}>
@@ -156,7 +156,7 @@ export function ContactSection({
             </div>
             <p>or just say hello</p>
             <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
-              hey@miizumelon.com
+              hey@<span className={styles.emailDomain}>miizumelon.com</span>
             </a>
           </div>
         </div>
