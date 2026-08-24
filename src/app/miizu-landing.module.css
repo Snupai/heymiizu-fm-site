@@ -1216,7 +1216,7 @@
   text-box-edge: cap alphabetic;
   text-box-trim: trim-both;
   text-indent: 0;
-  transform: translateX(var(--nva-shift, 0px));
+  transform: scaleX(var(--nva-scale, 1)) translateX(var(--nva-shift, 0px));
   transform-origin: 0 100%;
   white-space: nowrap;
 }
@@ -1478,6 +1478,7 @@
   color: var(--miizu-bg);
   overflow: hidden;
   padding: 4.6rem 1.2rem 2.4rem;
+  position: relative;
   scroll-margin-top: 3.4rem;
 }
 
@@ -1487,12 +1488,28 @@
   font-size: clamp(1.45rem, 7.6vw, 2.35rem);
   letter-spacing: -0.015em;
   line-height: 0.96;
+  position: relative;
+  z-index: 1;
 }
 
 .mobileWorkList .workLine {
   color: var(--miizu-bg);
   overflow: hidden;
   width: 100%;
+}
+
+.mobileWorkShade {
+  background: linear-gradient(
+    90deg,
+    rgba(33, 23, 230, 0.42) 0%,
+    rgba(33, 23, 230, 0.1) 36%,
+    transparent 100%
+  );
+  inset: 0 auto 0 0;
+  pointer-events: none;
+  position: absolute;
+  width: 72%;
+  z-index: 0;
 }
 
 .clientsSection {
@@ -1719,15 +1736,18 @@
   .footer {
     height: auto;
     min-height: 0;
+    overflow-x: clip;
+    width: 100%;
   }
 
   .nuviaPanel {
     --nva-crop: 0.888;
     background: var(--miizu-bg);
-    height: 41.76vw;
+    height: calc(var(--nva-size, 47vw) * var(--nva-crop));
     min-height: 0;
     overflow: hidden;
     position: relative;
+    width: 100%;
   }
 
   .representedBy {
@@ -1736,14 +1756,15 @@
 
   .nuviaWordmark {
     bottom: 0;
-    font-size: 47vw;
+    font-size: var(--nva-size, 47vw);
     height: 100%;
     top: auto;
+    width: 100%;
   }
 
   .nuviaWord {
     letter-spacing: 0;
-    transform: translateX(var(--nva-shift, 0px));
+    transform: scaleX(var(--nva-scale, 1)) translateX(var(--nva-shift, 0px));
     transform-origin: 0 100%;
   }
 

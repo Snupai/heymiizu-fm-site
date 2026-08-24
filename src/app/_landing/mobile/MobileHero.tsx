@@ -1,9 +1,14 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { useLenis } from "lenis/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   getIntroCardSlideTransition,
@@ -18,6 +23,7 @@ const HEADER_TONE_OFFSET_PX = 52;
 export function MobileHero() {
   const reduceMotion = useReducedMotion();
   const lenis = useLenis();
+  const heroRef = useRef<HTMLElement>(null);
   const [onDark, setOnDark] = useState(false);
   const {
     handleIntroCardSlideComplete,
@@ -26,6 +32,18 @@ export function MobileHero() {
     introScrollLocked,
     showreelVideoRef,
   } = useIntroSequence(reduceMotion, true);
+  const { scrollYProgress } = useScroll({
+    offset: ["start start", "end start"],
+    target: heroRef,
+  });
+  const copyY = useTransform(scrollYProgress, [0, 0.5], [0, -36]);
+  const copyOpacity = useTransform(scrollYProgress, [0, 0.38], [1, 0]);
+  const cardScale = useTransform(scrollYProgress, [0, 0.85], [1, 1.14]);
+  const cardY = useTransform(scrollYProgress, [0, 0.85], [0, 56]);
+  const cardRadius = useTransform(scrollYProgress, [0, 0.72], [27, 6]);
+  const hintOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+  const introComplete = introPhase === "complete";
+  const scrollDriven = introComplete && reduceMotion !== true;
 
   useEffect(() => {
     const updateTone = () => {
@@ -55,8 +73,6 @@ export function MobileHero() {
     }
     target.scrollIntoView({ behavior: "smooth" });
   };
-
-  const introComplete = introPhase === "complete";
 
   return (
     <>
@@ -96,11 +112,13 @@ export function MobileHero() {
         data-intro-lock={introScrollLocked ? "" : undefined}
         data-intro-phase={introActive ? introPhase : undefined}
         id="hero"
+        ref={heroRef}
       >
         <motion.div
-          animate={{ opacity: 1, y: 0 }}
+          animate={scrollDriven ? undefined : { opacity: 1, y: 0 }}
           className={`${styles.heroCopy} ${styles.mobileHeroCopy}`}
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          style={scrollDriven ? { opacity: copyOpacity, y: copyY } : undefined}
           transition={{ duration: 0.55, ease: INTRO_SLIDE_EASE }}
         >
           <h1>
@@ -115,14 +133,26 @@ export function MobileHero() {
         </motion.div>
 
         <motion.button
-          animate={{
-            opacity: introPhase === "video" ? 0 : 1,
-            pointerEvents: introPhase === "video" ? "none" : "auto",
-            y: 0,
-          }}
+          animate={
+            scrollDriven
+              ? false
+              : {
+                  opacity: introPhase === "video" ? 0 : 1,
+                  pointerEvents: introPhase === "video" ? "none" : "auto",
+                  y: 0,
+                }
+          }
           className={styles.mobileWorkWithMe}
           initial={reduceMotion ? false : { opacity: 0, y: 8 }}
           onClick={() => scrollToId("contact-form")}
+          style={
+            scrollDriven
+              ? {
+                  opacity: copyOpacity,
+                  y: copyY,
+                }
+              : undefined
+          }
           transition={{ delay: 0.18, duration: 0.45, ease: INTRO_SLIDE_EASE }}
           type="button"
         >
@@ -141,6 +171,11 @@ export function MobileHero() {
           className={styles.mobileShowreel}
           initial={introActive ? { x: "100vw" } : false}
           onAnimationComplete={handleIntroCardSlideComplete}
+          style={
+            scrollDriven
+              ? { borderRadius: cardRadius, scale: cardScale, y: cardY }
+              : undefined
+          }
           transition={
             introPhase === "revealing"
               ? getIntroCardSlideTransition(true)
@@ -164,14 +199,26 @@ export function MobileHero() {
         </motion.div>
 
         <motion.button
-          animate={{
-            opacity: introComplete ? 1 : 0,
-            pointerEvents: introComplete ? "auto" : "none",
-          }}
+          animate={
+            scrollDriven
+              ? false
+              : {
+                  opacity: introComplete ? 1 : 0,
+                  pointerEvents: introComplete ? "auto" : "none",
+                }
+          }
           aria-label="Open the work section"
           className={styles.mobileScrollHint}
           initial={false}
           onClick={() => scrollToId("work")}
+          style={
+            scrollDriven
+              ? {
+                  opacity: hintOpacity,
+                  pointerEvents: introComplete ? "auto" : "none",
+                }
+              : undefined
+          }
           transition={{ duration: 0.4, ease: INTRO_SLIDE_EASE }}
           type="button"
         >

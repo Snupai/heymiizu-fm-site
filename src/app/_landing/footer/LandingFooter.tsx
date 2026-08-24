@@ -8,7 +8,11 @@ import type { PointerEvent } from "react";
 
 import styles from "../../miizu-landing.module.css";
 import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
-import { anchorRepresentedBy, measureNvaInk } from "./nva-measurement";
+import {
+  anchorRepresentedBy,
+  fitMobileNvaInk,
+  measureNvaInk,
+} from "./nva-measurement";
 
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
@@ -68,8 +72,46 @@ export function LandingFooter() {
       if (!word) return;
 
       if (compactQuery.matches) {
-        footer?.style.removeProperty("--nva-size");
-      } else if (footer && footer.clientWidth > 0) {
+        if (!footer || footer.clientWidth <= 0) return;
+
+        const computed = window.getComputedStyle(word);
+        const fontSize = Number.parseFloat(computed.fontSize);
+        if (!Number.isFinite(fontSize) || fontSize <= 0) return;
+
+        const ink = measureNvaInk(computed, fontSize);
+        if (!ink) return;
+
+        const target = footer.clientWidth;
+        const nextSize = fontSize * (target / ink.inkWidth);
+        if (Math.abs(nextSize - fontSize) > 0.45) {
+          footer.style.setProperty("--nva-size", `${nextSize}px`);
+          wordmark.style.width = `${target}px`;
+          wordmark.style.setProperty(
+            "--nva-shift",
+            `${-ink.inkLeft * (nextSize / fontSize)}px`,
+          );
+          wordmark.style.setProperty("--nva-scale", "1");
+          return;
+        }
+
+        const fit = fitMobileNvaInk(ink, target);
+        if (!fit) return;
+
+        wordmark.style.width = `${fit.width}px`;
+        wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
+        wordmark.style.setProperty(
+          "--nva-scale",
+          Math.abs(fit.scale - 1) > 0.004 ? String(fit.scale) : "1",
+        );
+
+        const label = representedByRef.current;
+        if (label) anchorRepresentedBy(word, label);
+        return;
+      }
+
+      footer?.style.removeProperty("--nva-scale");
+
+      if (footer && footer.clientWidth > 0) {
         const current = window.getComputedStyle(word);
         const currentSize = Number.parseFloat(current.fontSize);
 
@@ -109,6 +151,7 @@ export function LandingFooter() {
       const shift = -ink.inkLeft - bleed;
       wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
       wordmark.style.setProperty("--nva-shift", `${shift}px`);
+      wordmark.style.setProperty("--nva-scale", "1");
 
       const label = representedByRef.current;
       if (label) anchorRepresentedBy(word, label);

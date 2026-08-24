@@ -97,6 +97,19 @@ export function measureNvaInk(computed: CSSStyleDeclaration, fontSize: number) {
   return { inkLeft, inkWidth };
 }
 
+export function fitMobileNvaInk(
+  ink: { inkLeft: number; inkWidth: number },
+  targetWidth: number,
+) {
+  if (!(ink.inkWidth > 0) || !(targetWidth > 0)) return null;
+
+  return {
+    scale: targetWidth / ink.inkWidth,
+    shift: -ink.inkLeft,
+    width: targetWidth,
+  };
+}
+
 export function anchorRepresentedBy(word: HTMLElement, label: HTMLElement) {
   const panel = word.parentElement?.parentElement;
   const textNode = word.firstChild;
