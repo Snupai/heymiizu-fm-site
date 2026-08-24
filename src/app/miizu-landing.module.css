@@ -1397,6 +1397,7 @@
   min-height: calc(100svh - 3.6rem);
   overflow-x: clip;
   padding: 0.35rem 1.1rem 1.15rem;
+  position: relative;
 }
 
 .mobileHeroCopy {
@@ -1460,6 +1461,29 @@
   width: 100%;
 }
 
+.mobileShowreelVeil {
+  background: linear-gradient(
+    180deg,
+    transparent 28%,
+    color-mix(in srgb, #050315 72%, transparent) 100%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.mobileHeroBridge {
+  background: #000;
+  bottom: 0;
+  height: 22vh;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
+
 .mobileScrollHint {
   align-self: center;
   background: transparent;
@@ -1494,7 +1518,8 @@
 
 .mobileWorkList .workLine {
   color: var(--miizu-bg);
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   width: 100%;
 }
 
@@ -1508,8 +1533,22 @@
   inset: 0 auto 0 0;
   pointer-events: none;
   position: absolute;
+  transform-origin: 0 50%;
   width: 72%;
   z-index: 0;
+}
+
+.mobileWorkCover {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, #050315 88%, var(--miizu-primary)) 100%
+  );
+  inset: auto 0 0;
+  height: 42%;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
 }
 
 .clientsSection {
@@ -1540,6 +1579,20 @@
 
 .clientsSection .clientGroup span {
   font-size: clamp(2rem, 11vw, 3.6rem);
+}
+
+.mobileContactWash {
+  background: linear-gradient(
+    90deg,
+    rgba(33, 23, 230, 0.4) 0%,
+    rgba(33, 23, 230, 0.1) 40%,
+    transparent 100%
+  );
+  inset: 0 auto 0 0;
+  pointer-events: none;
+  position: absolute;
+  width: 78%;
+  z-index: 0;
 }
 
 @media (max-width: 760px) {
@@ -1654,9 +1707,17 @@
 
   .contactPitch {
     min-height: 0;
+    overflow: hidden;
     padding: 4.6rem 1.15rem 2.8rem;
     position: relative;
     top: auto;
+    z-index: 1;
+  }
+
+  .contactPitch h2,
+  .contactPitch .regionToggle,
+  .contactPitch .directContact {
+    position: relative;
     z-index: 1;
   }
 
@@ -1744,10 +1805,13 @@
     --nva-crop: 0.888;
     background: var(--miizu-bg);
     height: calc(var(--nva-size, 47vw) * var(--nva-crop));
+    left: 0;
+    margin-left: calc(50% - 50vw);
+    max-width: none;
     min-height: 0;
     overflow: hidden;
     position: relative;
-    width: 100%;
+    width: 100vw;
   }
 
   .representedBy {
@@ -1758,6 +1822,9 @@
     bottom: 0;
     font-size: var(--nva-size, 47vw);
     height: 100%;
+    left: 0;
+    max-width: none;
+    overflow: hidden;
     top: auto;
     width: 100%;
   }

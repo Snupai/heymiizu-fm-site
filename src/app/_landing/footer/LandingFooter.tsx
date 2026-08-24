@@ -1,6 +1,13 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -8,10 +15,12 @@ import type { PointerEvent } from "react";
 
 import styles from "../../miizu-landing.module.css";
 import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
+import { useIntroLayout } from "../scene/useIntroLayout";
 import {
   anchorRepresentedBy,
   fitMobileNvaInk,
   measureNvaInk,
+  mobileNvaViewportWidth,
 } from "./nva-measurement";
 
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
@@ -22,6 +31,9 @@ function supportsFineHover() {
 }
 
 export function LandingFooter() {
+  const layout = useIntroLayout();
+  const reduceMotion = useReducedMotion();
+  const footerRef = useRef<HTMLElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
   const representedByRef = useRef<HTMLSpanElement>(null);
   const nuviaTooltipReady = useRef(false);
@@ -29,6 +41,26 @@ export function LandingFooter() {
   const lastNuviaTouchAt = useRef(-Infinity);
   const nuviaTooltipX = useMotionValue(0);
   const nuviaTooltipY = useMotionValue(0);
+  const { scrollYProgress } = useScroll({
+    offset: ["start end", "start 0.62"],
+    target: footerRef,
+  });
+  const compactMotion = layout === "compact" && reduceMotion !== true;
+  const linksY = useTransform(
+    scrollYProgress,
+    [0.12, 1],
+    compactMotion ? [42, 0] : [0, 0],
+  );
+  const linksOpacity = useTransform(
+    scrollYProgress,
+    [0.12, 1],
+    compactMotion ? [0, 1] : [1, 1],
+  );
+  const representedOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.72],
+    compactMotion ? [0, 1] : [1, 1],
+  );
   const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
     stiffness: 420,
     damping: 32,
@@ -72,7 +104,15 @@ export function LandingFooter() {
       if (!word) return;
 
       if (compactQuery.matches) {
-        if (!footer || footer.clientWidth <= 0) return;
+        const target = mobileNvaViewportWidth(
+          window.innerWidth,
+          window.visualViewport?.width,
+        );
+        if (!footer || target <= 0) return;
+
+        wordmark.style.width = `${target}px`;
+        wordmark.style.setProperty("--nva-scale", "1");
+        wordmark.style.setProperty("--nva-shift", "0px");
 
         const computed = window.getComputedStyle(word);
         const fontSize = Number.parseFloat(computed.fontSize);
@@ -81,28 +121,27 @@ export function LandingFooter() {
         const ink = measureNvaInk(computed, fontSize);
         if (!ink) return;
 
-        const target = footer.clientWidth;
         const nextSize = fontSize * (target / ink.inkWidth);
-        if (Math.abs(nextSize - fontSize) > 0.45) {
+        if (
+          Number.isFinite(nextSize) &&
+          nextSize > 0 &&
+          Math.abs(nextSize - fontSize) > 0.45
+        ) {
           footer.style.setProperty("--nva-size", `${nextSize}px`);
-          wordmark.style.width = `${target}px`;
           wordmark.style.setProperty(
             "--nva-shift",
             `${-ink.inkLeft * (nextSize / fontSize)}px`,
           );
-          wordmark.style.setProperty("--nva-scale", "1");
+          const label = representedByRef.current;
+          if (label) anchorRepresentedBy(word, label);
           return;
         }
 
-        const fit = fitMobileNvaInk(ink, target);
+        const fit = fitMobileNvaInk(ink, target + 0.75);
         if (!fit) return;
 
-        wordmark.style.width = `${fit.width}px`;
         wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
-        wordmark.style.setProperty(
-          "--nva-scale",
-          Math.abs(fit.scale - 1) > 0.004 ? String(fit.scale) : "1",
-        );
+        wordmark.style.setProperty("--nva-scale", String(fit.scale));
 
         const label = representedByRef.current;
         if (label) anchorRepresentedBy(word, label);
@@ -161,6 +200,7 @@ export function LandingFooter() {
     if (footer) resizeObserver.observe(footer);
     compactQuery.addEventListener("change", fitWordmark);
     window.addEventListener("resize", fitWordmark);
+    window.visualViewport?.addEventListener("resize", fitWordmark);
     void document.fonts.ready.then(fitWordmark);
     fitWordmark();
     let layoutFrame = window.requestAnimationFrame(() => {
@@ -172,6 +212,7 @@ export function LandingFooter() {
       resizeObserver.disconnect();
       compactQuery.removeEventListener("change", fitWordmark);
       window.removeEventListener("resize", fitWordmark);
+      window.visualViewport?.removeEventListener("resize", fitWordmark);
     };
   }, []);
 
@@ -299,7 +340,7 @@ export function LandingFooter() {
 
   return (
     <>
-      <footer className={styles.footer} id="footer">
+      <footer className={styles.footer} id="footer" ref={footerRef}>
         <div
           className={styles.nuviaPanel}
           onPointerDown={toggleNuviaTouchTooltip}
@@ -307,9 +348,13 @@ export function LandingFooter() {
           onPointerLeave={leaveNuviaTooltip}
           onPointerMove={moveNuviaTooltip}
         >
-          <span className={styles.representedBy} ref={representedByRef}>
+          <motion.span
+            className={styles.representedBy}
+            ref={representedByRef}
+            style={compactMotion ? { opacity: representedOpacity } : undefined}
+          >
             represented by
-          </span>
+          </motion.span>
           <div
             aria-label="NVA, represented by Nuvia"
             className={styles.nuviaWordmark}
@@ -353,11 +398,17 @@ export function LandingFooter() {
             </span>
           </div>
         </div>
-        <nav className={styles.footerLinks} aria-label="Legal and about links">
+        <motion.nav
+          className={styles.footerLinks}
+          aria-label="Legal and about links"
+          style={
+            compactMotion ? { opacity: linksOpacity, y: linksY } : undefined
+          }
+        >
           <Link href="/imprint">Imprint</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="#hero">who is miizu?</Link>
-        </nav>
+        </motion.nav>
       </footer>
       {nuviaTooltipMounted
         ? createPortal(

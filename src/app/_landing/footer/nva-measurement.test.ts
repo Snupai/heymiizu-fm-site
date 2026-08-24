@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 
-import { fitMobileNvaInk } from "./nva-measurement";
+import {
+  fitMobileNvaInk,
+  mobileNvaViewportWidth,
+} from "./nva-measurement";
 
 describe("mobile NVA full-width fit", () => {
   test("scales ink to the viewport and shifts the left bearing to 0", () => {
@@ -14,5 +17,11 @@ describe("mobile NVA full-width fit", () => {
   test("rejects empty ink or target widths", () => {
     expect(fitMobileNvaInk({ inkLeft: 0, inkWidth: 0 }, 390)).toBeNull();
     expect(fitMobileNvaInk({ inkLeft: 0, inkWidth: 200 }, 0)).toBeNull();
+  });
+
+  test("prefers the visual viewport when it is available", () => {
+    expect(mobileNvaViewportWidth(390.4, 389.6)).toBe(390);
+    expect(mobileNvaViewportWidth(412)).toBe(412);
+    expect(mobileNvaViewportWidth(0, 0)).toBe(0);
   });
 });

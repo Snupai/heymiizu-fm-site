@@ -132,10 +132,30 @@ export function ContactSection({
     [0.28, 1],
     reduceMotion ? [0, 0] : [64, 0],
   );
+  const formScale = useTransform(
+    scrollYProgress,
+    [0.28, 1],
+    reduceMotion ? [1, 1] : [0.94, 1],
+  );
+  const formOpacity = useTransform(
+    scrollYProgress,
+    [0.18, 0.78],
+    reduceMotion ? [1, 1] : [0.28, 1],
+  );
   const pitchOpacity = useTransform(
     scrollYProgress,
     [0, 0.55],
     reduceMotion ? [1, 1] : [0.28, 1],
+  );
+  const pitchY = useTransform(
+    scrollYProgress,
+    [0, 0.62],
+    reduceMotion ? [0, 0] : [36, 0],
+  );
+  const washX = useTransform(
+    scrollYProgress,
+    [0, 0.48],
+    reduceMotion ? ["0%", "0%"] : ["-38%", "0%"],
   );
 
   useEffect(() => {
@@ -160,8 +180,17 @@ export function ContactSection({
       <div className={styles.contactSection}>
         <motion.div
           className={styles.contactPitch}
-          style={compactMotion ? { opacity: pitchOpacity } : undefined}
+          style={
+            compactMotion ? { opacity: pitchOpacity, y: pitchY } : undefined
+          }
         >
+          {compact ? (
+            <motion.div
+              aria-hidden="true"
+              className={styles.mobileContactWash}
+              style={compactMotion ? { x: washX } : undefined}
+            />
+          ) : null}
           <motion.div
             initial={compactMotion ? { opacity: 0, y: 28 } : false}
             transition={{ duration: 0.7, ease: INTRO_SLIDE_EASE }}
@@ -209,7 +238,16 @@ export function ContactSection({
 
         <motion.div
           className={styles.formPanel}
-          style={compactMotion ? { y: formY } : undefined}
+          style={
+            compactMotion
+              ? {
+                  opacity: formOpacity,
+                  scale: formScale,
+                  transformOrigin: "50% 0%",
+                  y: formY,
+                }
+              : undefined
+          }
         >
           <ContactForm compact={compact} region={region} />
         </motion.div>

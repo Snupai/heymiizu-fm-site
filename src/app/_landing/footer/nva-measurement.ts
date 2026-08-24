@@ -97,6 +97,15 @@ export function measureNvaInk(computed: CSSStyleDeclaration, fontSize: number) {
   return { inkLeft, inkWidth };
 }
 
+export function mobileNvaViewportWidth(
+  innerWidth: number,
+  visualWidth?: number,
+) {
+  const raw = visualWidth && visualWidth > 0 ? visualWidth : innerWidth;
+  if (!(raw > 0)) return 0;
+  return Math.round(raw);
+}
+
 export function fitMobileNvaInk(
   ink: { inkLeft: number; inkWidth: number },
   targetWidth: number,

@@ -41,6 +41,9 @@ export function MobileHero() {
   const cardScale = useTransform(scrollYProgress, [0, 0.85], [1, 1.14]);
   const cardY = useTransform(scrollYProgress, [0, 0.85], [0, 56]);
   const cardRadius = useTransform(scrollYProgress, [0, 0.72], [27, 6]);
+  const cardRotate = useTransform(scrollYProgress, [0, 0.85], [0, -1.8]);
+  const veilOpacity = useTransform(scrollYProgress, [0.28, 0.92], [0, 0.78]);
+  const bridgeY = useTransform(scrollYProgress, [0.42, 1], ["108%", "0%"]);
   const hintOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
   const introComplete = introPhase === "complete";
   const scrollDriven = introComplete && reduceMotion !== true;
@@ -173,7 +176,12 @@ export function MobileHero() {
           onAnimationComplete={handleIntroCardSlideComplete}
           style={
             scrollDriven
-              ? { borderRadius: cardRadius, scale: cardScale, y: cardY }
+              ? {
+                  borderRadius: cardRadius,
+                  rotate: cardRotate,
+                  scale: cardScale,
+                  y: cardY,
+                }
               : undefined
           }
           transition={
@@ -195,6 +203,11 @@ export function MobileHero() {
             >
               <source src="/showreel_2026.mp4" type="video/mp4" />
             </video>
+            <motion.div
+              aria-hidden="true"
+              className={styles.mobileShowreelVeil}
+              style={scrollDriven ? { opacity: veilOpacity } : undefined}
+            />
           </div>
         </motion.div>
 
@@ -224,6 +237,11 @@ export function MobileHero() {
         >
           scroll
         </motion.button>
+        <motion.div
+          aria-hidden="true"
+          className={styles.mobileHeroBridge}
+          style={scrollDriven ? { y: bridgeY } : undefined}
+        />
       </section>
     </>
   );
