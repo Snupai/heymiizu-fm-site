@@ -1431,6 +1431,7 @@
 
 .mobileShowreel {
   border-radius: 1.7rem;
+  box-shadow: 0 1.15rem 2.8rem rgba(5, 3, 21, 0.14);
   flex: 1 1 0;
   isolation: isolate;
   margin-top: auto;
@@ -1490,6 +1491,8 @@
 
 .mobileWorkList .workLine {
   color: var(--miizu-bg);
+  overflow: hidden;
+  width: 100%;
 }
 
 .clientsSection {

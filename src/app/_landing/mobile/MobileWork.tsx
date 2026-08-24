@@ -11,8 +11,6 @@ import {
 import { workLineClassName } from "../scene/WorkLines";
 import styles from "../../miizu-landing.module.css";
 
-const LINE_EASE = INTRO_SLIDE_EASE;
-
 export function MobileWork() {
   const reduceMotion = useReducedMotion();
 
@@ -20,20 +18,21 @@ export function MobileWork() {
     <section className={styles.mobileWork} id="work">
       <div className={styles.mobileWorkList}>
         {WORK_LINES.map((line, index) => (
-          <motion.p
-            className={workLineClassName(line.variant)}
-            initial={reduceMotion ? false : { opacity: 0, x: "-42vw" }}
-            key={line.id}
-            transition={{
-              delay: reduceMotion ? 0 : index * WORK_LINE_STAGGER_S,
-              duration: reduceMotion ? 0 : 0.9,
-              ease: LINE_EASE,
-            }}
-            viewport={{ amount: 0.55, once: true }}
-            whileInView={{ opacity: 1, x: 0 }}
-          >
-            <span className={styles.workLineMotion}>{line.text}</span>
-          </motion.p>
+          <p className={workLineClassName(line.variant)} key={line.id}>
+            <motion.span
+              className={styles.workLineMotion}
+              initial={reduceMotion ? false : { opacity: 0, x: "-42%" }}
+              transition={{
+                delay: reduceMotion ? 0 : index * WORK_LINE_STAGGER_S,
+                duration: reduceMotion ? 0 : 0.85,
+                ease: INTRO_SLIDE_EASE,
+              }}
+              viewport={{ amount: 0.35, once: true }}
+              whileInView={{ opacity: 1, x: 0 }}
+            >
+              {line.text}
+            </motion.span>
+          </p>
         ))}
       </div>
 
