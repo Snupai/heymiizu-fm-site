@@ -53,12 +53,20 @@ function FooterContent() {
               <FaYoutube />
             </a>
           </div>
-          <Link
-            href="/imprint"
-            className="text-xs text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
-          >
-            Imprint
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/imprint"
+              className="text-xs text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
+            >
+              Imprint
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-xs text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
+            >
+              Privacy
+            </Link>
+          </div>
         </div>
       </footer>
     );
@@ -136,12 +144,20 @@ function FooterContent() {
                   Snupai
                 </a>
               </div>
-              <Link
-                href="/imprint"
-                className="mt-2 text-sm text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
-              >
-                Imprint
-              </Link>
+              <div className="mt-2 flex gap-3">
+                <Link
+                  href="/imprint"
+                  className="text-sm text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
+                >
+                  Imprint
+                </Link>
+                <Link
+                  href="/privacy"
+                  className="text-sm text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
+                >
+                  Privacy
+                </Link>
+              </div>
             </div>
           </div>
         </div>

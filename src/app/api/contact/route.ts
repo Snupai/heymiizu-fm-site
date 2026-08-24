@@ -269,6 +269,7 @@ export async function POST(req: NextRequest) {
     !deadlineTo ||
     !isValidDateKey(deadlineFrom) ||
     !isValidDateKey(deadlineTo) ||
+    deadlineFrom < getDateKeyInTimeZone() ||
     deadlineTo < deadlineFrom
   ) {
     return NextResponse.json(

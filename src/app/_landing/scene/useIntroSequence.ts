@@ -23,8 +23,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   const revealStartedAtRef = useRef(0);
 
   const introActive = introPhase !== "complete";
-  const introScrollLocked =
-    introActive && !(introCardIn && introCanComplete);
+  const introScrollLocked = introActive && !(introCardIn && introCanComplete);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -163,6 +162,12 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     const video = introVideoRef.current;
     if (!video) return;
 
+    if (video.networkState === video.NETWORK_NO_SOURCE) {
+      setIntroCanComplete(true);
+      setIntroPhase((phase) => (phase === "video" ? "revealing" : phase));
+      return;
+    }
+
     let timer: number | undefined;
 
     const markReady = () => setIntroCanComplete(true);
@@ -196,8 +201,13 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     setIntroCardSettled(true);
   };
 
-  const handleIntroVideoEnded = () => {
+  const finishIntroVideo = () => {
     setIntroCanComplete(true);
+    setIntroPhase((phase) => (phase === "video" ? "revealing" : phase));
+  };
+
+  const handleIntroVideoEnded = () => {
+    finishIntroVideo();
 
     const video = introVideoRef.current;
     if (!video) return;
@@ -208,9 +218,15 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     video.pause();
   };
 
+  const handleIntroVideoError = () => {
+    finishIntroVideo();
+    introVideoRef.current?.pause();
+  };
+
   return {
     handleIntroCardSlideComplete,
     handleIntroVideoEnded,
+    handleIntroVideoError,
     introActive,
     introPhase,
     introScrollLocked,

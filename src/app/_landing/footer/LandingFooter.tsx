@@ -311,7 +311,7 @@ export function LandingFooter() {
         </div>
         <nav className={styles.footerLinks} aria-label="Legal and about links">
           <Link href="/imprint">Imprint</Link>
-          <Link href="/imprint">Privacy</Link>
+          <Link href="/privacy">Privacy</Link>
           <Link href="#hero">who is miizu?</Link>
         </nav>
       </footer>

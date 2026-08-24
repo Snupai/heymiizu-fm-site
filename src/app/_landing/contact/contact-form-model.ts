@@ -2,6 +2,8 @@ import type { ValidationError } from "intl-tel-input";
 import type { DateRange } from "react-day-picker";
 import { z } from "zod";
 
+import { getDateKeyInTimeZone } from "@/lib/contact-settings";
+
 const CONTACT_EMAIL_SCHEMA = z.string().trim().email().max(120);
 
 export const SERVICES = [
@@ -35,31 +37,17 @@ export function getContactRegionFromCountry(
   return code === "DE" ? "local" : "international";
 }
 
-export function getContactRegionFromAcceptLanguage(
-  acceptLanguage: string | null | undefined,
-): ContactRegion | null {
-  const primary = acceptLanguage
-    ?.split(",")[0]
-    ?.trim()
-    .split(";")[0]
-    ?.toLowerCase();
-
-  if (primary === "de" || primary === "de-de") return "local";
-  return null;
-}
-
 export function getContactRegionFromRequest({
-  country,
-  acceptLanguage,
+  countries,
 }: {
-  country: string | null | undefined;
-  acceptLanguage: string | null | undefined;
+  countries: readonly (string | null | undefined)[];
 }): ContactRegion {
-  return (
-    getContactRegionFromCountry(country) ??
-    getContactRegionFromAcceptLanguage(acceptLanguage) ??
-    DEFAULT_CONTACT_REGION
-  );
+  for (const country of countries) {
+    const region = getContactRegionFromCountry(country);
+    if (region) return region;
+  }
+
+  return DEFAULT_CONTACT_REGION;
 }
 
 export type ContactData = {
@@ -134,12 +122,7 @@ export function getContactDateKey(date: Date) {
 }
 
 export function isAvailableContactDate(date: Date) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const candidate = new Date(date);
-  candidate.setHours(0, 0, 0, 0);
-  return candidate >= today;
+  return getContactDateKey(date) >= getDateKeyInTimeZone();
 }
 
 export function getEmailValidationMessage(email: string) {

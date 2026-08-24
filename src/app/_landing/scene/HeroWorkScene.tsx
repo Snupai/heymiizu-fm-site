@@ -63,6 +63,7 @@ export function HeroWorkScene({
   const {
     handleIntroCardSlideComplete,
     handleIntroVideoEnded,
+    handleIntroVideoError,
     introActive,
     introPhase,
     introScrollLocked,
@@ -120,7 +121,10 @@ export function HeroWorkScene({
       return;
     }
 
-    if (workSequenceStarted && scrollYProgress.get() >= SCROLL_WORK_EXIT_START) {
+    if (
+      workSequenceStarted &&
+      scrollYProgress.get() >= SCROLL_WORK_EXIT_START
+    ) {
       workSequenceTime.jump(WORK_SEQUENCE_DURATION_S);
       return;
     }
@@ -181,7 +185,7 @@ export function HeroWorkScene({
             disablePictureInPicture
             muted
             onEnded={handleIntroVideoEnded}
-            onError={handleIntroVideoEnded}
+            onError={handleIntroVideoError}
             playsInline
             preload="auto"
             style={{ y: introPhase === "complete" ? heroExitY : undefined }}

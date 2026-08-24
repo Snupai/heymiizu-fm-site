@@ -14,13 +14,8 @@ const COUNTRY_HEADERS = [
 
 export default async function HomePage() {
   const headerStore = await headers();
-  const country = COUNTRY_HEADERS.reduce<string | null>(
-    (found, name) => found ?? headerStore.get(name),
-    null,
-  );
   const initialRegion = getContactRegionFromRequest({
-    country,
-    acceptLanguage: headerStore.get("accept-language"),
+    countries: COUNTRY_HEADERS.map((name) => headerStore.get(name)),
   });
 
   return <MiizuLanding initialRegion={initialRegion} />;

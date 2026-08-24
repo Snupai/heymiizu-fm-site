@@ -161,7 +161,7 @@ The form collects a name, email, service, budget, complete project date range, a
 Key behavior:
 
 - The server rechecks commission availability before sending an inquiry.
-- Email and optional phone values are validated server-side; complete/non-past date-range rules are enforced in the browser.
+- Email, optional phone values, and complete/non-past project date ranges are validated server-side as well as in the browser.
 - Inquiries are delivered by email only and are not stored in Supabase.
 - The submitter is assigned as `replyTo`; no confirmation email is sent.
 - Paused submissions return HTTP `423`.
@@ -176,6 +176,7 @@ Rate limiting allows one submission attempt per reported client IP per minute on
 | -------------- | ---------------------------------------------------------------------- |
 | `/`            | Animated portfolio and commission experience                           |
 | `/imprint`     | Bilingual English/German legal notice                                  |
+| `/privacy`     | Bilingual privacy information for the site's data processing           |
 | `/login`       | Supabase email/password sign-in                                        |
 | `/auth`        | Alternate sign-in and account-creation interface                       |
 | `/admin`       | Role-gated project, category, user, upload, and contact administration |
