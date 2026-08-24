@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import type { PointerEvent } from "react";
 
 import styles from "../../miizu-landing.module.css";
+import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
 import { anchorRepresentedBy, measureNvaInk } from "./nva-measurement";
 
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
@@ -54,7 +55,7 @@ export function LandingFooter() {
     if (!wordmark) return;
 
     const footer = wordmark.closest("footer");
-    const compactQuery = window.matchMedia("(max-width: 760px)");
+    const compactQuery = window.matchMedia(COMPACT_LAYOUT_QUERY);
 
     const fitWordmark = () => {
       const words = [

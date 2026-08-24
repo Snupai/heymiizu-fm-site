@@ -6,7 +6,7 @@ import { WORK_LINES, type WorkLineVariant } from "./content";
 import { getWorkLineEntryX } from "./scroll-timeline";
 import styles from "../../miizu-landing.module.css";
 
-function workLineClassName(variant: WorkLineVariant) {
+export function workLineClassName(variant: WorkLineVariant) {
   switch (variant) {
     case "lead":
       return `${styles.workLine} ${styles.workLineLead}`;

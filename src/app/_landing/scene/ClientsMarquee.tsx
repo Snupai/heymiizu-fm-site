@@ -7,11 +7,13 @@ import { CLIENT_MARQUEE_ROWS, CLIENTS } from "./content";
 import styles from "../../miizu-landing.module.css";
 
 export function ClientsMarquee({
+  embedded = false,
   reduceMotion,
   x,
 }: {
+  embedded?: boolean;
   reduceMotion: boolean | null;
-  x: MotionValue<string>;
+  x?: MotionValue<string>;
 }) {
   const clientMarqueesRef = useRef<HTMLDivElement>(null);
 
@@ -99,9 +101,9 @@ export function ClientsMarquee({
   return (
     <motion.div
       aria-label="Selected clients"
-      className={styles.clientsOverlay}
+      className={embedded ? styles.clientsSection : styles.clientsOverlay}
       id="clients"
-      style={{ x }}
+      style={x ? { x } : undefined}
     >
       <div className={styles.clientsRail}>
         <span className={styles.clientsLabel}>selected clients</span>

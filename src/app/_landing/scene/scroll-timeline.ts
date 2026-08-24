@@ -183,6 +183,9 @@ export function getClientsContactFadeScaleX(progress: number) {
 
 export type IntroLayout = "compact" | "medium" | "desktop";
 
+export const COMPACT_LAYOUT_MAX_WIDTH = 760;
+export const COMPACT_LAYOUT_QUERY = `(max-width: ${COMPACT_LAYOUT_MAX_WIDTH}px)`;
+
 const INTRO_PANEL_REST = {
   compact: {
     x: "-5vw",
@@ -209,7 +212,7 @@ export function getIntroPanelRest(layout: IntroLayout) {
 }
 
 export function getIntroLayout(width: number): IntroLayout {
-  if (width <= 760) return "compact";
+  if (width <= COMPACT_LAYOUT_MAX_WIDTH) return "compact";
   if (width <= 1400) return "medium";
   return "desktop";
 }
