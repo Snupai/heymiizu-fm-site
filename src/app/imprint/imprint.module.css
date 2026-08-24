@@ -64,6 +64,8 @@
 .content {
   margin: 0 auto;
   max-width: 44rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: clamp(2.5rem, 7svh, 5rem) clamp(1.35rem, 3vw, 3.8rem) 6rem;
 }
 
@@ -116,6 +118,7 @@
 .notice a {
   border-bottom: 1px solid currentColor;
   color: var(--miizu-primary);
+  overflow-wrap: anywhere;
   text-decoration: none;
 }
 
@@ -123,4 +126,17 @@
   border: 0;
   border-top: 1px solid color-mix(in srgb, var(--miizu-ink) 12%, transparent);
   margin: 3.5rem 0;
+}
+
+@media (pointer: coarse) {
+  .backLink,
+  .directContactLink {
+    align-items: center;
+    display: inline-flex;
+    min-height: 44px;
+  }
+
+  .backLink {
+    min-width: 44px;
+  }
 }

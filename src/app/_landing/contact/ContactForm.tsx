@@ -34,10 +34,10 @@ import { useContactForm } from "./useContactForm";
 const loadPhoneUtils = () => import("intl-tel-input/utils");
 
 export function ContactForm({
-  compact,
+  narrow,
   region,
 }: {
-  compact: boolean;
+  narrow: boolean;
   region: ContactRegion;
 }) {
   const {
@@ -64,6 +64,7 @@ export function ContactForm({
     updateDeadlineRange,
     updateField,
     updatePhone,
+    validationSummary,
   } = useContactForm(region);
 
   const succeeded = result?.type === "success";
@@ -114,10 +115,23 @@ export function ContactForm({
       )}
 
       <form
+        aria-describedby={
+          validationSummary ? "contact-validation-summary" : undefined
+        }
         className={`${styles.contactForm} ${showOverlay ? styles.formPaused : ""}`}
         noValidate
         onSubmit={handleSubmit}
       >
+        {validationSummary ? (
+          <p
+            className={styles.validationSummary}
+            id="contact-validation-summary"
+            role="alert"
+          >
+            {validationSummary}
+          </p>
+        ) : null}
+
         <fieldset disabled={disabled}>
           <label htmlFor="contact-name">
             <span>what should i call you?</span>
@@ -161,7 +175,10 @@ export function ContactForm({
           </label>
 
           <label htmlFor="contact-phone">
-            <span>what&rsquo;s the best number to reach you?</span>
+            <span>
+              what&rsquo;s the best number to reach you?{" "}
+              <small className={styles.optionalField}>(optional)</small>
+            </span>
             <IntlTelInput
               containerClass={styles.phoneInput}
               countryOrder={["de", "gb", "us"]}
@@ -175,7 +192,7 @@ export function ContactForm({
                 "aria-invalid": Boolean(phoneError),
                 autoComplete: "tel",
                 onBlur: () => markFieldTouched("telephone"),
-                placeholder: "Phone number (optional)",
+                placeholder: "Phone (optional)",
               }}
               loadUtils={loadPhoneUtils}
               onChangeErrorCode={setPhoneErrorCode}
@@ -327,6 +344,7 @@ export function ContactForm({
               <PopoverContent
                 align="end"
                 className={`w-auto ${styles.contactDatePopover}`}
+                collisionPadding={2}
               >
                 <Calendar
                   className={styles.contactCalendar}
@@ -335,7 +353,7 @@ export function ContactForm({
                   disabled={(date) => !isAvailableContactDate(date)}
                   min={1}
                   month={deadlineMonth}
-                  numberOfMonths={compact ? 1 : 2}
+                  numberOfMonths={narrow ? 1 : 2}
                   onMonthChange={setDeadlineMonth}
                   onSelect={updateDeadlineRange}
                   selected={deadlineRange}

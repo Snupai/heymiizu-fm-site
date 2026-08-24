@@ -1,180 +1,148 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Logo from "./Logo";
+import { useEffect, useId, useRef, useState } from "react";
+
 import { useAuth } from "@/hooks/useAuth";
 
+import Logo from "./Logo";
+
+type NavigationItem = {
+  href: string;
+  label: string;
+  adminOnly?: boolean;
+};
+
+const navigationItems: NavigationItem[] = [
+  { href: "/", label: "Home" },
+  { href: "/#work", label: "Work" },
+  { href: "/#contact", label: "Contact" },
+  { href: "/admin", label: "Admin", adminOnly: true },
+];
+
 function NavbarContent() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const [isMobile, setIsMobile] = useState(false);
+  const menuId = useId();
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAdmin, user, signOut } = useAuth();
+  const visibleNavigationItems = navigationItems.filter(
+    (item) => !item.adminOnly || isAdmin,
+  );
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsMobile(
-        /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          window.navigator.userAgent,
-        ),
-      );
-    }
-  }, []);
+    setMenuOpen(false);
+  }, [pathname]);
 
-  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
-    // Intentionally left blank for future navigation logic
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+
+      const menu = document.getElementById(menuId);
+      const restoreTriggerFocus =
+        menu?.contains(document.activeElement) ?? false;
+
+      setMenuOpen(false);
+      if (restoreTriggerFocus) {
+        window.requestAnimationFrame(() => menuTriggerRef.current?.focus());
+      }
+    };
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const closeAtDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    desktopQuery.addEventListener("change", closeAtDesktop);
+
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      desktopQuery.removeEventListener("change", closeAtDesktop);
+    };
+  }, [menuId, menuOpen]);
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
-  if (isMobile) {
-    return (
+  return (
+    <>
       <nav
-        className="flex w-full flex-col items-center justify-between bg-white px-4 py-3 shadow-md"
-        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 3000 }}
+        aria-label="Primary navigation"
+        className="fixed inset-x-0 top-0 z-[3000] flex min-h-[var(--shared-nav-height)] flex-col bg-white px-4 shadow-md md:hidden"
       >
-        <div className="flex w-full items-center justify-between">
-          <div />
-          <div className="flex flex-1 justify-center">
+        <div className="grid min-h-[var(--shared-nav-height)] w-full grid-cols-[2.75rem_1fr_2.75rem] items-center">
+          <span aria-hidden="true" />
+          <div className="justify-self-center">
             <Logo />
           </div>
           <button
-            aria-label="Open menu"
-            style={{
-              width: 32,
-              height: 32,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "none",
-              border: "none",
-              padding: 0,
-            }}
+            aria-controls={menuId}
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-transparent text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             onClick={() => setMenuOpen((open) => !open)}
+            ref={menuTriggerRef}
+            type="button"
           >
-            <span style={{ fontSize: 28, color: "#0189ff" }}>&#9776;</span>
+            <span aria-hidden="true" className="text-[1.75rem] leading-none">
+              {menuOpen ? "×" : "☰"}
+            </span>
           </button>
         </div>
-        {menuOpen && (
+
+        {menuOpen ? (
           <div
-            className="animate-fade-in mt-2 flex w-full flex-col items-center border-t border-gray-200 bg-white"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.07)" }}
+            className="animate-fade-in absolute inset-x-0 top-full flex max-h-[calc(100dvh-var(--shared-nav-height))] flex-col overflow-y-auto border-t border-gray-200 bg-white px-4 pb-3 shadow-md"
+            data-lenis-prevent
+            id={menuId}
           >
-            <Link
-              href="/"
-              className="block w-full py-2 text-center text-lg"
-              onClick={() => setMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              href="/#work"
-              className="block w-full py-2 text-center text-lg"
-              onClick={() => setMenuOpen(false)}
-            >
-              Work
-            </Link>
-            <Link
-              href="/#contact"
-              className="block w-full py-2 text-center text-lg"
-              onClick={() => setMenuOpen(false)}
-            >
-              Contact
-            </Link>
-            {isAdmin && (
+            {visibleNavigationItems.map((item) => (
               <Link
-                href="/admin"
-                className="block w-full py-2 text-center text-lg"
+                className="flex min-h-11 w-full items-center justify-center border-b border-gray-100 px-3 text-center text-base text-ink transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
+                href={item.href}
+                key={item.href}
                 onClick={() => setMenuOpen(false)}
               >
-                Admin
+                {item.label}
               </Link>
-            )}
+            ))}
             {user ? (
               <button
+                className="flex min-h-11 w-full items-center justify-center px-3 text-center text-base text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                 onClick={() => {
                   void signOut();
                   setMenuOpen(false);
                 }}
-                className="block w-full py-2 text-center text-lg text-red-500"
+                type="button"
               >
                 Logout
               </button>
             ) : (
               <Link
+                className="flex min-h-11 w-full items-center justify-center px-3 text-center text-sm text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                 href="/login"
-                className="block w-full py-2 text-center text-sm text-gray-400"
                 onClick={() => setMenuOpen(false)}
               >
                 Login
               </Link>
             )}
           </div>
-        )}
+        ) : null}
       </nav>
-    );
-  }
-
-  // Desktop navbar
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  };
-
-  return (
-    <motion.main
-      ref={containerRef}
-      className="relative w-full overflow-hidden bg-white"
-      initial="hidden"
-      animate="visible"
-      variants={fadeIn}
-      transition={{ duration: 0.5 }}
-    >
-      <AnimatePresence>
-        {false && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
-          >
-            <motion.div
-              className="relative flex h-full w-full items-center justify-center"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.5, opacity: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-white"
-                initial={{ scale: 0, borderRadius: "50%" }}
-                animate={{ scale: 1, borderRadius: "0%" }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              />
-              <motion.h1
-                className="z-10 text-9xl font-bold text-black"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Loading...
-              </motion.h1>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <motion.nav
-        className="fixed left-0 right-0 top-0 z-[2000]"
-        variants={fadeInUp}
+        aria-label="Primary navigation"
+        animate="visible"
+        className="fixed inset-x-0 top-0 z-[2000] hidden md:block"
+        initial="hidden"
         transition={{ duration: 0.5, delay: 0.3 }}
+        variants={fadeInUp}
       >
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-transparent via-white/40 to-white/60" />
         <div
@@ -197,141 +165,73 @@ function NavbarContent() {
         />
 
         <div className="container relative z-10 mx-auto flex items-center justify-between px-12 py-8">
-          <div className="flex items-center">
-            <Logo />
-          </div>
+          <Logo />
 
           <div className="flex items-center gap-8">
             <ul className="flex items-center gap-8 text-lg">
-              <li className="inline-flex flex-col items-center">
-                <motion.div
-                  initial="initial"
-                  whileHover="hover"
-                  animate="initial"
-                  className="group relative"
+              {visibleNavigationItems.map((item) => (
+                <li
+                  className="inline-flex flex-col items-center"
+                  key={item.href}
                 >
-                  <Link
-                    href="/"
-                    className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/")}
-                  >
-                    <span
-                      className={`relative z-10 transition-colors duration-200 ${pathname === "/" ? "text-brand" : ""}`}
-                    >
-                      Home
-                      <motion.span
-                        className="absolute bottom-0 left-0 block h-[2px] bg-brand"
-                        style={{ width: "100%" }}
-                        initial={{ scaleX: 0, originX: 0 }}
-                        variants={{ hover: { scaleX: 1, originX: 0 } }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </span>
-                  </Link>
-                </motion.div>
-              </li>
-              <li className="inline-flex flex-col items-center">
-                <motion.div
-                  initial="initial"
-                  whileHover="hover"
-                  animate="initial"
-                  className="group relative"
-                >
-                  <Link
-                    href="/#work"
-                    className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/#work")}
-                  >
-                    <span className="relative z-10 transition-colors duration-200">
-                      Work
-                      <motion.span
-                        className="absolute bottom-0 left-0 block h-[2px] bg-brand"
-                        style={{ width: "100%" }}
-                        initial={{ scaleX: 0, originX: 0 }}
-                        variants={{ hover: { scaleX: 1, originX: 0 } }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </span>
-                  </Link>
-                </motion.div>
-              </li>
-              <li className="inline-flex flex-col items-center">
-                <motion.div
-                  initial="initial"
-                  whileHover="hover"
-                  animate="initial"
-                  className="group relative"
-                >
-                  <Link
-                    href="/#contact"
-                    className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/#contact")}
-                  >
-                    <span className="relative z-10 transition-colors duration-200">
-                      Contact Me
-                      <motion.span
-                        className="absolute bottom-0 left-0 block h-[2px] bg-brand"
-                        style={{ width: "100%" }}
-                        initial={{ scaleX: 0, originX: 0 }}
-                        variants={{ hover: { scaleX: 1, originX: 0 } }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </span>
-                  </Link>
-                </motion.div>
-              </li>
-              {isAdmin && (
-                <li className="inline-flex flex-col items-center">
                   <motion.div
-                    initial="initial"
-                    whileHover="hover"
                     animate="initial"
                     className="group relative"
+                    initial="initial"
+                    whileHover="hover"
                   >
                     <Link
-                      href="/admin"
-                      className="group relative block"
-                      onClick={(e) => handleLinkClick(e, "/admin")}
+                      className="group relative inline-flex items-center justify-center"
+                      data-touch-target="square"
+                      href={item.href}
                     >
                       <span
-                        className={`relative z-10 transition-colors duration-200 ${pathname === "/admin" ? "text-brand" : ""}`}
+                        className={`relative z-10 transition-colors duration-200 ${
+                          pathname === item.href ||
+                          (item.href === "/admin" && pathname === "/admin")
+                            ? "text-brand"
+                            : ""
+                        }`}
                       >
-                        Admin
+                        {item.label === "Contact" ? "Contact Me" : item.label}
                         <motion.span
                           className="absolute bottom-0 left-0 block h-[2px] bg-brand"
-                          style={{ width: "100%" }}
                           initial={{ scaleX: 0, originX: 0 }}
-                          variants={{ hover: { scaleX: 1, originX: 0 } }}
+                          style={{ width: "100%" }}
                           transition={{ duration: 0.3 }}
+                          variants={{ hover: { scaleX: 1, originX: 0 } }}
                         />
                       </span>
                     </Link>
                   </motion.div>
                 </li>
-              )}
+              ))}
             </ul>
 
-            <div className="flex items-center gap-4">
+            <AnimatePresence initial={false}>
               {user ? (
                 <button
-                  onClick={() => signOut()}
-                  className="text-sm font-medium text-gray-600 transition-colors hover:text-black"
+                  className="inline-flex items-center justify-center text-sm font-medium text-gray-600 transition-colors hover:text-black"
+                  data-touch-target="square"
+                  onClick={() => void signOut()}
+                  type="button"
                 >
                   Logout
                 </button>
               ) : (
                 <Link
+                  className="inline-flex items-center justify-center text-xs text-gray-300 transition-colors hover:text-gray-500"
+                  data-touch-target="square"
                   href="/login"
-                  className="text-xs text-gray-300 transition-colors hover:text-gray-500"
                 >
                   Login
                 </Link>
               )}
-            </div>
+            </AnimatePresence>
           </div>
         </div>
       </motion.nav>
-    </motion.main>
+    </>
   );
 }
 

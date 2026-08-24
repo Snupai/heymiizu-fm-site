@@ -68,7 +68,25 @@ export function LandingFooter() {
 
       if (compactQuery.matches) {
         footer?.style.removeProperty("--nva-size");
+
+        if (footer && footer.clientWidth > 0) {
+          const current = window.getComputedStyle(word);
+          const currentSize = Number.parseFloat(current.fontSize);
+
+          if (Number.isFinite(currentSize) && currentSize > 0) {
+            const currentInk = measureNvaInk(current, currentSize);
+
+            if (currentInk) {
+              const targetInkWidth = footer.clientWidth + 2;
+              wordmark.style.setProperty(
+                "--nva-scale-x",
+                `${targetInkWidth / currentInk.inkWidth}`,
+              );
+            }
+          }
+        }
       } else if (footer && footer.clientWidth > 0) {
+        wordmark.style.removeProperty("--nva-scale-x");
         const current = window.getComputedStyle(word);
         const currentSize = Number.parseFloat(current.fontSize);
 

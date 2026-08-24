@@ -98,9 +98,9 @@ export const ProjectsList = ({
       <div className="grid gap-4">
         {projects.map((project) => (
           <Card key={project.id}>
-            <CardContent className="flex items-center justify-between p-4">
-              <div className="flex flex-1 items-center gap-4">
-                <div className="relative h-16 w-24 overflow-hidden rounded">
+            <CardContent className="flex flex-col items-stretch gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 flex-1 items-center gap-4">
+                <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded">
                   <Image
                     src={project.thumbnail_url}
                     alt={project.title}
@@ -108,15 +108,16 @@ export const ProjectsList = ({
                     className="object-cover"
                   />
                 </div>
-                <div>
-                  <h3 className="font-semibold">{project.title}</h3>
-                  <p className="text-muted-foreground text-sm">
+                <div className="min-w-0">
+                  <h3 className="break-words font-semibold">{project.title}</h3>
+                  <p className="text-muted-foreground min-w-0 text-sm [overflow-wrap:anywhere]">
                     {project.categories?.name}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex justify-end gap-2 sm:justify-start">
                 <Button
+                  aria-label={`Edit ${project.title}`}
                   variant="outline"
                   size="sm"
                   onClick={() => onEdit(project)}
@@ -124,6 +125,7 @@ export const ProjectsList = ({
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button
+                  aria-label={`Delete ${project.title}`}
                   variant="outline"
                   size="sm"
                   onClick={(e) => handleDeleteClick(e, project)}
@@ -137,30 +139,30 @@ export const ProjectsList = ({
       </div>
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="max-w-md rounded-lg border border-black/10 bg-white p-6 [&>button]:hidden">
+        <DialogContent className="max-w-md border border-black/10 bg-white p-4 sm:p-6 [&>button]:hidden">
           <DialogHeader className="text-left">
             <DialogTitle className="mb-2 text-xl font-bold text-ink">
               Delete Project
             </DialogTitle>
-            <DialogDescription className="text-base text-ink/70">
+            <DialogDescription className="break-words text-base text-ink/70">
               Are you sure you want to delete &quot;{projectToDelete?.title}
               &quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-6 flex flex-row justify-end gap-3">
+          <DialogFooter className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Button
               variant="outline"
               onClick={() => {
                 setShowDeleteDialog(false);
                 setProjectToDelete(null);
               }}
-              className="rounded-full border border-brand bg-white px-5 py-2 text-brand transition-colors hover:bg-brand-light"
+              className="w-full rounded-full border border-brand bg-white px-5 py-2 text-brand transition-colors hover:bg-brand-light sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               onClick={handleConfirmDelete}
-              className="rounded-full bg-brand px-5 py-2 text-white transition-colors hover:bg-brand-dark"
+              className="w-full rounded-full bg-brand px-5 py-2 text-white transition-colors hover:bg-brand-dark sm:w-auto"
             >
               Delete
             </Button>

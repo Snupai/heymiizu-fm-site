@@ -12,10 +12,7 @@ function Select<Value, Multiple extends boolean | undefined = false>(
   return <SelectPrimitive.Root modal={false} {...props} />;
 }
 
-function SelectGroup({
-  className,
-  ...props
-}: SelectPrimitive.Group.Props) {
+function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
     <SelectPrimitive.Group
       className={cn(className)}
@@ -25,10 +22,7 @@ function SelectGroup({
   );
 }
 
-function SelectValue({
-  className,
-  ...props
-}: SelectPrimitive.Value.Props) {
+function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   return (
     <SelectPrimitive.Value
       className={cn(className)}
@@ -54,7 +48,9 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon
-        render={<ChevronDown aria-hidden="true" className="size-4 opacity-50" />}
+        render={
+          <ChevronDown aria-hidden="true" className="size-4 opacity-50" />
+        }
       />
     </SelectPrimitive.Trigger>
   );
@@ -72,11 +68,7 @@ function SelectContent({
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
-    | "align"
-    | "alignOffset"
-    | "side"
-    | "sideOffset"
-    | "alignItemWithTrigger"
+    "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
   >) {
   return (
     <SelectPrimitive.Portal>
@@ -85,12 +77,13 @@ function SelectContent({
         alignItemWithTrigger={alignItemWithTrigger}
         alignOffset={alignOffset}
         className="z-50"
+        collisionPadding={8}
         side={side}
         sideOffset={sideOffset}
       >
         <SelectPrimitive.Popup
           className={cn(
-            "relative z-50 max-h-[var(--available-height)] w-[var(--anchor-width)] origin-[var(--transform-origin)] overflow-x-hidden overflow-y-auto outline-none",
+            "relative z-50 max-h-[min(var(--available-height),calc(100dvh-1rem))] w-[var(--anchor-width)] max-w-[calc(100vw-1rem)] origin-[var(--transform-origin)] overflow-y-auto overflow-x-hidden outline-none",
             className,
           )}
           data-lenis-prevent
@@ -98,7 +91,9 @@ function SelectContent({
           {...props}
         >
           <SelectScrollUpButton />
-          <SelectPrimitive.List className="p-1">{children}</SelectPrimitive.List>
+          <SelectPrimitive.List className="p-1">
+            {children}
+          </SelectPrimitive.List>
           <SelectScrollDownButton />
         </SelectPrimitive.Popup>
       </SelectPrimitive.Positioner>
@@ -114,7 +109,7 @@ function SelectItem({
   return (
     <SelectPrimitive.Item
       className={cn(
-        "relative flex w-full cursor-default select-none items-center py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "relative flex min-h-9 w-full cursor-default select-none items-center py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className,
       )}
       data-slot="select-item"

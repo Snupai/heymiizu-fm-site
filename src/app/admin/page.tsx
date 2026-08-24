@@ -86,27 +86,22 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen pt-20">
-      <header className="border-border bg-card/50 sticky top-20 z-40 border-b backdrop-blur-sm">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/")}
-          >
+    <div className="bg-background min-h-screen pt-[var(--shared-nav-height)]">
+      <header className="border-border bg-card/50 sticky top-[var(--shared-nav-height)] z-40 border-b backdrop-blur-sm">
+        <div className="container mx-auto grid grid-cols-1 items-center gap-3 px-4 py-4 sm:grid-cols-[1fr_auto_1fr]">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-center text-xl font-bold sm:text-2xl">
             <span className="text-gradient">Admin Dashboard</span>
           </h1>
-          <div className="w-[100px]" />
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto min-w-0 px-4 py-6 sm:py-8">
         <Tabs defaultValue="projects" className="space-y-6">
-          <TabsList className="grid w-full max-w-xl grid-cols-4">
+          <TabsList className="grid h-auto w-full max-w-xl grid-cols-2 gap-1 md:grid-cols-4">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -116,9 +111,12 @@ const AdminPage = () => {
           <TabsContent value="projects" className="space-y-6">
             {!showProjectForm ? (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <h2 className="text-2xl font-bold">Manage Projects</h2>
-                  <Button onClick={() => setShowProjectForm(true)}>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => setShowProjectForm(true)}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Project
                   </Button>
@@ -158,9 +156,12 @@ const AdminPage = () => {
           <TabsContent value="categories" className="space-y-6">
             {!showCategoryForm ? (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <h2 className="text-2xl font-bold">Manage Categories</h2>
-                  <Button onClick={() => setShowCategoryForm(true)}>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => setShowCategoryForm(true)}
+                  >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Category
                   </Button>

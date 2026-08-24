@@ -26,7 +26,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <NavbarContent />
       </ChromeGate>
       <AutoLogout />
-      <div className="flex flex-1 flex-col">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col" data-primary-shell>
+        {children}
+      </div>
       <ChromeGate>
         <FooterContent />
       </ChromeGate>

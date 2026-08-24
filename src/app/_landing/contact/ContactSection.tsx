@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, type MotionValue } from "framer-motion";
+import { useLenis } from "lenis/react";
 // import { ArrowUpRight } from "lucide-react";
 import {
   useCallback,
@@ -12,15 +13,45 @@ import {
 
 import { CONTACT_HEADLINES } from "./content";
 import styles from "../../miizu-landing.module.css";
+import { SCROLL_CONTACT_SET } from "../scene/scroll-timeline";
 import { ContactForm } from "./ContactForm";
 import type { ContactRegion } from "./contact-form-model";
 
+const CONTACT_HANDOFF_LERP = 0.1;
 const REGION_PILL_SPRING = {
   type: "spring",
   stiffness: 520,
   damping: 28,
   mass: 0.6,
 } as const;
+
+function nestedContactScrollerCanConsume(
+  target: EventTarget | null,
+  root: HTMLElement,
+  deltaY: number,
+) {
+  let element = target instanceof HTMLElement ? target : null;
+
+  while (element) {
+    const { overflowY } = window.getComputedStyle(element);
+    const scrollable =
+      (overflowY === "auto" ||
+        overflowY === "overlay" ||
+        overflowY === "scroll") &&
+      element.scrollHeight > element.clientHeight + 1;
+
+    if (scrollable) {
+      const maxScrollTop = element.scrollHeight - element.clientHeight;
+      if (deltaY > 0 && element.scrollTop < maxScrollTop - 1) return true;
+      if (deltaY < 0 && element.scrollTop > 1) return true;
+    }
+
+    if (element === root) break;
+    element = element.parentElement;
+  }
+
+  return false;
+}
 
 function RegionToggle({
   region,
@@ -99,16 +130,19 @@ function RegionToggle({
 }
 
 export function ContactSection({
-  compact,
+  narrow,
   initialRegion,
   wipeX,
 }: {
-  compact: boolean;
+  narrow: boolean;
   initialRegion: ContactRegion;
   wipeX: MotionValue<string>;
 }) {
   const [region, setRegion] = useState<ContactRegion>(initialRegion);
   const [headlineIndex, setHeadlineIndex] = useState(0);
+  const contactWipeRef = useRef<HTMLDivElement>(null);
+  const lastTouchY = useRef<number | null>(null);
+  const lenis = useLenis();
 
   useEffect(() => {
     setHeadlineIndex(Math.floor(Math.random() * CONTACT_HEADLINES.length));
@@ -119,10 +153,100 @@ export function ContactSection({
   //   process.env.NEXT_PUBLIC_BOOKING_URL ??
   //   "mailto:hey@miizumelon.com?subject=Let%27s%20book%20a%20call";
 
+  useEffect(() => {
+    const contactWipe = contactWipeRef.current;
+    if (!contactWipe) return;
+
+    const handOffToTimeline = (deltaY: number) => {
+      if (!lenis || deltaY === 0) return false;
+
+      const contactSettled =
+        Math.abs(contactWipe.getBoundingClientRect().left) < 2;
+      lenis.scrollTo(lenis.targetScroll + deltaY, {
+        lerp: CONTACT_HANDOFF_LERP,
+        programmatic: false,
+        userData: contactSettled
+          ? { skipPause: { at: SCROLL_CONTACT_SET, dir: "down" } }
+          : undefined,
+      });
+      return true;
+    };
+
+    const handleWheel = (event: globalThis.WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      if (
+        nestedContactScrollerCanConsume(event.target, contactWipe, event.deltaY)
+      ) {
+        return;
+      }
+
+      const deltaScale =
+        event.deltaMode === globalThis.WheelEvent.DOM_DELTA_LINE
+          ? 16.666666666666668
+          : event.deltaMode === globalThis.WheelEvent.DOM_DELTA_PAGE
+            ? window.innerHeight
+            : 1;
+      if (!handOffToTimeline(event.deltaY * deltaScale)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    const handleTouchStart = (event: globalThis.TouchEvent) => {
+      lastTouchY.current = event.touches[0]?.clientY ?? null;
+    };
+
+    const handleTouchMove = (event: globalThis.TouchEvent) => {
+      const currentY = event.touches[0]?.clientY;
+      const previousY = lastTouchY.current;
+      if (currentY === undefined || previousY === null) return;
+
+      lastTouchY.current = currentY;
+      const deltaY = previousY - currentY;
+      if (Math.abs(deltaY) < 0.5) return;
+      if (nestedContactScrollerCanConsume(event.target, contactWipe, deltaY)) {
+        return;
+      }
+      if (!handOffToTimeline(deltaY)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    const resetTouchTracking = () => {
+      lastTouchY.current = null;
+    };
+
+    contactWipe.addEventListener("wheel", handleWheel, {
+      capture: true,
+      passive: false,
+    });
+    contactWipe.addEventListener("touchstart", handleTouchStart, {
+      capture: true,
+      passive: true,
+    });
+    contactWipe.addEventListener("touchmove", handleTouchMove, {
+      capture: true,
+      passive: false,
+    });
+    contactWipe.addEventListener("touchend", resetTouchTracking, true);
+    contactWipe.addEventListener("touchcancel", resetTouchTracking, true);
+
+    return () => {
+      contactWipe.removeEventListener("wheel", handleWheel, true);
+      contactWipe.removeEventListener("touchstart", handleTouchStart, true);
+      contactWipe.removeEventListener("touchmove", handleTouchMove, true);
+      contactWipe.removeEventListener("touchend", resetTouchTracking, true);
+      contactWipe.removeEventListener("touchcancel", resetTouchTracking, true);
+    };
+  }, [lenis]);
+
   return (
     <motion.div
       className={styles.contactWipe}
+      data-contact-scroll-container
       id="contact"
+      ref={contactWipeRef}
       style={{ x: wipeX }}
     >
       <div className={styles.contactSection}>
@@ -161,8 +285,8 @@ export function ContactSection({
           </div>
         </div>
 
-        <div className={styles.formPanel}>
-          <ContactForm compact={compact} region={region} />
+        <div className={styles.formPanel} data-contact-scroll-container>
+          <ContactForm narrow={narrow} region={region} />
         </div>
       </div>
     </motion.div>

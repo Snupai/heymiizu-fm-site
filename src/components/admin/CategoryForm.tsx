@@ -65,7 +65,7 @@ export const CategoryForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="name">Name *</Label>
           <Input
@@ -106,15 +106,20 @@ export const CategoryForm = ({
         />
       </div>
 
-      <div className="flex gap-3">
-        <Button type="submit" disabled={loading}>
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button className="w-full sm:w-auto" type="submit" disabled={loading}>
           {loading
             ? "Saving..."
             : category
               ? "Update Category"
               : "Create Category"}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button
+          className="w-full sm:w-auto"
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </div>

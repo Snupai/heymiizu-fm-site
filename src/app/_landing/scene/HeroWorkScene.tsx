@@ -35,6 +35,7 @@ export function HeroWorkScene({
 }) {
   const reduceMotion = useReducedMotion();
   const [compact, setCompact] = useState(false);
+  const [contactNarrow, setContactNarrow] = useState(false);
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -53,11 +54,21 @@ export function HeroWorkScene({
   }, []);
 
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 760px)");
-    const sync = () => setCompact(query.matches);
+    const compactQuery = window.matchMedia("(max-width: 760px)");
+    const contactQuery = window.matchMedia("(max-width: 960px)");
+    const sync = () => {
+      setCompact(compactQuery.matches);
+      setContactNarrow(contactQuery.matches);
+    };
+
     sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
+    compactQuery.addEventListener("change", sync);
+    contactQuery.addEventListener("change", sync);
+
+    return () => {
+      compactQuery.removeEventListener("change", sync);
+      contactQuery.removeEventListener("change", sync);
+    };
   }, []);
 
   const {
@@ -120,7 +131,10 @@ export function HeroWorkScene({
       return;
     }
 
-    if (workSequenceStarted && scrollYProgress.get() >= SCROLL_WORK_EXIT_START) {
+    if (
+      workSequenceStarted &&
+      scrollYProgress.get() >= SCROLL_WORK_EXIT_START
+    ) {
       workSequenceTime.jump(WORK_SEQUENCE_DURATION_S);
       return;
     }
@@ -166,29 +180,27 @@ export function HeroWorkScene({
       ref={sceneRef}
     >
       <div className={styles.stickyStage}>
-        {!reduceMotion ? (
-          <motion.video
-            ref={introVideoRef}
-            aria-hidden="true"
-            autoPlay
-            className={`${styles.heroIntroVideo} ${
-              introPhase === "video"
-                ? styles.heroIntroVideoOverlay
-                : introPhase === "revealing"
-                  ? styles.heroIntroVideoRevealing
-                  : ""
-            }`}
-            disablePictureInPicture
-            muted
-            onEnded={handleIntroVideoEnded}
-            onError={handleIntroVideoEnded}
-            playsInline
-            preload="auto"
-            style={{ y: introPhase === "complete" ? heroExitY : undefined }}
-          >
-            <source src="/preload_v2.mp4" type="video/mp4" />
-          </motion.video>
-        ) : null}
+        <motion.video
+          ref={introVideoRef}
+          aria-hidden="true"
+          autoPlay
+          className={`${styles.heroIntroVideo} ${
+            introPhase === "video"
+              ? styles.heroIntroVideoOverlay
+              : introPhase === "revealing"
+                ? styles.heroIntroVideoRevealing
+                : ""
+          }`}
+          disablePictureInPicture
+          muted
+          onEnded={handleIntroVideoEnded}
+          onError={handleIntroVideoEnded}
+          playsInline
+          preload="auto"
+          style={{ y: introPhase === "complete" ? heroExitY : undefined }}
+        >
+          <source src="/preload_v2.mp4" type="video/mp4" />
+        </motion.video>
 
         <motion.header
           animate={
@@ -285,7 +297,9 @@ export function HeroWorkScene({
                 <source src="/showreel_2026.mp4" type="video/mp4" />
               </video>
             </motion.div>
+          </motion.div>
 
+          <div className={styles.showreelOverlays}>
             <ClientsMarquee reduceMotion={reduceMotion} x={clientsOverlayX} />
 
             <motion.div
@@ -306,7 +320,7 @@ export function HeroWorkScene({
               workExitX={workExitX}
               workSequenceTime={workSequenceTime}
             />
-          </motion.div>
+          </div>
         </motion.section>
 
         <motion.div
@@ -324,7 +338,7 @@ export function HeroWorkScene({
         </motion.div>
 
         <ContactSection
-          compact={compact}
+          narrow={contactNarrow}
           initialRegion={initialRegion}
           wipeX={contactWipeX}
         />

@@ -64,20 +64,21 @@ export const CategoriesList = ({
     <div className="grid gap-4">
       {categories.map((category) => (
         <Card key={category.id}>
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <h3 className="flex items-center gap-2 font-semibold">
+          <CardContent className="flex flex-col items-stretch gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h3 className="flex min-w-0 items-center gap-2 break-words font-semibold">
                 {category.icon && <span>{category.icon}</span>}
                 {category.name}
               </h3>
               {category.description && (
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground break-words text-sm">
                   {category.description}
                 </p>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex justify-end gap-2 sm:justify-start">
               <Button
+                aria-label={`Edit ${category.name}`}
                 variant="outline"
                 size="sm"
                 onClick={() => onEdit(category)}
@@ -85,6 +86,7 @@ export const CategoriesList = ({
                 <Edit className="h-4 w-4" />
               </Button>
               <Button
+                aria-label={`Delete ${category.name}`}
                 variant="outline"
                 size="sm"
                 onClick={() => handleDelete(category.id)}

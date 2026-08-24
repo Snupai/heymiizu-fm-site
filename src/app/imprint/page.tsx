@@ -63,10 +63,14 @@ export default function ImprintPage() {
           <h2 className={styles.imprintH2}>Contact</h2>
           <p>
             <strong>Phone:</strong>{" "}
-            <a href="tel:+4915120767544">+49 1512 0767544</a>
+            <a className={styles.directContactLink} href="tel:+4915120767544">
+              +49 1512 0767544
+            </a>
             <br />
             <strong>Email:</strong>{" "}
-            <a href="mailto:nya@snupai.me">nya@snupai.me</a>
+            <a className={styles.directContactLink} href="mailto:nya@snupai.me">
+              nya@snupai.me
+            </a>
           </p>
         </section>
         <section className={styles.imprintSection}>
@@ -191,10 +195,14 @@ export default function ImprintPage() {
           <h2 className={styles.imprintH2}>Kontakt</h2>
           <p>
             <strong>Telefon:</strong>{" "}
-            <a href="tel:+4915120767544">+49 1512 0767544</a>
+            <a className={styles.directContactLink} href="tel:+4915120767544">
+              +49 1512 0767544
+            </a>
             <br />
             <strong>E-Mail:</strong>{" "}
-            <a href="mailto:nya@snupai.me">nya@snupai.me</a>
+            <a className={styles.directContactLink} href="mailto:nya@snupai.me">
+              nya@snupai.me
+            </a>
           </p>
         </section>
         <section className={styles.imprintSection}>

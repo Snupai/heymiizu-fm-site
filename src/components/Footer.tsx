@@ -1,152 +1,147 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { FaTwitter } from "react-icons/fa";
-import { FaInstagram } from "react-icons/fa";
-import { FaYoutube } from "react-icons/fa";
+import Link from "next/link";
+import type { IconType } from "react-icons";
+import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+
+type SocialAction = {
+  compactHref: string;
+  icon: IconType;
+  label: string;
+  wideHref: string;
+};
+
+const socialActions: SocialAction[] = [
+  {
+    compactHref: "https://x.com/heymiizu",
+    icon: FaTwitter,
+    label: "Twitter",
+    wideHref: "https://x.com/FromNuvia",
+  },
+  {
+    compactHref: "https://www.instagram.com/miizumelon/",
+    icon: FaInstagram,
+    label: "Instagram",
+    wideHref: "https://www.instagram.com/fromnuvia/",
+  },
+  {
+    compactHref: "https://www.youtube.com/@Miizumelon",
+    icon: FaYoutube,
+    label: "YouTube",
+    wideHref: "https://www.youtube.com/@Miizumelon",
+  },
+];
 
 function FooterContent() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsMobile(
-        /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          window.navigator.userAgent,
-        ),
-      );
-    }
-  }, []);
-
-  if (isMobile) {
-    return (
-      <footer className="w-full border-t border-gray-200 bg-white py-4">
-        <div className="flex flex-col items-center gap-1">
-          <div className="mb-1 flex items-center justify-center gap-8">
-            <a
-              href="https://x.com/heymiizu"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Twitter"
-              className="text-2xl text-ink transition-colors hover:text-brand"
-            >
-              <FaTwitter />
-            </a>
-            <a
-              href="https://www.instagram.com/miizumelon/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="text-2xl text-ink transition-colors hover:text-brand"
-            >
-              <FaInstagram />
-            </a>
-            <a
-              href="https://www.youtube.com/@Miizumelon"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="YouTube"
-              className="text-2xl text-ink transition-colors hover:text-brand"
-            >
-              <FaYoutube />
-            </a>
+  return (
+    <>
+      <footer className="w-full border-t border-gray-200 bg-white py-3 md:hidden">
+        <div className="flex flex-col items-center gap-1 px-4">
+          <a
+            className="flex min-h-11 items-center justify-center px-3 text-sm text-ink transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            href="mailto:hey@miizumelon.de"
+          >
+            hey@miizumelon.de
+          </a>
+          <div className="flex items-center justify-center gap-4">
+            {socialActions.map(({ compactHref, icon: Icon, label }) => (
+              <a
+                aria-label={label}
+                className="flex h-11 w-11 items-center justify-center rounded-full text-2xl text-ink transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                href={compactHref}
+                key={label}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Icon aria-hidden="true" />
+              </a>
+            ))}
           </div>
           <Link
+            className="flex min-h-11 items-center justify-center px-4 text-xs text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             href="/imprint"
-            className="text-xs text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
           >
             Imprint
           </Link>
         </div>
       </footer>
-    );
-  }
 
-  return (
-    <div className="relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] w-screen border-t border-gray-200 bg-white">
-      <div className="py-4">
-        <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="flex flex-col">
-            {/* Main Footer Content */}
-            <div className="mb-4 flex items-center justify-between">
-              {/* Left Side: Logo and Email */}
-              <div className="flex items-center space-x-6">
-                <Link href="/" className="relative h-12 w-12">
-                  <Image
-                    src="/Sentimental_Icon.png"
-                    alt="Miizu Logo"
-                    fill
-                    className="object-contain"
-                  />
+      <footer className="relative hidden w-full border-t border-gray-200 bg-white md:block">
+        <div className="py-4">
+          <div className="mx-auto max-w-7xl px-4 md:px-8">
+            <div className="flex flex-col">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center space-x-6">
+                  <Link
+                    className="relative h-12 w-12"
+                    data-touch-target="square"
+                    href="/"
+                  >
+                    <Image
+                      alt="Miizu Logo"
+                      className="object-contain"
+                      fill
+                      src="/Sentimental_Icon.png"
+                    />
+                  </Link>
+                  <a
+                    className="inline-flex items-center justify-center text-base text-ink transition-colors duration-300 hover:text-brand"
+                    data-touch-target="square"
+                    href="mailto:hey@miizumelon.de"
+                  >
+                    hey@miizumelon.de
+                  </a>
+                </div>
+
+                <div className="flex space-x-6">
+                  {socialActions.map(({ label, wideHref }) => (
+                    <a
+                      className="inline-flex items-center justify-center text-base text-ink transition-colors duration-300 hover:text-brand"
+                      data-touch-target="square"
+                      href={wideHref}
+                      key={label}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center border-t border-black/5 pt-3">
+                <div className="flex items-center space-x-1 text-xs text-ink opacity-70">
+                  <p>
+                    Made with{" "}
+                    <span className="inline-block animate-pulse text-[#8839ef]">
+                      ❤
+                    </span>{" "}
+                    by
+                  </p>
+                  <a
+                    className="inline-flex items-center justify-center transition-colors duration-300 hover:text-ink"
+                    data-touch-target="square"
+                    href="https://snupai.me"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Snupai
+                  </a>
+                </div>
+                <Link
+                  className="mt-2 inline-flex items-center justify-center text-sm text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
+                  data-touch-target="square"
+                  href="/imprint"
+                >
+                  Imprint
                 </Link>
-                <a
-                  href="mailto:hey@miizumelon.de"
-                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
-                >
-                  hey@miizumelon.de
-                </a>
               </div>
-
-              {/* Right Side: Social Links */}
-              <div className="flex space-x-6">
-                <a
-                  href="https://x.com/FromNuvia"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
-                >
-                  Twitter
-                </a>
-                <a
-                  href="https://www.instagram.com/fromnuvia/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
-                >
-                  Instagram
-                </a>
-                <a
-                  href="https://www.youtube.com/@Miizumelon"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-ink transition-colors duration-300 hover:text-brand"
-                >
-                  YouTube
-                </a>
-              </div>
-            </div>
-
-            {/* Made with Heart - Centered at Bottom */}
-            <div className="flex flex-col items-center border-t border-black/5 pt-3">
-              <div className="flex items-center space-x-1 text-xs text-ink opacity-70">
-                <p>
-                  Made with{" "}
-                  <span className="inline-block animate-pulse text-[#8839ef]">
-                    ❤
-                  </span>{" "}
-                  by
-                </p>
-                <a
-                  href="https://snupai.me"
-                  target="_blank"
-                  className="transition-colors duration-300 hover:text-ink"
-                >
-                  Snupai
-                </a>
-              </div>
-              <Link
-                href="/imprint"
-                className="mt-2 text-sm text-ink underline opacity-80 transition-colors duration-300 hover:text-brand hover:opacity-100"
-              >
-                Imprint
-              </Link>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </footer>
+    </>
   );
 }
 

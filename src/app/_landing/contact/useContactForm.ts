@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import type { DateRange } from "react-day-picker";
 
-const SUCCESS_DISMISS_MS = 6000;
-
 import type { ContactFormStatus } from "@/lib/contact-settings";
 
 import {
@@ -23,6 +21,44 @@ import type {
   ContactRegion,
   ValidatedContactField,
 } from "./contact-form-model";
+
+const SUCCESS_DISMISS_MS = 6000;
+const CONTACT_SCROLL_CONTAINER_SELECTOR = "[data-contact-scroll-container]";
+
+function scrollFieldIntoContactContainer(field: HTMLElement) {
+  let candidate = field.parentElement;
+
+  while (candidate) {
+    if (candidate.matches(CONTACT_SCROLL_CONTAINER_SELECTOR)) {
+      const { overflowY } = window.getComputedStyle(candidate);
+      const canScroll =
+        (overflowY === "auto" || overflowY === "scroll") &&
+        candidate.scrollHeight > candidate.clientHeight + 1;
+
+      if (canScroll) {
+        const containerBox = candidate.getBoundingClientRect();
+        const fieldBox = field.getBoundingClientRect();
+        const desiredTop =
+          candidate.scrollTop +
+          fieldBox.top -
+          containerBox.top -
+          (candidate.clientHeight - fieldBox.height) / 2;
+        const maxTop = candidate.scrollHeight - candidate.clientHeight;
+
+        candidate.scrollTo({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches
+            ? "auto"
+            : "smooth",
+          top: Math.min(maxTop, Math.max(0, desiredTop)),
+        });
+        return;
+      }
+    }
+
+    candidate = candidate.parentElement;
+  }
+}
 
 export function useContactForm(region: ContactRegion) {
   const [data, setData] = useState<ContactData>(INITIAL_CONTACT_DATA);
@@ -43,6 +79,9 @@ export function useContactForm(region: ContactRegion) {
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [validationSummary, setValidationSummary] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -85,6 +124,7 @@ export function useContactForm(region: ContactRegion) {
   const updateField = (field: keyof ContactData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
     setResult(null);
+    setValidationSummary(null);
   };
 
   const markFieldTouched = (field: ValidatedContactField) => {
@@ -100,6 +140,7 @@ export function useContactForm(region: ContactRegion) {
     setResult((current) =>
       phone === "" && current?.type === "success" ? current : null,
     );
+    setValidationSummary(null);
     if (phone) markFieldTouched("telephone");
   };
 
@@ -160,23 +201,43 @@ export function useContactForm(region: ContactRegion) {
     event.preventDefault();
     if (submitting || status.paused || statusLoading) return;
 
+    const form = event.currentTarget;
+    const invalidFieldId = nameValidationMessage
+      ? "contact-name"
+      : emailValidationMessage
+        ? "contact-email"
+        : phoneValidationMessage
+          ? "contact-phone"
+          : serviceValidationMessage
+            ? "service"
+            : budgetValidationMessage
+              ? "budget"
+              : deadlineValidationMessage
+                ? "deadline-picker"
+                : descriptionValidationMessage
+                  ? "project-description"
+                  : null;
+
     setTouchedFields(ALL_CONTACT_FIELDS_TOUCHED);
 
-    if (
-      nameValidationMessage ||
-      emailValidationMessage ||
-      phoneValidationMessage ||
-      serviceValidationMessage ||
-      budgetValidationMessage ||
-      deadlineValidationMessage ||
-      descriptionValidationMessage
-    ) {
+    if (invalidFieldId) {
       setResult(null);
+      setValidationSummary(
+        "Please review the highlighted fields before sending your request.",
+      );
+      window.requestAnimationFrame(() => {
+        const field = form.querySelector<HTMLElement>(`#${invalidFieldId}`);
+        if (!field) return;
+
+        field.focus({ preventScroll: true });
+        scrollFieldIntoContactContainer(field);
+      });
       return;
     }
 
     setSubmitting(true);
     setResult(null);
+    setValidationSummary(null);
 
     try {
       const response = await fetch("/api/contact", {
@@ -259,5 +320,6 @@ export function useContactForm(region: ContactRegion) {
     updateDeadlineRange,
     updateField,
     updatePhone,
+    validationSummary,
   };
 }

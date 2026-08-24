@@ -82,6 +82,15 @@
     "SF Pro Display", -apple-system, BlinkMacSystemFont,
     var(--font-rethink-sans), system-ui, sans-serif;
   --radius: 0.625rem;
+  /* Shared fixed chrome contract. Sticky route headers should offset by this
+     value rather than duplicating navbar measurements. */
+  --shared-nav-height: 4rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --shared-nav-height: 6.5rem;
+  }
 }
 
 html {
@@ -119,7 +128,6 @@ html {
 /* Keep overflow while Lenis is stopped (intro lock, scene pauses). Overlay
    scrollbars do not take layout width, so showing/hiding them does not jump. */
 html.lenis:not(.lenis-autoToggle).lenis-stopped {
-  overflow-x: clip;
   overflow-y: overlay;
 }
 
@@ -153,11 +161,47 @@ body {
   font-weight: 600;
   letter-spacing: 0.02em;
   max-width: 100%;
-  overflow-x: clip;
+  min-width: 0;
 }
 
 @layer base {
   body {
     @apply bg-white text-black;
+  }
+}
+
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (pointer: coarse) {
+  [data-slot="button"],
+  [data-slot="input"],
+  [data-slot="select-trigger"],
+  [data-slot="select-item"],
+  [data-slot="dialog-close"],
+  [data-slot="tabs-trigger"],
+  [data-touch-target] {
+    min-height: 44px;
+  }
+
+  [data-slot="button"],
+  [data-slot="dialog-close"],
+  [data-touch-target="square"] {
+    min-width: 44px;
+  }
+
+  [data-slot="calendar"] {
+    --cell-size: 44px !important;
+    padding: 4px;
+  }
+
+  [data-slot="calendar"] button {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

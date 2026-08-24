@@ -108,7 +108,7 @@ export function ContactSettingsForm() {
   return (
     <Card className="max-w-2xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex flex-wrap items-center gap-2">
           <PauseCircle className="h-5 w-5" />
           Contact form availability
         </CardTitle>
@@ -123,8 +123,8 @@ export function ContactSettingsForm() {
           </p>
         ) : (
           <>
-            <div className="flex items-center justify-between gap-6 rounded-lg border p-4">
-              <div>
+            <div className="flex flex-col items-stretch gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+              <div className="min-w-0">
                 <p className="font-medium">Pause contact form</p>
                 <p className="text-muted-foreground text-sm">
                   Visitors will see that commissions are paused and cannot
@@ -142,17 +142,22 @@ export function ContactSettingsForm() {
                     pauseUntil: current.paused ? null : current.pauseUntil,
                   }))
                 }
-                className={`relative h-7 w-12 shrink-0 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
-                  settings.paused
-                    ? "border-brand-dark bg-brand"
-                    : "border-gray-400 bg-gray-300"
-                }`}
+                className="relative flex h-11 w-[3.25rem] shrink-0 items-center justify-center self-end rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:self-auto"
               >
                 <span
-                  className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full border border-gray-200 bg-white shadow-md transition-transform ${
-                    settings.paused ? "translate-x-5" : "translate-x-0"
+                  aria-hidden="true"
+                  className={`relative h-7 w-12 rounded-full border transition-colors ${
+                    settings.paused
+                      ? "border-brand-dark bg-brand"
+                      : "border-gray-400 bg-gray-300"
                   }`}
-                />
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full border border-gray-200 bg-white shadow-md transition-transform ${
+                      settings.paused ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </span>
               </button>
             </div>
 
@@ -176,7 +181,7 @@ export function ContactSettingsForm() {
                       pauseUntil: event.target.value || null,
                     }))
                   }
-                  className="max-w-xs"
+                  className="w-full max-w-xs"
                 />
                 <p className="text-muted-foreground text-sm">
                   Leave blank to pause indefinitely. With a date, the form
@@ -185,12 +190,16 @@ export function ContactSettingsForm() {
               </div>
             )}
 
-            <div className="flex items-center gap-3">
-              <Button onClick={handleSave} disabled={saving || !isDirty}>
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+              <Button
+                className="w-full sm:w-auto"
+                onClick={handleSave}
+                disabled={saving || !isDirty}
+              >
                 {saving ? "Saving..." : "Save availability"}
               </Button>
               <span
-                className="text-muted-foreground text-sm"
+                className="text-muted-foreground min-w-0 break-words text-sm"
                 aria-live="polite"
               >
                 {savedSettings.paused

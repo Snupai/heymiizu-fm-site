@@ -147,10 +147,10 @@ export function useHeroWorkTimeline(compact: boolean) {
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED],
     ["0%", "0%", "-100%"],
   );
-  const workExitX = useTransform(
-    scrollYProgress,
-    (progress) => `${getMarqueeHandoffProgress(progress) * 100}vw`,
-  );
+  const workExitX = useTransform(scrollYProgress, (progress) => {
+    const handoff = getMarqueeHandoffProgress(progress);
+    return `calc(${handoff * 100}vw + ${handoff}px)`;
+  });
   const clientsOverlayX = useTransform(
     scrollYProgress,
     (progress) => `${(getMarqueeHandoffProgress(progress) - 1) * 100}%`,

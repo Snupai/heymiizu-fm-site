@@ -64,10 +64,12 @@ export const UsersList = ({ refreshTrigger }: UsersListProps) => {
     <div className="grid gap-4">
       {users.map((user) => (
         <Card key={user.id}>
-          <CardContent className="flex items-center justify-between p-4">
-            <div className="space-y-1">
-              <p className="font-medium">{user.email ?? "No email found"}</p>
-              <p className="text-muted-foreground font-mono text-xs">
+          <CardContent className="flex flex-col items-stretch gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <p className="break-all font-medium">
+                {user.email ?? "No email found"}
+              </p>
+              <p className="text-muted-foreground break-all font-mono text-xs">
                 ID: {user.user_id}
               </p>
               <Badge
@@ -82,9 +84,10 @@ export const UsersList = ({ refreshTrigger }: UsersListProps) => {
                 {user.role}
               </Badge>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end">
               {user.role !== "admin" && (
                 <Button
+                  className="w-full sm:w-auto"
                   variant="outline"
                   size="sm"
                   onClick={() => updateRole(user.user_id, "admin")}
@@ -94,6 +97,7 @@ export const UsersList = ({ refreshTrigger }: UsersListProps) => {
               )}
               {user.role !== "pending" && (
                 <Button
+                  className="w-full sm:w-auto"
                   variant="outline"
                   size="sm"
                   onClick={() => updateRole(user.user_id, "pending")}
@@ -103,6 +107,7 @@ export const UsersList = ({ refreshTrigger }: UsersListProps) => {
               )}
               {user.role !== "denied" && (
                 <Button
+                  className="w-full sm:w-auto"
                   variant="outline"
                   size="sm"
                   onClick={() => updateRole(user.user_id, "denied")}

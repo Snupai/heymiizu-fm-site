@@ -214,9 +214,10 @@ export const ProjectForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="video">Video {!project && "*"}</Label>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">
           <Input
             id="video"
+            className="min-w-0 max-w-full overflow-hidden"
             type="file"
             accept="video/*"
             onChange={(e) => {
@@ -246,7 +247,7 @@ export const ProjectForm = ({
             }}
             required={!project}
           />
-          <Upload className="text-muted-foreground h-5 w-5" />
+          <Upload className="text-muted-foreground h-5 w-5 shrink-0" />
         </div>
         {project && (
           <p className="text-muted-foreground text-xs">
@@ -257,15 +258,16 @@ export const ProjectForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="thumbnail">Thumbnail {!project && "*"}</Label>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">
           <Input
             id="thumbnail"
+            className="min-w-0 max-w-full overflow-hidden"
             type="file"
             accept="image/*"
             onChange={(e) => setThumbnailFile(e.target.files?.[0] ?? null)}
             required={!project}
           />
-          <Upload className="text-muted-foreground h-5 w-5" />
+          <Upload className="text-muted-foreground h-5 w-5 shrink-0" />
         </div>
         {project && (
           <p className="text-muted-foreground text-xs">
@@ -284,8 +286,8 @@ export const ProjectForm = ({
             <Progress value={uploadProgress} className="h-2" />
           </div>
         )}
-        <div className="flex gap-3">
-          <Button type="submit" disabled={loading}>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button className="w-full sm:w-auto" type="submit" disabled={loading}>
             {loading
               ? "Saving..."
               : project
@@ -293,6 +295,7 @@ export const ProjectForm = ({
                 : "Create Project"}
           </Button>
           <Button
+            className="w-full sm:w-auto"
             type="button"
             variant="outline"
             onClick={onCancel}

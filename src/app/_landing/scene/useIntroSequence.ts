@@ -14,22 +14,20 @@ export type IntroPhase = "video" | "revealing" | "complete";
 export function useIntroSequence(reduceMotion: boolean | null) {
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const showreelVideoRef = useRef<HTMLVideoElement>(null);
-  const [introPhase, setIntroPhase] = useState<IntroPhase>(
-    reduceMotion ? "complete" : "video",
-  );
+  const [introPhase, setIntroPhase] = useState<IntroPhase>("video");
   const [introCardIn, setIntroCardIn] = useState(false);
   const [introCardSettled, setIntroCardSettled] = useState(false);
   const [introCanComplete, setIntroCanComplete] = useState(false);
   const revealStartedAtRef = useRef(0);
 
   const introActive = introPhase !== "complete";
-  const introScrollLocked =
-    introActive && !(introCardIn && introCanComplete);
+  const introScrollLocked = introActive && !(introCardIn && introCanComplete);
 
   useEffect(() => {
-    if (reduceMotion) {
-      setIntroPhase("complete");
-    }
+    if (!reduceMotion) return;
+
+    introVideoRef.current?.pause();
+    setIntroPhase("complete");
   }, [reduceMotion]);
 
   useEffect(() => {
@@ -102,7 +100,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [introPhase]);
 
   useLayoutEffect(() => {
-    if (!introScrollLocked) return;
+    if (reduceMotion || !introScrollLocked) return;
 
     const html = document.documentElement;
     const body = document.body;
@@ -155,7 +153,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       body.style.overscrollBehavior = previousStyles.bodyOverscrollBehavior;
       body.style.touchAction = previousStyles.bodyTouchAction;
     };
-  }, [introScrollLocked]);
+  }, [introScrollLocked, reduceMotion]);
 
   useEffect(() => {
     if (introPhase === "complete" || reduceMotion) return;

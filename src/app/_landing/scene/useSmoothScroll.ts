@@ -10,7 +10,9 @@ import {
   type ScrollPauseStop,
 } from "./scroll-timeline";
 
-function pauseKey(stop: ScrollPauseStop) {
+type PauseIdentity = Pick<ScrollPauseStop, "at" | "dir">;
+
+function pauseKey(stop: PauseIdentity) {
   return `${stop.dir}:${stop.at}`;
 }
 
@@ -18,13 +20,20 @@ function crossedPauseStop(
   from: number,
   to: number,
   consumed: Set<string>,
+  skippedPause?: PauseIdentity,
 ): ScrollPauseStop | null {
   if (to === from) return null;
 
   const dir = to > from ? "down" : "up";
 
   for (const stop of SCROLL_PAUSE_STOPS) {
-    if (stop.dir !== dir || consumed.has(pauseKey(stop))) continue;
+    if (
+      stop.dir !== dir ||
+      consumed.has(pauseKey(stop)) ||
+      (skippedPause && pauseKey(stop) === pauseKey(skippedPause))
+    ) {
+      continue;
+    }
 
     if (dir === "down" && from < stop.at && stop.at <= to) return stop;
     if (dir === "up" && to <= stop.at && stop.at < from) return stop;
@@ -34,7 +43,8 @@ function crossedPauseStop(
 }
 
 function isScrollbarPointer(event: PointerEvent) {
-  if (event.pointerType !== "mouse" && event.pointerType !== "pen") return false;
+  if (event.pointerType !== "mouse" && event.pointerType !== "pen")
+    return false;
   if (event.button !== 0) return false;
   return event.clientX >= document.documentElement.clientWidth;
 }
@@ -51,7 +61,10 @@ export function useSmoothScroll(
   const draggingScrollbar = useRef(false);
   const onPauseStopRef = useRef(onPauseStop);
   const lenis = useLenis();
-  onPauseStopRef.current = onPauseStop;
+
+  useEffect(() => {
+    onPauseStopRef.current = onPauseStop;
+  }, [onPauseStop]);
 
   const clearHold = () => {
     window.clearTimeout(holdTimer.current);
@@ -107,12 +120,15 @@ export function useSmoothScroll(
       if (!scene) return;
 
       const progress = sceneProgress(scene, instance.scroll);
-      const skipPauses =
+      const skipAllPauses =
         draggingScrollbar.current ||
         instance.isScrolling === "native" ||
         instance.userData.skipPauses === true;
+      const skippedPause = instance.userData.skipPause as
+        | PauseIdentity
+        | undefined;
 
-      if (skipPauses) {
+      if (skipAllPauses) {
         if (pauseUntil.current !== 0) {
           clearHold();
           instance.start();
@@ -140,6 +156,7 @@ export function useSmoothScroll(
         lastProgress.current,
         progress,
         consumed.current,
+        skippedPause,
       );
 
       lastProgress.current = progress;
