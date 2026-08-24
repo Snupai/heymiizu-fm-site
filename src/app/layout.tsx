@@ -1,6 +1,7 @@
 import { Rethink_Sans } from "next/font/google";
 import "../styles/globals.css";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import React from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
@@ -12,12 +13,36 @@ const rethinkSans = Rethink_Sans({
   variable: "--font-rethink-sans",
 });
 
+const CANONICAL_TITLE = "Miizu - Motion Direction";
+
+const TAB_TITLES = [
+  "miizumelon.com",
+  "miiiiiiiiizu",
+  "Miizu - Motion Design",
+  "Your new motion designer ;)",
+] as const;
+
+const EASTER_EGG_CHANCE = 0.25;
+
+function randomTabTitle(): string {
+  const defaultTitle = TAB_TITLES[0];
+  if (Math.random() >= EASTER_EGG_CHANCE) {
+    return defaultTitle;
+  }
+
+  const eggIndex = 1 + Math.floor(Math.random() * (TAB_TITLES.length - 1));
+  return TAB_TITLES[eggIndex] ?? defaultTitle;
+}
+
 export async function generateMetadata(): Promise<Metadata> {
+  await connection();
+  const title = randomTabTitle();
+
   return {
     metadataBase: new URL(
       "https://heymiizu-fm-site-git-main-snupai.vercel.app",
     ),
-    title: "Miizu - Motion Direction",
+    title,
     description:
       "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.",
     icons: {
@@ -35,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
     },
     openGraph: {
-      title: "Miizu - Motion Direction",
+      title: CANONICAL_TITLE,
       description:
         "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.",
       images: [
@@ -49,7 +74,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Miizu - Motion Direction",
+      title: CANONICAL_TITLE,
       description:
         "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.",
       images: ["/dd8ushtKAafNiPreGQQfuOm10U.jpg"],
