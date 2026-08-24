@@ -31,13 +31,15 @@ export default function NotFound() {
 
   return (
     <motion.main
-      className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-surface via-surface-light to-brand-light"
+      className="from-surface via-surface-light relative h-screen w-full overflow-hidden bg-gradient-to-b to-brand-light"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       {/* 404 marker for layout to detect and hide header/footer */}
-      <span id="__404_marker__" className="sr-only">404</span>
+      <span id="__404_marker__" className="sr-only">
+        404
+      </span>
       {/* Background video */}
       <video
         className="absolute inset-0 h-full w-full object-cover opacity-100"
@@ -54,14 +56,13 @@ export default function NotFound() {
         aria-label="Cute animated background"
       />
 
-      
       {/* Dark overlay for better contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40 pointer-events-none" />
-      
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40" />
+
       {/* Foreground content */}
-      <div className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center text-center p-6 translate-x-[3.5vw] sm:translate-x-[6.5vw] md:translate-x-[11vw] lg:translate-x-[15vw] xl:translate-x-[19vw] 2xl:translate-x-[23vw]">
+      <div className="relative z-10 flex min-h-screen w-full translate-x-[3.5vw] flex-col items-center justify-center p-6 text-center sm:translate-x-[6.5vw] md:translate-x-[11vw] lg:translate-x-[15vw] xl:translate-x-[19vw] 2xl:translate-x-[23vw]">
         <motion.h1
-          className="text-7xl md:text-8xl font-extrabold mb-4 drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] text-white"
+          className="mb-4 text-7xl font-extrabold text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] md:text-8xl"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -69,20 +70,21 @@ export default function NotFound() {
           404
         </motion.h1>
         <motion.h2
-          className="text-2xl md:text-3xl font-bold mb-3 text-white/90 drop-shadow-[0_3px_8px_rgba(0,0,0,0.45)]"
+          className="mb-3 text-2xl font-bold text-white/90 drop-shadow-[0_3px_8px_rgba(0,0,0,0.45)] md:text-3xl"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           Page Not Found
         </motion.h2>
-        <p className="text-base md:text-lg text-white/80 mb-8 max-w-xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">
+        <p className="mb-8 max-w-xl text-base text-white/80 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] md:text-lg">
           Oops! The page you are looking for does not exist.
-          <br className="hidden md:block" /> It might have been moved or deleted.
+          <br className="hidden md:block" /> It might have been moved or
+          deleted.
         </p>
         <Link
           href="/"
-          className="inline-flex items-center justify-center bg-brand hover:bg-brand-dark text-white px-8 py-3 rounded-full text-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+          className="inline-flex items-center justify-center rounded-full bg-brand px-8 py-3 text-lg font-medium text-white shadow-lg transition-colors hover:bg-brand-dark hover:shadow-xl"
         >
           Go Home
         </Link>

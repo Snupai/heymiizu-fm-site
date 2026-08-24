@@ -8,13 +8,13 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
-    EMAIL_HOST: z.string(),
-    EMAIL_PORT: z.string(),
-    EMAIL_SECURE: z.string(),
-    EMAIL_USER: z.string(),
-    EMAIL_PASS: z.string(),
-    EMAIL_FROM: z.string(),
-    EMAIL_TO: z.string(),
+    EMAIL_HOST: z.string().optional(),
+    EMAIL_PORT: z.string().optional(),
+    EMAIL_SECURE: z.string().optional(),
+    EMAIL_USER: z.string().optional(),
+    EMAIL_PASS: z.string().optional(),
+    EMAIL_FROM: z.string().optional(),
+    EMAIL_TO: z.string().optional(),
   },
 
   /**

@@ -1,23 +1,29 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import nextVitals from "eslint-config-next/core-web-vitals";
 import tseslint from "typescript-eslint";
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
+const typeCheckedRules = Object.assign(
+  {},
+  ...[
+    ...tseslint.configs.recommended,
+    ...tseslint.configs.recommendedTypeChecked,
+    ...tseslint.configs.stylisticTypeChecked,
+  ].map((config) => config.rules ?? {}),
+);
 
 export default tseslint.config(
+  ...nextVitals,
   {
-    ignores: [".next"],
+    ignores: [".vercel/**"],
   },
-  ...compat.extends("next/core-web-vitals"),
   {
     files: ["**/*.ts", "**/*.tsx"],
-    extends: [
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-    ],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
     rules: {
+      ...typeCheckedRules,
       "@typescript-eslint/array-type": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
       "@typescript-eslint/consistent-type-imports": [
@@ -33,16 +39,14 @@ export default tseslint.config(
         "error",
         { checksVoidReturn: { attributes: false } },
       ],
+      // Several components intentionally synchronize client-only browser state
+      // after hydration (media queries, localStorage, and viewport detection).
+      "react-hooks/set-state-in-effect": "off",
     },
   },
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,
-    },
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-      },
     },
   },
 );

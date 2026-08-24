@@ -8,7 +8,11 @@ import React, { useEffect, useState } from "react";
  *  - Looks for an element with id "__404_marker__" added by not-found.tsx
  *  - Also checks for body class "hide-chrome" as a fallback
  */
-export default function ChromeGate({ children }: { children: React.ReactNode }) {
+export default function ChromeGate({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
@@ -22,7 +26,11 @@ export default function ChromeGate({ children }: { children: React.ReactNode }) 
 
     // Observe DOM changes in case the 404 marker mounts after hydration
     const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true });
+    observer.observe(document.documentElement, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+    });
 
     return () => observer.disconnect();
   }, []);
