@@ -27,3 +27,11 @@
 - Contact Local/International default comes from request geo headers (`x-vercel-ip-country`, `cf-ipcountry`, and fallbacks) on `src/app/page.tsx`; unknown country falls back to International.
 - Book-a-call is coming soon; keep the previous live button markup commented in `ContactSection.tsx` instead of deleting it.
 - Contact notification emails are built in `src/lib/contact-email.ts`; show Germany vs International near the top, label the selected service as the submission type, and do not include an Assets option.
+
+## Cursor Cloud specific instructions
+
+- Bun is the package manager (see `bun.lock`); Node 22 is already on the base image. The startup update script runs `bun install`. Standard scripts live in `package.json` (`bun run dev`, `bun run build`, `bun run check`, `bun run lint`, `bun run typecheck`).
+- Run the dev server with `bun run dev` (Next.js 16 + Turbopack) on `http://localhost:3000`. Copy `.env.example` to `.env` if `.env` is missing; SMTP/Supabase vars are placeholders and are fine for the public landing page.
+- The landing page and interactive commission/contact form render and accept input without any backend. `GET /api/contact` returns HTTP 500 (and submissions fail) until real `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set — this is expected locally, not a broken environment. The Supabase schema is not reproducible from this repo (see README "Supabase prerequisites").
+- `next dev` (Next.js 16) re-appends a `<!-- BEGIN:nextjs-agent-rules -->` block to `AGENTS.md` on every run, showing up as an uncommitted change. This is harmless; either ignore it or commit it. Disable via `agentRules: false` in `next.config.js` if undesired.
+- `bun run check` runs `eslint` then `tsc`. ESLint currently reports one pre-existing error in `src/app/_landing/scene/useSmoothScroll.ts` (`react-hooks/refs`), which stops the chained `tsc` step; `bun run typecheck` passes on its own.
