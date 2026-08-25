@@ -1453,14 +1453,19 @@
 }
 
 .mobileContactIntro h1 {
-  font-size: clamp(2.55rem, 13.5vw, 4.1rem);
+  font-size: clamp(2.35rem, 12.2vw, 4.1rem);
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 0.88;
   margin: 0;
 }
 
-.mobileContactIntro h1 span {
+.mobileContactLead {
+  display: block;
+  white-space: nowrap;
+}
+
+.mobileContactIntro h1 span:last-child {
   display: block;
   font-size: 0.78em;
 }

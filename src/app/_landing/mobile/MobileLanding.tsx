@@ -47,7 +47,7 @@ export function MobileLanding({
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          Got something
+          <span className={styles.mobileContactLead}>Got something</span>
           <span>BIIIG?</span>
         </motion.h1>
         <p>Tell me what you&rsquo;re launching.</p>
