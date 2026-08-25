@@ -33,8 +33,10 @@ const CONTACT_REQUEST_SCHEMA = z.object({
     .optional(),
   referral: z.string().trim().max(80).optional(),
   service: z.enum(SERVICES),
-  budget: z.enum(BUDGETS),
-  deadline: z.string().trim().regex(CONTACT_DEADLINE_PATTERN),
+  budget: z.union([z.enum(BUDGETS), z.literal("")]).optional(),
+  deadline: z
+    .union([z.string().trim().regex(CONTACT_DEADLINE_PATTERN), z.literal("")])
+    .optional(),
   region: z.enum(["local", "international"]),
   description: z.string().trim().min(1).max(1600),
 });
@@ -263,19 +265,21 @@ export async function POST(req: NextRequest) {
   }
 
   const inquiry = parsed.data;
-  const [deadlineFrom, deadlineTo] = inquiry.deadline.split(" - ");
-  if (
-    !deadlineFrom ||
-    !deadlineTo ||
-    !isValidDateKey(deadlineFrom) ||
-    !isValidDateKey(deadlineTo) ||
-    deadlineFrom < getDateKeyInTimeZone() ||
-    deadlineTo < deadlineFrom
-  ) {
-    return NextResponse.json(
-      { error: "Please select a valid project date range." },
-      { status: 400 },
-    );
+  if (inquiry.deadline) {
+    const [deadlineFrom, deadlineTo] = inquiry.deadline.split(" - ");
+    if (
+      !deadlineFrom ||
+      !deadlineTo ||
+      !isValidDateKey(deadlineFrom) ||
+      !isValidDateKey(deadlineTo) ||
+      deadlineFrom < getDateKeyInTimeZone() ||
+      deadlineTo < deadlineFrom
+    ) {
+      return NextResponse.json(
+        { error: "Please select a valid project date range." },
+        { status: 400 },
+      );
+    }
   }
 
   rateLimit[ip] = now;
@@ -296,8 +300,8 @@ export async function POST(req: NextRequest) {
     telephone: inquiry.telephone ?? null,
     referral: inquiry.referral ?? null,
     service: inquiry.service,
-    budget: inquiry.budget,
-    deadline: inquiry.deadline,
+    budget: inquiry.budget || "",
+    deadline: inquiry.deadline || "",
     region: inquiry.region,
     description: inquiry.description,
   });

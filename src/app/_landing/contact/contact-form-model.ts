@@ -153,3 +153,20 @@ export function getPhoneValidationMessage(
       return "Please enter a valid phone number.";
   }
 }
+
+export function getBudgetValidationMessage(budget: string, required: boolean) {
+  if (!required || budget) return null;
+  return "Please choose a budget range.";
+}
+
+export function getDeadlineValidationMessage(
+  range: DateRange | undefined,
+  deadline: string,
+  required: boolean,
+) {
+  if (!range?.from) {
+    return required ? "Please select a project date range." : null;
+  }
+  if (!range.to || !deadline) return "Please select an end date.";
+  return null;
+}

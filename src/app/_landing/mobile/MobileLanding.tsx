@@ -1,21 +1,22 @@
 "use client";
 
-import { useMotionValue } from "framer-motion";
-import { useEffect } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Mail } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-import { ContactSection } from "../contact/ContactSection";
+import { ContactForm } from "../contact/ContactForm";
 import type { ContactRegion } from "../contact/contact-form-model";
-import { LandingFooter } from "../footer/LandingFooter";
+import { RegionToggle } from "../contact/RegionToggle";
 import styles from "../../miizu-landing.module.css";
-import { MobileHero } from "./MobileHero";
-import { MobileClients, MobileWork } from "./MobileWork";
 
 export function MobileLanding({
   initialRegion,
 }: {
   initialRegion: ContactRegion;
 }) {
-  const wipeX = useMotionValue("0vw");
+  const reduceMotion = useReducedMotion();
+  const [region, setRegion] = useState<ContactRegion>(initialRegion);
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -28,12 +29,46 @@ export function MobileLanding({
   }, []);
 
   return (
-    <main className={`${styles.site} ${styles.mobileSite}`}>
-      <MobileHero />
-      <MobileWork />
-      <MobileClients />
-      <ContactSection compact initialRegion={initialRegion} wipeX={wipeX} />
-      <LandingFooter />
+    <main className={`${styles.site} ${styles.mobileContactPage}`}>
+      <header className={styles.mobileContactHeader}>
+        <span>miizumelon</span>
+        <a
+          aria-label="Email hey@miizumelon.com"
+          className={styles.mobileContactMail}
+          href="mailto:hey@miizumelon.com"
+        >
+          <Mail aria-hidden="true" />
+        </a>
+      </header>
+
+      <section className={styles.mobileContactIntro}>
+        <motion.h1
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          Got something
+          <span>BIIIG?</span>
+        </motion.h1>
+        <p>Tell me what you&rsquo;re launching.</p>
+        <RegionToggle onChange={setRegion} region={region} />
+      </section>
+
+      <div className={styles.mobileContactForm}>
+        <ContactForm compact region={region} short />
+        <a
+          className={styles.mobileContactEmail}
+          href="mailto:hey@miizumelon.com"
+        >
+          or email hey@
+          <span className={styles.emailDomain}>miizumelon.com</span>
+        </a>
+        <nav aria-label="Legal" className={styles.mobileContactLegal}>
+          <Link href="/imprint">Imprint</Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/privacy">Privacy</Link>
+        </nav>
+      </div>
     </main>
   );
 }

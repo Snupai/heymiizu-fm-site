@@ -16,18 +16,20 @@ export default function MiizuLanding({
 }) {
   const layout = useIntroLayout();
 
+  if (layout === null) {
+    return <main aria-busy="true" className={styles.site} />;
+  }
+
+  if (layout === "compact") {
+    return <MobileLanding initialRegion={initialRegion} />;
+  }
+
   return (
     <SmoothScroll>
-      {layout === null ? (
-        <main aria-busy="true" className={styles.site} />
-      ) : layout === "compact" ? (
-        <MobileLanding initialRegion={initialRegion} />
-      ) : (
-        <main className={styles.site}>
-          <HeroWorkScene initialRegion={initialRegion} />
-          <LandingFooter />
-        </main>
-      )}
+      <main className={styles.site}>
+        <HeroWorkScene initialRegion={initialRegion} />
+        <LandingFooter />
+      </main>
     </SmoothScroll>
   );
 }

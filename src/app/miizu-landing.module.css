@@ -161,18 +161,6 @@
   }
 }
 
-@keyframes mobile-hero-handwritten-in {
-  from {
-    opacity: 0;
-    transform: translateY(-52%) rotate(-16deg) scale(0.86);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(-52%) rotate(-8deg) scale(1.04, 1);
-  }
-}
-
 .heroWorkScene[data-intro-phase="video"] .header {
   transform: translate3d(0, -120%, 0);
 }
@@ -1418,157 +1406,164 @@
   }
 }
 
-.mobileSite {
+.mobileContactPage {
+  background: var(--miizu-primary);
+  color: var(--miizu-bg);
+  display: flex;
+  flex-direction: column;
   min-height: 100svh;
   overflow-x: clip;
 }
 
-.mobileHeader.header {
-  background: color-mix(in srgb, var(--miizu-bg) 84%, transparent);
+.mobileContactHeader {
+  align-items: center;
   -webkit-backdrop-filter: blur(18px) saturate(1.2);
   backdrop-filter: blur(18px) saturate(1.2);
-  inset: auto;
+  background: color-mix(in srgb, var(--miizu-primary) 82%, transparent);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1.15rem;
   position: sticky;
   top: 0;
-  transition:
-    background 220ms ease,
-    color 220ms ease;
-  width: 100%;
   z-index: 40;
 }
 
-.mobileHeader[data-on-dark] {
-  background: color-mix(in srgb, #050315 46%, transparent);
+.mobileContactHeader span {
+  font-size: 0.95rem;
+  font-weight: 620;
+  letter-spacing: 0.02em;
 }
 
-.mobileHeader[data-on-dark] > * {
+.mobileContactMail {
+  align-items: center;
+  color: var(--miizu-bg);
+  display: flex;
+  height: 2.35rem;
+  justify-content: center;
+  width: 2.35rem;
+}
+
+.mobileContactMail svg {
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.mobileContactIntro {
+  padding: 0.35rem 1.15rem 1.5rem;
+}
+
+.mobileContactIntro h1 {
+  font-size: clamp(2.55rem, 13.5vw, 4.1rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.88;
+  margin: 0;
+}
+
+.mobileContactIntro h1 span {
+  display: block;
+  font-size: 0.78em;
+}
+
+.mobileContactIntro p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0.9rem 0 1.4rem;
+  opacity: 0.9;
+}
+
+.mobileContactPage .regionToggle {
+  display: grid;
+  max-width: 100%;
+  width: 100%;
+}
+
+.mobileContactPage .regionToggle button {
+  font-size: clamp(0.82rem, 3.4vw, 1rem);
+  padding: 0.7em 0.55em;
+}
+
+.mobileContactForm {
+  background: #000;
+  border-radius: 1.8rem 1.8rem 0 0;
+  flex: 1;
+  min-height: 0;
+  padding: 2.15rem 1.15rem 2.6rem;
+}
+
+.mobileContactPage .submitButton {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mobileContactForm .formShell {
+  margin: 0;
+  max-width: none;
+}
+
+.mobileContactEmail {
+  color: color-mix(in srgb, var(--miizu-bg) 72%, transparent);
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 620;
+  margin: 1.35rem 0 0;
+  text-align: center;
+  text-decoration: none;
+}
+
+.mobileContactEmail:hover,
+.mobileContactEmail:focus-visible {
   color: var(--miizu-bg);
 }
 
-.mobileHero {
+.mobileContactLegal {
   display: flex;
-  flex-direction: column;
-  height: calc(100svh - 3.6rem);
-  min-height: calc(100svh - 3.6rem);
-  overflow-x: clip;
-  padding: 2.8rem 1.1rem 0;
-  position: relative;
+  gap: 0.45rem;
+  justify-content: center;
+  margin-top: 1.15rem;
 }
 
-.mobileHeroCopy {
-  display: block;
-  flex: 0 0 auto;
-  left: auto;
-  overflow: visible;
-  padding-bottom: 0.85rem;
-  padding-top: 0.85rem;
-  position: relative;
-  top: auto;
-  width: 100%;
+.mobileContactLegal a,
+.mobileContactLegal span {
+  color: color-mix(in srgb, var(--miizu-bg) 58%, transparent);
+  font-size: 0.82rem;
+  font-weight: 620;
+  text-decoration: none;
 }
 
-.mobileShowreel {
-  border-radius: 1.7rem;
-  box-shadow: 0 1.15rem 2.8rem rgba(5, 3, 21, 0.14);
-  flex: 1 1 0;
-  isolation: isolate;
-  margin-top: 1.25rem;
-  min-height: 12rem;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  will-change: transform;
+.mobileContactLegal a:hover,
+.mobileContactLegal a:focus-visible {
+  color: var(--miizu-bg);
 }
 
-.mobileShowreelFrame {
-  background: #050315;
-  height: 100%;
-  inset: 0;
-  overflow: hidden;
-  position: absolute;
-  width: 100%;
+.projectDetails {
+  margin-top: 0.35rem;
 }
 
-.mobileShowreelVideo {
-  display: block;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  pointer-events: none;
-  width: 100%;
-}
-
-.mobileShowreelVeil {
-  background: linear-gradient(
-    180deg,
-    transparent 28%,
-    color-mix(in srgb, #050315 72%, transparent) 100%
-  );
-  inset: 0;
-  pointer-events: none;
-  position: absolute;
-  z-index: 1;
-}
-
-.mobileScrollHint {
-  align-self: center;
+.projectDetailsToggle {
+  align-items: center;
   background: transparent;
   border: 0;
-  color: color-mix(in srgb, var(--miizu-ink) 28%, transparent);
+  color: #0189ff;
   cursor: pointer;
-  flex: 0 0 auto;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  margin-bottom: 0.55rem;
-  margin-top: 0.7rem;
-  padding: 0.35rem;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 620;
+  gap: 0.4rem;
+  letter-spacing: 0.02em;
+  margin: 0.35rem 0 0.55rem;
+  padding: 0.35rem 0;
 }
 
-.mobileWork {
-  --mobile-work-pad: 1.2rem;
-  background: #000;
-  color: var(--miizu-bg);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 0;
-  overflow: hidden;
-  padding: 3.2rem var(--mobile-work-pad) 1.15rem;
-  position: relative;
-  scroll-margin-top: 3.4rem;
+.projectDetailsIcon {
+  height: 1rem;
+  transition: transform 180ms ease;
+  width: 1rem;
 }
 
-.mobileWorkList {
-  display: flex;
-  flex-direction: column;
-  font-size: clamp(1.45rem, 7.6vw, 2.35rem);
-  letter-spacing: -0.015em;
-  line-height: 0.96;
-  position: relative;
-  z-index: 1;
-}
-
-.mobileWorkList .workLine {
-  color: var(--miizu-bg);
-  overflow-x: clip;
-  overflow-y: visible;
-  width: 100%;
-}
-
-.mobileWorkShade {
-  background: linear-gradient(
-    90deg,
-    rgba(33, 23, 230, 0.42) 0%,
-    rgba(33, 23, 230, 0.1) 36%,
-    transparent 100%
-  );
-  inset: 0 auto 0 0;
-  pointer-events: none;
-  position: absolute;
-  transform-origin: 0 50%;
-  width: 72%;
-  z-index: 0;
+.projectDetailsIcon[data-open] {
+  transform: rotate(45deg);
 }
 
 .clientsSection {
@@ -1627,32 +1622,6 @@
     left: 1rem;
     top: 12svh;
     width: calc(100% - 2rem);
-  }
-
-  .mobileHero .heroCopy {
-    left: auto;
-    position: relative;
-    top: auto;
-    width: 100%;
-  }
-
-  .mobileHero .heroCopy h1 {
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 0.94;
-  }
-
-  .mobileHero .handwrittenHey {
-    animation-name: mobile-hero-handwritten-in;
-    left: 0;
-    top: 32%;
-    transform: translateY(-52%) rotate(-8deg) scale(1.04, 1);
-  }
-
-  .mobileHeroCopy:not([data-entered]) h1 > span,
-  .mobileHeroCopy:not([data-entered]) .handwrittenHey {
-    animation: none;
-    opacity: 0;
   }
 
   .heroCopy h1 {
@@ -1892,12 +1861,6 @@
     width: calc(100% - 1.7rem);
   }
 
-  .mobileHero .heroCopy {
-    left: auto;
-    top: auto;
-    width: 100%;
-  }
-
   .heroCopy h1 {
     font-size: clamp(2.45rem, 13.2vw, 3.2rem);
   }
@@ -1914,18 +1877,15 @@
     padding: 2.2rem 1rem 3rem;
   }
 
-  .mobileHero {
-    padding-inline: 0.85rem;
-  }
-
-  .mobileWork {
-    --mobile-work-pad: 1rem;
+  .mobileContactHeader,
+  .mobileContactIntro,
+  .mobileContactForm {
+    padding-inline: 1rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .showreelPanel,
-  .mobileShowreel {
+  .showreelPanel {
     transform: none;
   }
 
@@ -1936,11 +1896,6 @@
   .heroCopy h1 > span,
   .handwrittenHey {
     animation: none;
-  }
-
-  .mobileHeroCopy h1 > span,
-  .mobileHeroCopy .handwrittenHey {
-    opacity: 1;
   }
 
   .clientNames {
