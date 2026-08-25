@@ -1,22 +1,18 @@
 "use client";
 
-import { useMotionValue } from "framer-motion";
 import { useEffect } from "react";
 
 import { ContactSection } from "../contact/ContactSection";
 import type { ContactRegion } from "../contact/contact-form-model";
 import { LandingFooter } from "../footer/LandingFooter";
 import styles from "../../miizu-landing.module.css";
-import { MobileHero } from "./MobileHero";
-import { MobileClients, MobileWork } from "./MobileWork";
+import { MobileIdentity } from "./MobileIdentity";
 
 export function MobileLanding({
   initialRegion,
 }: {
   initialRegion: ContactRegion;
 }) {
-  const wipeX = useMotionValue("0vw");
-
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
     window.history.scrollRestoration = "manual";
@@ -29,10 +25,8 @@ export function MobileLanding({
 
   return (
     <main className={`${styles.site} ${styles.mobileSite}`}>
-      <MobileHero />
-      <MobileWork />
-      <MobileClients />
-      <ContactSection compact initialRegion={initialRegion} wipeX={wipeX} />
+      <MobileIdentity />
+      <ContactSection compact formFirst initialRegion={initialRegion} />
       <LandingFooter />
     </main>
   );
