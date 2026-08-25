@@ -1437,14 +1437,6 @@
   z-index: 40;
 }
 
-.mobileHeaderSolo {
-  grid-template-columns: 1fr;
-}
-
-.mobileHeaderSolo a {
-  justify-self: start;
-}
-
 .mobileHeader[data-on-dark] {
   background: color-mix(in srgb, #050315 46%, transparent);
 }
@@ -1456,8 +1448,10 @@
 .mobileHero {
   display: flex;
   flex-direction: column;
+  height: calc(100svh - 3.6rem);
+  min-height: calc(100svh - 3.6rem);
   overflow-x: clip;
-  padding: 0.2rem 1.1rem 1.45rem;
+  padding: 2.8rem 1.1rem 0;
   position: relative;
 }
 
@@ -1466,23 +1460,24 @@
   flex: 0 0 auto;
   left: auto;
   overflow: visible;
-  padding-bottom: 0.55rem;
-  padding-top: 0.35rem;
+  padding-bottom: 0.85rem;
+  padding-top: 0.85rem;
   position: relative;
   top: auto;
   width: 100%;
 }
 
 .mobileShowreel {
-  aspect-ratio: 16 / 9;
-  border-radius: 1.35rem;
+  border-radius: 1.7rem;
   box-shadow: 0 1.15rem 2.8rem rgba(5, 3, 21, 0.14);
+  flex: 1 1 0;
   isolation: isolate;
-  margin-top: 0.15rem;
-  min-height: 0;
+  margin-top: 1.25rem;
+  min-height: 12rem;
   overflow: hidden;
   position: relative;
   width: 100%;
+  will-change: transform;
 }
 
 .mobileShowreelFrame {
@@ -1503,56 +1498,77 @@
   width: 100%;
 }
 
-.mobileProof {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  list-style: none;
-  margin: 0.85rem 0 0;
-  padding: 0;
+.mobileShowreelVeil {
+  background: linear-gradient(
+    180deg,
+    transparent 28%,
+    color-mix(in srgb, #050315 72%, transparent) 100%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
 }
 
-.mobileProofChip {
-  border: 1px solid color-mix(in srgb, var(--miizu-ink) 14%, transparent);
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 620;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  padding: 0.42em 0.72em 0.38em;
+.mobileScrollHint {
+  align-self: center;
+  background: transparent;
+  border: 0;
+  color: color-mix(in srgb, var(--miizu-ink) 28%, transparent);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.55rem;
+  margin-top: 0.7rem;
+  padding: 0.35rem;
 }
 
-.mobileClientsLine {
-  color: color-mix(in srgb, var(--miizu-ink) 48%, transparent);
-  font-size: 0.72rem;
-  font-weight: 620;
-  letter-spacing: 0.02em;
-  line-height: 1.45;
-  margin: 0.7rem 0 0;
-}
-
-.mobileFormIntro {
-  margin: 0 auto 1.35rem;
-  max-width: 34rem;
-  width: 100%;
-}
-
-.mobileDirectEmail {
-  color: color-mix(in srgb, var(--miizu-bg) 72%, transparent);
-  display: block;
-  font-size: 0.95rem;
-  font-weight: 620;
-  letter-spacing: 0.01em;
-  margin: 1.35rem auto 0;
-  max-width: 34rem;
-  text-align: center;
-  text-decoration: none;
-  width: 100%;
-}
-
-.mobileDirectEmail:hover,
-.mobileDirectEmail:focus-visible {
+.mobileWork {
+  --mobile-work-pad: 1.2rem;
+  background: #000;
   color: var(--miizu-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+  overflow: hidden;
+  padding: 3.2rem var(--mobile-work-pad) 1.15rem;
+  position: relative;
+  scroll-margin-top: 3.4rem;
+}
+
+.mobileWorkList {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(1.45rem, 7.6vw, 2.35rem);
+  letter-spacing: -0.015em;
+  line-height: 0.96;
+  position: relative;
+  z-index: 1;
+}
+
+.mobileWorkList .workLine {
+  color: var(--miizu-bg);
+  overflow-x: clip;
+  overflow-y: visible;
+  width: 100%;
+}
+
+.mobileWorkShade {
+  background: linear-gradient(
+    90deg,
+    rgba(33, 23, 230, 0.42) 0%,
+    rgba(33, 23, 230, 0.1) 36%,
+    transparent 100%
+  );
+  inset: 0 auto 0 0;
+  pointer-events: none;
+  position: absolute;
+  transform-origin: 0 50%;
+  width: 72%;
+  z-index: 0;
 }
 
 .clientsSection {
@@ -1599,27 +1615,6 @@
   z-index: 0;
 }
 
-.mobileFormContact.contactWipe {
-  height: auto;
-  inset: auto;
-  margin-top: -1.2rem;
-  overflow: visible;
-  position: relative;
-  width: 100%;
-}
-
-.mobileFormContact .contactSection {
-  display: flex;
-  flex-direction: column;
-  height: auto;
-  min-height: 0;
-}
-
-.mobileFormContact .formPanel {
-  align-items: stretch;
-  flex-direction: column;
-}
-
 @media (max-width: 760px) {
   .heroIntroVideo,
   .heroIntroVideoOverlay,
@@ -1642,7 +1637,6 @@
   }
 
   .mobileHero .heroCopy h1 {
-    font-size: clamp(2.15rem, 10.5vw, 3.05rem);
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 0.94;
@@ -1814,10 +1808,6 @@
     z-index: 2;
   }
 
-  .mobileFormContact .formPanel {
-    margin-top: 0;
-  }
-
   .formShell {
     scroll-margin-top: 4.2rem;
   }
@@ -1926,6 +1916,10 @@
 
   .mobileHero {
     padding-inline: 0.85rem;
+  }
+
+  .mobileWork {
+    --mobile-work-pad: 1rem;
   }
 }
 

@@ -107,14 +107,12 @@ function RegionToggle({
 
 export function ContactSection({
   compact,
-  formFirst = false,
   initialRegion,
   wipeX,
 }: {
   compact: boolean;
-  formFirst?: boolean;
   initialRegion: ContactRegion;
-  wipeX?: MotionValue<string>;
+  wipeX: MotionValue<string>;
 }) {
   const reduceMotion = useReducedMotion();
   const contactRef = useRef<HTMLDivElement>(null);
@@ -146,77 +144,50 @@ export function ContactSection({
   );
 
   useEffect(() => {
-    if (formFirst) return;
     setHeadlineIndex(Math.floor(Math.random() * CONTACT_HEADLINES.length));
-  }, [formFirst]);
+  }, []);
 
   const headline = CONTACT_HEADLINES[headlineIndex];
   // const bookingUrl =
   //   process.env.NEXT_PUBLIC_BOOKING_URL ??
   //   "mailto:hey@miizumelon.com?subject=Let%27s%20book%20a%20call";
-  const compactMotion = compact && !formFirst && reduceMotion !== true;
-  const form = (
-    <>
-      {formFirst ? (
-        <div className={styles.mobileFormIntro}>
-          <RegionToggle onChange={setRegion} region={region} />
-        </div>
-      ) : null}
-      <ContactForm compact={compact} region={region} />
-      {formFirst ? (
-        <a
-          className={styles.mobileDirectEmail}
-          href="mailto:hey@miizumelon.com"
-        >
-          or hey@<span className={styles.emailDomain}>miizumelon.com</span>
-        </a>
-      ) : null}
-    </>
-  );
+  const compactMotion = compact && reduceMotion !== true;
 
   return (
     <motion.div
-      className={`${styles.contactWipe}${formFirst ? ` ${styles.mobileFormContact}` : ""}`}
+      className={styles.contactWipe}
       id="contact"
       ref={contactRef}
-      style={compact || !wipeX ? undefined : { x: wipeX }}
+      style={compact ? undefined : { x: wipeX }}
     >
       <div className={styles.contactSection}>
-        {formFirst ? (
-          <div className={styles.formPanel}>{form}</div>
-        ) : (
-          <>
-            <div className={styles.contactPitch}>
-              {compact ? (
-                <motion.div
-                  aria-hidden="true"
-                  className={styles.mobileContactWash}
-                  style={compactMotion ? { x: washX } : undefined}
-                />
-              ) : null}
-              <motion.div
-                initial={compactMotion ? { opacity: 0, y: 28 } : false}
-                transition={{ duration: 0.7, ease: INTRO_SLIDE_EASE }}
-                viewport={{ amount: 0.45, once: true }}
-                whileInView={compactMotion ? { opacity: 1, y: 0 } : undefined}
-              >
-                <h2>{headline}</h2>
-                <RegionToggle onChange={setRegion} region={region} />
-              </motion.div>
+        <div className={styles.contactPitch}>
+          {compact ? (
+            <motion.div
+              aria-hidden="true"
+              className={styles.mobileContactWash}
+              style={compactMotion ? { x: washX } : undefined}
+            />
+          ) : null}
+          <motion.div
+            initial={compactMotion ? { opacity: 0, y: 28 } : false}
+            transition={{ duration: 0.7, ease: INTRO_SLIDE_EASE }}
+            viewport={{ amount: 0.45, once: true }}
+            whileInView={compactMotion ? { opacity: 1, y: 0 } : undefined}
+          >
+            <h2>{headline}</h2>
+            <RegionToggle onChange={setRegion} region={region} />
+          </motion.div>
 
-              <motion.div
-                className={styles.directContact}
-                initial={compactMotion ? { opacity: 0, y: 24 } : false}
-                transition={{
-                  delay: 0.08,
-                  duration: 0.7,
-                  ease: INTRO_SLIDE_EASE,
-                }}
-                viewport={{ amount: 0.4, once: true }}
-                whileInView={compactMotion ? { opacity: 1, y: 0 } : undefined}
-              >
-                {/* Restore book-a-call: uncomment the <a>, ArrowUpRight import, and bookingUrl. Comment out the coming-soon <div>. */}
-                {/*
+          <motion.div
+            className={styles.directContact}
+            initial={compactMotion ? { opacity: 0, y: 24 } : false}
+            transition={{ delay: 0.08, duration: 0.7, ease: INTRO_SLIDE_EASE }}
+            viewport={{ amount: 0.4, once: true }}
+            whileInView={compactMotion ? { opacity: 1, y: 0 } : undefined}
+          >
+            {/* Restore book-a-call: uncomment the <a>, ArrowUpRight import, and bookingUrl. Comment out the coming-soon <div>. */}
+            {/*
             <a
               className={styles.bookCall}
               href={bookingUrl}
@@ -229,40 +200,35 @@ export function ContactSection({
               </span>
             </a>
             */}
-                <div
-                  aria-label="Book a call, coming soon"
-                  className={`${styles.bookCall} ${styles.bookCallSoon}`}
-                >
-                  <span className={styles.bookCallText}>book a call</span>
-                  <span className={styles.comingSoon}>coming soon</span>
-                </div>
-                <p>or just say hello</p>
-                <a
-                  className={styles.emailLink}
-                  href="mailto:hey@miizumelon.com"
-                >
-                  hey@<span className={styles.emailDomain}>miizumelon.com</span>
-                </a>
-              </motion.div>
-            </div>
-
-            <motion.div
-              className={styles.formPanel}
-              style={
-                compactMotion
-                  ? {
-                      opacity: formOpacity,
-                      scale: formScale,
-                      transformOrigin: "50% 0%",
-                      y: formY,
-                    }
-                  : undefined
-              }
+            <div
+              aria-label="Book a call, coming soon"
+              className={`${styles.bookCall} ${styles.bookCallSoon}`}
             >
-              {form}
-            </motion.div>
-          </>
-        )}
+              <span className={styles.bookCallText}>book a call</span>
+              <span className={styles.comingSoon}>coming soon</span>
+            </div>
+            <p>or just say hello</p>
+            <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
+              hey@<span className={styles.emailDomain}>miizumelon.com</span>
+            </a>
+          </motion.div>
+        </div>
+
+        <motion.div
+          className={styles.formPanel}
+          style={
+            compactMotion
+              ? {
+                  opacity: formOpacity,
+                  scale: formScale,
+                  transformOrigin: "50% 0%",
+                  y: formY,
+                }
+              : undefined
+          }
+        >
+          <ContactForm compact={compact} region={region} />
+        </motion.div>
       </div>
     </motion.div>
   );

@@ -24,7 +24,3 @@ export const WORK_LINES = [
 ] as const;
 
 export type WorkLineVariant = (typeof WORK_LINES)[number]["variant"];
-
-export const WORK_PROOF_ITEMS = WORK_LINES.filter(
-  (line) => line.variant === "item" || line.variant === "itemEnd",
-);
