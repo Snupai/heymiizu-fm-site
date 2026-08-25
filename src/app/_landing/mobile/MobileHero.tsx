@@ -43,14 +43,24 @@ export function MobileHero() {
   const cardRadius = useTransform(scrollYProgress, [0, 0.72], [27, 6]);
   const cardRotate = useTransform(scrollYProgress, [0, 0.85], [0, -1.8]);
   const veilOpacity = useTransform(scrollYProgress, [0.28, 0.92], [0, 0.78]);
-  const bridgeY = useTransform(scrollYProgress, [0.42, 1], ["108%", "0%"]);
   const hintOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
   const introComplete = introPhase === "complete";
   const scrollDriven = introComplete && reduceMotion !== true;
+  const [copyEntered, setCopyEntered] = useState(reduceMotion === true);
+
+  useEffect(() => {
+    if (reduceMotion === true) {
+      setCopyEntered(true);
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => setCopyEntered(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [reduceMotion]);
 
   useEffect(() => {
     const updateTone = () => {
-      const overDark = ["work", "contact"].some((id) => {
+      const overDark = ["work", "clients", "contact"].some((id) => {
         const section = document.getElementById(id);
         if (!section) return false;
         const box = section.getBoundingClientRect();
@@ -118,11 +128,13 @@ export function MobileHero() {
         ref={heroRef}
       >
         <motion.div
-          animate={scrollDriven ? undefined : { opacity: 1, y: 0 }}
           className={`${styles.heroCopy} ${styles.mobileHeroCopy}`}
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          style={scrollDriven ? { opacity: copyOpacity, y: copyY } : undefined}
-          transition={{ duration: 0.55, ease: INTRO_SLIDE_EASE }}
+          data-entered={copyEntered ? "" : undefined}
+          style={
+            scrollDriven
+              ? { opacity: copyOpacity, y: copyY }
+              : { opacity: 1, y: 0 }
+          }
         >
           <h1>
             <span className={styles.printHey}>
@@ -134,33 +146,6 @@ export function MobileHero() {
             <span>I&rsquo;m Miizu</span>
           </h1>
         </motion.div>
-
-        <motion.button
-          animate={
-            scrollDriven
-              ? false
-              : {
-                  opacity: introPhase === "video" ? 0 : 1,
-                  pointerEvents: introPhase === "video" ? "none" : "auto",
-                  y: 0,
-                }
-          }
-          className={styles.mobileWorkWithMe}
-          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-          onClick={() => scrollToId("contact-form")}
-          style={
-            scrollDriven
-              ? {
-                  opacity: copyOpacity,
-                  y: copyY,
-                }
-              : undefined
-          }
-          transition={{ delay: 0.18, duration: 0.45, ease: INTRO_SLIDE_EASE }}
-          type="button"
-        >
-          work with me
-        </motion.button>
 
         <motion.div
           animate={
@@ -237,11 +222,6 @@ export function MobileHero() {
         >
           scroll
         </motion.button>
-        <motion.div
-          aria-hidden="true"
-          className={styles.mobileHeroBridge}
-          style={scrollDriven ? { y: bridgeY } : undefined}
-        />
       </section>
     </>
   );

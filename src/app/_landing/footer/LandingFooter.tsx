@@ -18,7 +18,7 @@ import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
 import { useIntroLayout } from "../scene/useIntroLayout";
 import {
   anchorRepresentedBy,
-  anchorRepresentedBySvg,
+  fitMobileNvaInk,
   measureNvaInk,
   mobileNvaViewportWidth,
 } from "./nva-measurement";
@@ -45,12 +45,8 @@ export function LandingFooter() {
     offset: ["start end", "start 0.62"],
     target: footerRef,
   });
-  const compactMotion = layout === "compact" && reduceMotion !== true;
-  const linksY = useTransform(
-    scrollYProgress,
-    [0.12, 1],
-    compactMotion ? [42, 0] : [0, 0],
-  );
+  const compact = layout === "compact";
+  const compactMotion = compact && reduceMotion !== true;
   const linksOpacity = useTransform(
     scrollYProgress,
     [0.12, 1],
@@ -110,19 +106,31 @@ export function LandingFooter() {
         );
         if (!footer || target <= 0) return;
 
-        wordmark.style.width = `${target}px`;
-        wordmark.style.removeProperty("--nva-scale");
-        wordmark.style.removeProperty("--nva-shift");
-        footer.style.setProperty("--nva-size", `${Math.round(target * 0.48)}px`);
+        const computed = window.getComputedStyle(word);
+        const fontSize = Number.parseFloat(computed.fontSize);
+        if (!Number.isFinite(fontSize) || fontSize <= 0) return;
 
-        const svgText = wordmark.querySelector("text");
-        if (svgText instanceof SVGTextElement) {
-          svgText.removeAttribute("transform");
-          svgText.setAttribute("textLength", "1000");
-          svgText.setAttribute("lengthAdjust", "spacingAndGlyphs");
-          const label = representedByRef.current;
-          if (label) anchorRepresentedBySvg(svgText, label);
+        const ink = measureNvaInk(computed, fontSize);
+        if (!ink) return;
+
+        const fit = fitMobileNvaInk(ink, target);
+        if (!fit) return;
+
+        const nextSize = Math.round(fontSize * fit.scale);
+        if (
+          Number.isFinite(nextSize) &&
+          nextSize > 0 &&
+          Math.abs(nextSize - fontSize) > 1
+        ) {
+          footer.style.setProperty("--nva-size", `${nextSize}px`);
         }
+
+        wordmark.style.width = `${fit.width}px`;
+        wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
+        wordmark.style.setProperty("--nva-scale", "1");
+
+        const label = representedByRef.current;
+        if (label) anchorRepresentedBy(word, label);
         return;
       }
 
@@ -214,6 +222,7 @@ export function LandingFooter() {
 
   const showNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
     if (
+      compact ||
       event.pointerType === "touch" ||
       !supportsFineHover() ||
       window.performance.now() - lastNuviaTouchAt.current <
@@ -246,6 +255,7 @@ export function LandingFooter() {
 
   const moveNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
     if (
+      !compact &&
       event.pointerType !== "touch" &&
       supportsFineHover() &&
       window.performance.now() - lastNuviaTouchAt.current >=
@@ -256,6 +266,7 @@ export function LandingFooter() {
 
   const leaveNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
     if (
+      !compact &&
       event.pointerType !== "touch" &&
       supportsFineHover() &&
       window.performance.now() - lastNuviaTouchAt.current >=
@@ -264,7 +275,36 @@ export function LandingFooter() {
       hideNuviaTooltip();
   };
 
+  const showCompactNuviaTooltip = (panel: HTMLElement) => {
+    const rect = panel.getBoundingClientRect();
+
+    lastNuviaTouchAt.current = window.performance.now();
+    nuviaTooltipX.jump(rect.left + rect.width / 2);
+    nuviaTooltipY.jump(rect.top + rect.height / 2);
+    nuviaTooltipReady.current = true;
+    setNuviaTooltipTouch(true);
+    setNuviaTooltipVisible(true);
+  };
+
+  const toggleCompactNuviaTooltip = () => {
+    const panel = nuviaWordmarkRef.current?.parentElement;
+    if (!panel) return;
+
+    if (nuviaTooltipTouch && nuviaTooltipVisible) {
+      hideNuviaTooltip();
+      return;
+    }
+
+    showCompactNuviaTooltip(panel);
+  };
+
   const toggleNuviaTouchTooltip = (event: PointerEvent<HTMLElement>) => {
+    if (compact) {
+      event.preventDefault();
+      toggleCompactNuviaTooltip();
+      return;
+    }
+
     if (event.pointerType !== "touch") return;
 
     if (nuviaTooltipHoverTimer.current !== null) {
@@ -309,10 +349,12 @@ export function LandingFooter() {
 
     document.addEventListener("pointerdown", dismissOutside);
     window.addEventListener("scroll", dismissTouchTooltip, { passive: true });
+    const autoHide = window.setTimeout(dismissTouchTooltip, 3_200);
 
     return () => {
       document.removeEventListener("pointerdown", dismissOutside);
       window.removeEventListener("scroll", dismissTouchTooltip);
+      window.clearTimeout(autoHide);
     };
   }, [nuviaTooltipTouch, nuviaTooltipVisible]);
 
@@ -320,11 +362,27 @@ export function LandingFooter() {
     <>
       <footer className={styles.footer} id="footer" ref={footerRef}>
         <div
+          aria-expanded={compact ? nuviaTooltipVisible && nuviaTooltipTouch : undefined}
+          aria-label={compact ? "NVA, represented by Nuvia" : undefined}
           className={styles.nuviaPanel}
+          data-nuvia-open={
+            compact && nuviaTooltipVisible && nuviaTooltipTouch ? "" : undefined
+          }
+          onKeyDown={
+            compact
+              ? (event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  toggleCompactNuviaTooltip();
+                }
+              : undefined
+          }
           onPointerDown={toggleNuviaTouchTooltip}
-          onPointerEnter={showNuviaTooltip}
-          onPointerLeave={leaveNuviaTooltip}
-          onPointerMove={moveNuviaTooltip}
+          onPointerEnter={compact ? undefined : showNuviaTooltip}
+          onPointerLeave={compact ? undefined : leaveNuviaTooltip}
+          onPointerMove={compact ? undefined : moveNuviaTooltip}
+          role={compact ? "button" : undefined}
+          tabIndex={compact ? 0 : undefined}
         >
           <motion.span
             className={styles.representedBy}
@@ -336,8 +394,10 @@ export function LandingFooter() {
           <div
             aria-label="NVA, represented by Nuvia"
             className={styles.nuviaWordmark}
-            onBlur={hideNuviaTooltip}
+            onBlur={compact ? undefined : hideNuviaTooltip}
             onFocus={() => {
+              if (compact) return;
+
               if (
                 window.performance.now() - lastNuviaTouchAt.current <
                 NUVIA_POST_TOUCH_SUPPRESSION_MS
@@ -360,7 +420,7 @@ export function LandingFooter() {
               setNuviaTooltipVisible(true);
             }}
             ref={nuviaWordmarkRef}
-            tabIndex={0}
+            tabIndex={compact ? -1 : 0}
           >
             <span
               aria-hidden="true"
@@ -395,9 +455,7 @@ export function LandingFooter() {
         <motion.nav
           className={styles.footerLinks}
           aria-label="Legal and about links"
-          style={
-            compactMotion ? { opacity: linksOpacity, y: linksY } : undefined
-          }
+          style={compactMotion ? { opacity: linksOpacity } : undefined}
         >
           <Link href="/imprint">Imprint</Link>
           <Link href="/privacy">Privacy</Link>
@@ -408,13 +466,13 @@ export function LandingFooter() {
         ? createPortal(
             <motion.span
               aria-hidden="true"
-              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}${nuviaTooltipTouch ? ` ${styles.nuviaTooltipTouch}` : ""}`}
+              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}${nuviaTooltipTouch || compact ? ` ${styles.nuviaTooltipTouch}` : ""}`}
               style={{
-                x: nuviaTooltipTouch ? nuviaTooltipX : nuviaTooltipFollowX,
-                y: nuviaTooltipTouch ? nuviaTooltipY : nuviaTooltipFollowY,
+                x: nuviaTooltipTouch || compact ? nuviaTooltipX : nuviaTooltipFollowX,
+                y: nuviaTooltipTouch || compact ? nuviaTooltipY : nuviaTooltipFollowY,
               }}
               transformTemplate={({ x, y }) =>
-                nuviaTooltipTouch
+                nuviaTooltipTouch || compact
                   ? `translate(${x}, ${y}) translate(-50%, -50%)`
                   : `translate(${x}, ${y}) translate(14px, -50%)`
               }

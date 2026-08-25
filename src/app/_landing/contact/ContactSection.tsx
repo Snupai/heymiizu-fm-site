@@ -122,11 +122,6 @@ export function ContactSection({
     offset: ["start end", "start 0.42"],
     target: contactRef,
   });
-  const compactY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    reduceMotion ? [0, 0] : [88, 0],
-  );
   const formY = useTransform(
     scrollYProgress,
     [0.28, 1],
@@ -141,16 +136,6 @@ export function ContactSection({
     scrollYProgress,
     [0.18, 0.78],
     reduceMotion ? [1, 1] : [0.28, 1],
-  );
-  const pitchOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.55],
-    reduceMotion ? [1, 1] : [0.28, 1],
-  );
-  const pitchY = useTransform(
-    scrollYProgress,
-    [0, 0.62],
-    reduceMotion ? [0, 0] : [36, 0],
   );
   const washX = useTransform(
     scrollYProgress,
@@ -173,17 +158,10 @@ export function ContactSection({
       className={styles.contactWipe}
       id="contact"
       ref={contactRef}
-      style={
-        compactMotion ? { y: compactY } : compact ? undefined : { x: wipeX }
-      }
+      style={compact ? undefined : { x: wipeX }}
     >
       <div className={styles.contactSection}>
-        <motion.div
-          className={styles.contactPitch}
-          style={
-            compactMotion ? { opacity: pitchOpacity, y: pitchY } : undefined
-          }
-        >
+        <div className={styles.contactPitch}>
           {compact ? (
             <motion.div
               aria-hidden="true"
@@ -234,7 +212,7 @@ export function ContactSection({
               hey@<span className={styles.emailDomain}>miizumelon.com</span>
             </a>
           </motion.div>
-        </motion.div>
+        </div>
 
         <motion.div
           className={styles.formPanel}

@@ -161,6 +161,18 @@
   }
 }
 
+@keyframes mobile-hero-handwritten-in {
+  from {
+    opacity: 0;
+    transform: translateY(-52%) rotate(-16deg) scale(0.86);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-52%) rotate(-8deg) scale(1.04, 1);
+  }
+}
+
 .heroWorkScene[data-intro-phase="video"] .header {
   transform: translate3d(0, -120%, 0);
 }
@@ -1300,6 +1312,26 @@
   white-space: normal;
 }
 
+@media (max-width: 760px) {
+  .nuviaPanel {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nuviaWordmark {
+    transition: filter 180ms ease;
+  }
+
+  .nuviaPanel:active .nuviaWordmark,
+  .nuviaPanel[data-nuvia-open] .nuviaWordmark {
+    filter: brightness(0.86);
+  }
+
+  .nuviaTooltip:not(.nuviaTooltipTouch) {
+    opacity: 0;
+  }
+}
+
 @media (hover: none) {
   .nuviaTooltipVisible:not(.nuviaTooltipTouch) {
     opacity: 0;
@@ -1416,39 +1448,22 @@
 .mobileHero {
   display: flex;
   flex-direction: column;
+  height: calc(100svh - 3.6rem);
   min-height: calc(100svh - 3.6rem);
   overflow-x: clip;
-  padding: 0.35rem 1.1rem 1.15rem;
+  padding: 2.8rem 1.1rem 0;
   position: relative;
 }
 
 .mobileHeroCopy {
   display: block;
+  flex: 0 0 auto;
   left: auto;
+  overflow: visible;
+  padding-bottom: 0.85rem;
+  padding-top: 0.85rem;
   position: relative;
   top: auto;
-  width: 100%;
-}
-
-.mobileWorkWithMe {
-  align-self: flex-start;
-  background: transparent;
-  border: 0;
-  color: var(--miizu-primary);
-  cursor: pointer;
-  font-size: clamp(0.92rem, 3.8vw, 1.05rem);
-  font-weight: 650;
-  letter-spacing: 0.04em;
-  margin: 0.85rem 0 1.1rem;
-  padding: 0.15rem 0;
-}
-
-.mobileWorkWithMe::after {
-  background: currentColor;
-  content: "";
-  display: block;
-  height: 0.08em;
-  margin-top: 0.14em;
   width: 100%;
 }
 
@@ -1457,8 +1472,8 @@
   box-shadow: 0 1.15rem 2.8rem rgba(5, 3, 21, 0.14);
   flex: 1 1 0;
   isolation: isolate;
-  margin-top: auto;
-  min-height: 15.5rem;
+  margin-top: 1.25rem;
+  min-height: 12rem;
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -1495,35 +1510,31 @@
   z-index: 1;
 }
 
-.mobileHeroBridge {
-  background: #000;
-  bottom: 0;
-  height: 22vh;
-  left: 0;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  z-index: 2;
-}
-
 .mobileScrollHint {
   align-self: center;
   background: transparent;
   border: 0;
   color: color-mix(in srgb, var(--miizu-ink) 28%, transparent);
   cursor: pointer;
+  flex: 0 0 auto;
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.14em;
-  margin-top: 0.85rem;
+  margin-bottom: 0.55rem;
+  margin-top: 0.7rem;
   padding: 0.35rem;
 }
 
 .mobileWork {
+  --mobile-work-pad: 1.2rem;
   background: #000;
   color: var(--miizu-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
   overflow: hidden;
-  padding: 4.6rem 1.2rem 2.4rem;
+  padding: 3.2rem var(--mobile-work-pad) 1.15rem;
   position: relative;
   scroll-margin-top: 3.4rem;
 }
@@ -1560,24 +1571,11 @@
   z-index: 0;
 }
 
-.mobileWorkCover {
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, #050315 88%, var(--miizu-primary)) 100%
-  );
-  inset: auto 0 0;
-  height: 42%;
-  pointer-events: none;
-  position: absolute;
-  z-index: 2;
-}
-
 .clientsSection {
   background: #000;
   color: var(--miizu-bg);
-  margin-top: 3.2rem;
   overflow: hidden;
+  padding: 1.4rem 0 2.2rem;
   position: relative;
   width: 100%;
 }
@@ -1636,6 +1634,25 @@
     position: relative;
     top: auto;
     width: 100%;
+  }
+
+  .mobileHero .heroCopy h1 {
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.94;
+  }
+
+  .mobileHero .handwrittenHey {
+    animation-name: mobile-hero-handwritten-in;
+    left: 0;
+    top: 32%;
+    transform: translateY(-52%) rotate(-8deg) scale(1.04, 1);
+  }
+
+  .mobileHeroCopy:not([data-entered]) h1 > span,
+  .mobileHeroCopy:not([data-entered]) .handwrittenHey {
+    animation: none;
+    opacity: 0;
   }
 
   .heroCopy h1 {
@@ -1704,6 +1721,7 @@
   .contactWipe {
     height: auto;
     inset: auto;
+    margin-top: -1px;
     overflow: visible;
     position: relative;
     scroll-margin-top: 3.4rem;
@@ -1730,7 +1748,7 @@
   .contactPitch {
     min-height: 0;
     overflow: hidden;
-    padding: 4.6rem 1.15rem 2.8rem;
+    padding: 2.6rem 1.15rem 2.8rem;
     position: relative;
     top: auto;
     z-index: 1;
@@ -1817,6 +1835,7 @@
   }
 
   .footer {
+    --nva-size: 38vw;
     height: auto;
     margin-left: calc(50% - 50vw);
     min-height: 0;
@@ -1825,9 +1844,9 @@
   }
 
   .nuviaPanel {
-    --nva-crop: 0.888;
+    --nva-crop: 0.68;
     background: var(--miizu-bg);
-    height: calc(var(--nva-size, 47vw) * var(--nva-crop));
+    height: calc(var(--nva-size, 38vw) * var(--nva-crop));
     left: 0;
     margin-left: 0;
     max-width: none;
@@ -1843,7 +1862,7 @@
 
   .nuviaWordmark {
     bottom: 0;
-    font-size: var(--nva-size, 47vw);
+    font-size: var(--nva-size, 38vw);
     height: 100%;
     left: 0;
     max-width: none;
@@ -1852,26 +1871,17 @@
     width: 100%;
   }
 
-  .nuviaWord,
-  .nuviaWordDark,
-  .nuviaWordLight {
-    display: none;
-  }
-
-  .nuviaSvg {
-    display: block;
-    height: 100%;
-    margin-left: -8%;
-    overflow: visible;
-    transform: none;
-    width: 116%;
-  }
-
   .footerLinks {
     align-items: center;
     background: var(--miizu-bg);
-    min-height: 15rem;
-    padding: 2.5rem 1.4rem;
+    min-height: 0;
+    padding: 0.15rem 1.4rem 0.85rem;
+  }
+
+  .footerLinks a {
+    font-size: 1.05rem;
+    line-height: 1.05;
+    margin: 0.12em 0;
   }
 }
 
@@ -1897,7 +1907,7 @@
   }
 
   .contactPitch {
-    padding: 4.2rem 1rem 2.4rem;
+    padding: 2.2rem 1rem 2.4rem;
   }
 
   .contactWipe .formPanel {
@@ -1909,7 +1919,7 @@
   }
 
   .mobileWork {
-    padding-inline: 1rem;
+    --mobile-work-pad: 1rem;
   }
 }
 
@@ -1926,6 +1936,11 @@
   .heroCopy h1 > span,
   .handwrittenHey {
     animation: none;
+  }
+
+  .mobileHeroCopy h1 > span,
+  .mobileHeroCopy .handwrittenHey {
+    opacity: 1;
   }
 
   .clientNames {

@@ -2,68 +2,50 @@
 
 import {
   motion,
+  useMotionValue,
   useReducedMotion,
-  useScroll,
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useRef } from "react";
+import { useLenis } from "lenis/react";
+import { useEffect, useRef } from "react";
 
 import { ClientsMarquee } from "../scene/ClientsMarquee";
 import { WORK_LINES, type WorkLineVariant } from "../scene/content";
+import {
+  getWorkLineEntryX,
+  getWorkShadeEntryX,
+  WORK_SEQUENCE_DURATION_S,
+} from "../scene/scroll-timeline";
 import { workLineClassName } from "../scene/WorkLines";
 import styles from "../../miizu-landing.module.css";
+
+function isWorkInView(section: HTMLElement) {
+  const rect = section.getBoundingClientRect();
+  return (
+    rect.top < window.innerHeight * 0.82 &&
+    rect.bottom > window.innerHeight * 0.08
+  );
+}
 
 function MobileWorkLine({
   children,
   index,
-  enterProgress,
-  exitProgress,
-  reduceMotion,
   variant,
+  workSequenceTime,
 }: {
   children: string;
   index: number;
-  enterProgress: MotionValue<number>;
-  exitProgress: MotionValue<number>;
-  reduceMotion: boolean | null;
   variant: WorkLineVariant;
+  workSequenceTime: MotionValue<number>;
 }) {
-  const start = index * 0.09;
-  const end = Math.min(1, start + 0.28);
-  const x = useTransform<number, string>(
-    [enterProgress, exitProgress],
-    ([enter = 0, exit = 0]) => {
-      if (reduceMotion) return "0%";
-      const span = Math.max(0.001, end - start);
-      const enterT = Math.min(1, Math.max(0, (enter - start) / span));
-      const enterX = -52 * (1 - enterT);
-      const exitX = 28 * exit;
-      return `${enterX + exitX}%`;
-    },
-  );
-  const y = useTransform<number, number>(
-    [enterProgress, exitProgress],
-    ([enter = 0, exit = 0]) => {
-      if (reduceMotion) return 0;
-      const span = Math.max(0.001, end - start);
-      const enterT = Math.min(1, Math.max(0, (enter - start) / span));
-      return 22 * (1 - enterT) + 16 * exit;
-    },
-  );
-  const opacity = useTransform<number, number>(
-    [enterProgress, exitProgress],
-    ([enter = 0, exit = 0]) => {
-      if (reduceMotion) return 1;
-      const span = Math.max(0.001, end - start);
-      const enterT = Math.min(1, Math.max(0, (enter - start) / span));
-      return enterT * (1 - exit);
-    },
+  const entryX = useTransform(workSequenceTime, (time) =>
+    getWorkLineEntryX(time, index),
   );
 
   return (
     <p className={workLineClassName(variant)}>
-      <motion.span className={styles.workLineMotion} style={{ opacity, x, y }}>
+      <motion.span className={styles.workLineMotion} style={{ x: entryX }}>
         {children}
       </motion.span>
     </p>
@@ -72,88 +54,88 @@ function MobileWorkLine({
 
 export function MobileWork() {
   const reduceMotion = useReducedMotion();
-  const workRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: enterProgress } = useScroll({
-    offset: ["start 0.94", "start 0.2"],
-    target: workRef,
+  const sectionRef = useRef<HTMLElement>(null);
+  const startMsRef = useRef<number | null>(null);
+  const workSequenceTime = useMotionValue(0);
+  const workShadeEntryX = useTransform(workSequenceTime, getWorkShadeEntryX);
+
+  const advanceRef = useRef<() => void>(() => {});
+  advanceRef.current = () => {
+    if (reduceMotion) return;
+
+    const section = sectionRef.current;
+    if (!section) return;
+
+    if (startMsRef.current == null) {
+      if (!isWorkInView(section)) return;
+      startMsRef.current = performance.now();
+    }
+
+    if (workSequenceTime.get() >= WORK_SEQUENCE_DURATION_S) return;
+
+    const elapsed = (performance.now() - startMsRef.current) / 1000;
+    workSequenceTime.set(Math.min(elapsed, WORK_SEQUENCE_DURATION_S));
+  };
+
+  useLenis(() => {
+    advanceRef.current();
   });
-  const { scrollYProgress: exitProgress } = useScroll({
-    offset: ["end 0.92", "end 0.18"],
-    target: workRef,
-  });
-  const shadeX = useTransform(
-    enterProgress,
-    [0, 0.32],
-    reduceMotion ? ["0%", "0%"] : ["-46%", "0%"],
-  );
-  const shadeScaleX = useTransform<number, number>(
-    [enterProgress, exitProgress],
-    ([enter = 0, exit = 0]) => {
-      if (reduceMotion) return 1;
-      return 0.72 + 0.28 * enter + 0.42 * exit;
-    },
-  );
-  const clientsY = useTransform<number, number>(
-    [enterProgress, exitProgress],
-    ([enter = 0, exit = 0]) => {
-      if (reduceMotion) return 0;
-      const inT = Math.min(1, Math.max(0, (enter - 0.52) / 0.48));
-      return 48 * (1 - inT) - 28 * exit;
-    },
-  );
-  const clientsOpacity = useTransform<number, number>(
-    [enterProgress, exitProgress],
-    ([enter = 0, exit = 0]) => {
-      if (reduceMotion) return 1;
-      const inT = Math.min(1, Math.max(0, (enter - 0.52) / 0.48));
-      return inT * (1 - 0.85 * exit);
-    },
-  );
-  const clientsScaleX = useTransform(exitProgress, (exit) =>
-    reduceMotion ? 1 : 1 + exit * 0.08,
-  );
-  const coverOpacity = useTransform(
-    exitProgress,
-    [0.15, 1],
-    reduceMotion ? [0, 0] : [0, 0.55],
-  );
+
+  useEffect(() => {
+    if (reduceMotion) {
+      startMsRef.current = 0;
+      workSequenceTime.jump(WORK_SEQUENCE_DURATION_S);
+      return;
+    }
+
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const advance = () => advanceRef.current();
+    advance();
+
+    const observer = new IntersectionObserver(advance, {
+      root: null,
+      rootMargin: "0px 0px -18% 0px",
+      threshold: [0.08, 0.2, 0.4],
+    });
+    observer.observe(section);
+
+    window.addEventListener("scroll", advance, { passive: true });
+    const interval = window.setInterval(advance, 32);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", advance);
+      window.clearInterval(interval);
+    };
+  }, [reduceMotion, workSequenceTime]);
 
   return (
-    <section className={styles.mobileWork} id="work" ref={workRef}>
+    <section className={styles.mobileWork} id="work" ref={sectionRef}>
       <motion.div
         aria-hidden="true"
         className={styles.mobileWorkShade}
-        style={{ scaleX: shadeScaleX, x: shadeX }}
+        style={{ x: workShadeEntryX }}
       />
       <div className={styles.mobileWorkList}>
         {WORK_LINES.map((line, index) => (
           <MobileWorkLine
-            enterProgress={enterProgress}
-            exitProgress={exitProgress}
             index={index}
             key={line.id}
-            reduceMotion={reduceMotion}
             variant={line.variant}
+            workSequenceTime={workSequenceTime}
           >
             {line.text}
           </MobileWorkLine>
         ))}
       </div>
-
-      <motion.div
-        style={{
-          opacity: clientsOpacity,
-          scaleX: clientsScaleX,
-          y: clientsY,
-        }}
-      >
-        <ClientsMarquee embedded reduceMotion={reduceMotion} />
-      </motion.div>
-      <motion.div
-        aria-hidden="true"
-        className={styles.mobileWorkCover}
-        style={{ opacity: coverOpacity }}
-      />
     </section>
   );
+}
+
+export function MobileClients() {
+  const reduceMotion = useReducedMotion();
+
+  return <ClientsMarquee embedded reduceMotion={reduceMotion} />;
 }

@@ -8,7 +8,7 @@ import type { ContactRegion } from "../contact/contact-form-model";
 import { LandingFooter } from "../footer/LandingFooter";
 import styles from "../../miizu-landing.module.css";
 import { MobileHero } from "./MobileHero";
-import { MobileWork } from "./MobileWork";
+import { MobileClients, MobileWork } from "./MobileWork";
 
 export function MobileLanding({
   initialRegion,
@@ -31,6 +31,7 @@ export function MobileLanding({
     <main className={`${styles.site} ${styles.mobileSite}`}>
       <MobileHero />
       <MobileWork />
+      <MobileClients />
       <ContactSection compact initialRegion={initialRegion} wipeX={wipeX} />
       <LandingFooter />
     </main>
