@@ -29,7 +29,7 @@ export const DEFAULT_CONTACT_REGION: ContactRegion = "international";
 
 const UNKNOWN_COUNTRY_CODES = new Set(["", "XX", "T1", "ZZ"]);
 
-export function getContactRegionFromCountry(
+function getContactRegionFromCountry(
   country: string | null | undefined,
 ): ContactRegion | null {
   const code = country?.trim().toUpperCase() ?? "";
@@ -152,4 +152,21 @@ export function getPhoneValidationMessage(
     default:
       return "Please enter a valid phone number.";
   }
+}
+
+export function getBudgetValidationMessage(budget: string, required: boolean) {
+  if (!required || budget) return null;
+  return "Please choose a budget range.";
+}
+
+export function getDeadlineValidationMessage(
+  range: DateRange | undefined,
+  deadline: string,
+  required: boolean,
+) {
+  if (!range?.from) {
+    return required ? "Please select a project date range." : null;
+  }
+  if (!range.to || !deadline) return "Please select an end date.";
+  return null;
 }

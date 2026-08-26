@@ -40,7 +40,7 @@ function formatDeadlineRange(deadline: string): string {
   return `${formatIsoDate(from)} – ${formatIsoDate(to)}`;
 }
 
-export function getContactLocationLabel(
+function getContactLocationLabel(
   region: ContactInquiry["region"],
 ): string {
   return region === "local" ? "Germany" : "International";
@@ -59,7 +59,7 @@ function fieldRow(label: string, valueHtml: string): string {
 
 export function buildContactInquiryEmail(inquiry: ContactInquiry) {
   const location = getContactLocationLabel(inquiry.region);
-  const dates = formatDeadlineRange(inquiry.deadline);
+  const dates = inquiry.deadline ? formatDeadlineRange(inquiry.deadline) : "";
   const phone = inquiry.telephone;
   const referral = inquiry.referral;
   const descriptionHtml = esc(inquiry.description).replace(/\n/g, "<br>");
@@ -72,8 +72,8 @@ export function buildContactInquiryEmail(inquiry: ContactInquiry) {
     `Email: ${inquiry.email}`,
     `Phone: ${phone ?? "Not provided"}`,
     `Found via: ${referral ?? "Not specified"}`,
-    `Budget: ${inquiry.budget}`,
-    `Project dates: ${dates}`,
+    `Budget: ${inquiry.budget || "Not provided"}`,
+    `Project dates: ${dates || "Not provided"}`,
     "",
     "About the project:",
     inquiry.description,
@@ -154,8 +154,8 @@ export function buildContactInquiryEmail(inquiry: ContactInquiry) {
                         : ""
                     }
                     ${referral ? fieldRow("Found via", esc(referral)) : ""}
-                    ${fieldRow("Budget", esc(inquiry.budget))}
-                    ${fieldRow("Project dates", esc(dates))}
+                    ${inquiry.budget ? fieldRow("Budget", esc(inquiry.budget)) : ""}
+                    ${dates ? fieldRow("Project dates", esc(dates)) : ""}
                   </table>
 
                   <p class="label">About the project</p>

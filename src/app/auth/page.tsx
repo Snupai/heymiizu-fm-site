@@ -71,10 +71,10 @@ const Auth = () => {
 
   return (
     <div className="bg-background flex min-h-screen items-center justify-center p-4">
-      <Card className="card-glow w-full max-w-md">
+      <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-center text-3xl font-bold">
-            <span className="text-gradient">Portfolio</span> Access
+            Portfolio Access
           </CardTitle>
           <CardDescription className="text-center">
             {isLogin

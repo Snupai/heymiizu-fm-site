@@ -17,10 +17,10 @@ import styles from "../../miizu-landing.module.css";
 import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
 import { useIntroLayout } from "../scene/useIntroLayout";
 import {
-  anchorRepresentedBy,
   fitMobileNvaInk,
   measureNvaInk,
   mobileNvaViewportWidth,
+  representedByWordmarkPin,
 } from "./nva-measurement";
 
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
@@ -89,6 +89,21 @@ export function LandingFooter() {
     const footer = wordmark.closest("footer");
     const compactQuery = window.matchMedia(COMPACT_LAYOUT_QUERY);
 
+    const pinRepresentedBy = () => {
+      const label = representedByRef.current;
+      const panel = wordmark.parentElement;
+      if (!label || !panel) return;
+
+      const pin = representedByWordmarkPin(
+        wordmark.getBoundingClientRect(),
+        panel.getBoundingClientRect(),
+      );
+      if (!pin) return;
+
+      label.style.setProperty("--n-x", `${pin.xPct}%`);
+      label.style.setProperty("--n-y", `${pin.yPct}%`);
+    };
+
     const fitWordmark = () => {
       const words = [
         ...wordmark.querySelectorAll<HTMLElement>(`.${styles.nuviaWord}`),
@@ -100,93 +115,101 @@ export function LandingFooter() {
       if (!word) return;
 
       if (compactQuery.matches) {
-        const target = mobileNvaViewportWidth(
-          window.innerWidth,
-          window.visualViewport?.width,
-        );
-        if (!footer || target <= 0) return;
+          const target = mobileNvaViewportWidth(
+            window.innerWidth,
+            window.visualViewport?.width,
+          );
+          if (!footer || target <= 0) return;
+
+          const computed = window.getComputedStyle(word);
+          const fontSize = Number.parseFloat(computed.fontSize);
+          if (!Number.isFinite(fontSize) || fontSize <= 0) return;
+
+          const ink = measureNvaInk(computed, fontSize);
+          if (!ink) return;
+
+          const fit = fitMobileNvaInk(ink, target);
+          if (!fit) return;
+
+          const nextSize = Math.round(fontSize * fit.scale);
+          if (
+            Number.isFinite(nextSize) &&
+            nextSize > 0 &&
+            Math.abs(nextSize - fontSize) > 1
+          ) {
+            footer.style.setProperty("--nva-size", `${nextSize}px`);
+          }
+
+          wordmark.style.width = `${fit.width}px`;
+          wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
+          wordmark.style.setProperty("--nva-scale", "1");
+          pinRepresentedBy();
+          return;
+        }
+
+        footer?.style.removeProperty("--nva-scale");
+
+        if (footer && footer.clientWidth > 0) {
+          const current = window.getComputedStyle(word);
+          const currentSize = Number.parseFloat(current.fontSize);
+
+          if (Number.isFinite(currentSize) && currentSize > 0) {
+            const currentInk = measureNvaInk(current, currentSize);
+
+            if (currentInk) {
+              const linksReserve = Math.min(
+                Math.max(footer.clientWidth * 0.2, 240),
+                480,
+              );
+              const nextSize = Math.round(
+                currentSize *
+                  ((footer.clientWidth - linksReserve) / currentInk.inkWidth),
+              );
+
+              if (
+                Number.isFinite(nextSize) &&
+                nextSize > 0 &&
+                Math.abs(nextSize - currentSize) > 1
+              ) {
+                footer.style.setProperty("--nva-size", `${nextSize}px`);
+              }
+            }
+          }
+        }
 
         const computed = window.getComputedStyle(word);
         const fontSize = Number.parseFloat(computed.fontSize);
+
         if (!Number.isFinite(fontSize) || fontSize <= 0) return;
 
         const ink = measureNvaInk(computed, fontSize);
         if (!ink) return;
 
-        const fit = fitMobileNvaInk(ink, target);
-        if (!fit) return;
-
-        const nextSize = Math.round(fontSize * fit.scale);
-        if (
-          Number.isFinite(nextSize) &&
-          nextSize > 0 &&
-          Math.abs(nextSize - fontSize) > 1
-        ) {
-          footer.style.setProperty("--nva-size", `${nextSize}px`);
-        }
-
-        wordmark.style.width = `${fit.width}px`;
-        wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
+        const bleed = 1;
+        const shift = -ink.inkLeft - bleed;
+        wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
+        wordmark.style.setProperty("--nva-shift", `${shift}px`);
         wordmark.style.setProperty("--nva-scale", "1");
-
-        const label = representedByRef.current;
-        if (label) anchorRepresentedBy(word, label);
-        return;
-      }
-
-      footer?.style.removeProperty("--nva-scale");
-
-      if (footer && footer.clientWidth > 0) {
-        const current = window.getComputedStyle(word);
-        const currentSize = Number.parseFloat(current.fontSize);
-
-        if (Number.isFinite(currentSize) && currentSize > 0) {
-          const currentInk = measureNvaInk(current, currentSize);
-
-          if (currentInk) {
-            const linksReserve = Math.min(
-              Math.max(footer.clientWidth * 0.2, 240),
-              480,
-            );
-            const nextSize = Math.round(
-              currentSize *
-                ((footer.clientWidth - linksReserve) / currentInk.inkWidth),
-            );
-
-            if (
-              Number.isFinite(nextSize) &&
-              nextSize > 0 &&
-              Math.abs(nextSize - currentSize) > 1
-            ) {
-              footer.style.setProperty("--nva-size", `${nextSize}px`);
-            }
-          }
-        }
-      }
-
-      const computed = window.getComputedStyle(word);
-      const fontSize = Number.parseFloat(computed.fontSize);
-
-      if (!Number.isFinite(fontSize) || fontSize <= 0) return;
-
-      const ink = measureNvaInk(computed, fontSize);
-      if (!ink) return;
-
-      const bleed = 1;
-      const shift = -ink.inkLeft - bleed;
-      wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
-      wordmark.style.setProperty("--nva-shift", `${shift}px`);
-      wordmark.style.setProperty("--nva-scale", "1");
-
-      const label = representedByRef.current;
-      if (label) anchorRepresentedBy(word, label);
+        pinRepresentedBy();
     };
 
-    const resizeObserver = new ResizeObserver(fitWordmark);
+    let fitFrame = 0;
+    const scheduleFit = () => {
+      if (fitFrame !== 0) return;
+      fitFrame = window.requestAnimationFrame(() => {
+        fitFrame = 0;
+        fitWordmark();
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(scheduleFit);
     if (footer) resizeObserver.observe(footer);
-    compactQuery.addEventListener("change", fitWordmark);
-    window.addEventListener("resize", fitWordmark);
-    window.visualViewport?.addEventListener("resize", fitWordmark);
+    resizeObserver.observe(wordmark);
+    const panel = wordmark.parentElement;
+    if (panel) resizeObserver.observe(panel);
+    compactQuery.addEventListener("change", scheduleFit);
+    window.addEventListener("resize", scheduleFit);
+    window.visualViewport?.addEventListener("resize", scheduleFit);
     void document.fonts.ready.then(fitWordmark);
     fitWordmark();
     let layoutFrame = window.requestAnimationFrame(() => {
@@ -194,11 +217,12 @@ export function LandingFooter() {
     });
 
     return () => {
+      window.cancelAnimationFrame(fitFrame);
       window.cancelAnimationFrame(layoutFrame);
       resizeObserver.disconnect();
-      compactQuery.removeEventListener("change", fitWordmark);
-      window.removeEventListener("resize", fitWordmark);
-      window.visualViewport?.removeEventListener("resize", fitWordmark);
+      compactQuery.removeEventListener("change", scheduleFit);
+      window.removeEventListener("resize", scheduleFit);
+      window.visualViewport?.removeEventListener("resize", scheduleFit);
     };
   }, []);
 
@@ -384,13 +408,6 @@ export function LandingFooter() {
           role={compact ? "button" : undefined}
           tabIndex={compact ? 0 : undefined}
         >
-          <motion.span
-            className={styles.representedBy}
-            ref={representedByRef}
-            style={compactMotion ? { opacity: representedOpacity } : undefined}
-          >
-            represented by
-          </motion.span>
           <div
             aria-label="NVA, represented by Nuvia"
             className={styles.nuviaWordmark}
@@ -428,29 +445,18 @@ export function LandingFooter() {
             >
               {"NVA"}
             </span>
-            <span
-              aria-hidden="true"
-              className={`${styles.nuviaWord} ${styles.nuviaWordLight}`}
-            >
-              {"NVA"}
-            </span>
-            <svg
-              aria-hidden="true"
-              className={styles.nuviaSvg}
-              preserveAspectRatio="none"
-              viewBox="0 0 1000 320"
-            >
-              <text
-                className={styles.nuviaSvgText}
-                lengthAdjust="spacingAndGlyphs"
-                textLength={1000}
-                x={0}
-                y={312}
-              >
-                NVA
-              </text>
-            </svg>
           </div>
+          <motion.span
+            className={styles.representedBy}
+            ref={representedByRef}
+            style={
+              compactMotion
+                ? { opacity: representedOpacity, position: "absolute", zIndex: 2 }
+                : { position: "absolute", zIndex: 2 }
+            }
+          >
+            represented by
+          </motion.span>
         </div>
         <motion.nav
           className={styles.footerLinks}

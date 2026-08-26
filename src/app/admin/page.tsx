@@ -98,7 +98,7 @@ const AdminPage = () => {
             Back to Home
           </Button>
           <h1 className="text-2xl font-bold">
-            <span className="text-gradient">Admin Dashboard</span>
+            Admin Dashboard
           </h1>
           <div className="w-[100px]" />
         </div>

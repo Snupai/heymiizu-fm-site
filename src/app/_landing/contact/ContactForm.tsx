@@ -69,6 +69,142 @@ export function ContactForm({
   const succeeded = result?.type === "success";
   const showOverlay = status.paused || succeeded;
 
+  const outreachFields = (
+    <>
+      <label htmlFor="contact-phone">
+        <span>what&rsquo;s the best number to reach you?</span>
+        <IntlTelInput
+          containerClass={styles.phoneInput}
+          countryOrder={["de", "gb", "us"]}
+          disabled={disabled}
+          initialCountry="de"
+          inputProps={{
+            id: "contact-phone",
+            "aria-describedby": phoneError ? "contact-phone-error" : undefined,
+            "aria-invalid": Boolean(phoneError),
+            autoComplete: "tel",
+            onBlur: () => markFieldTouched("telephone"),
+            placeholder: "Phone number (optional)",
+          }}
+          loadUtils={loadPhoneUtils}
+          onChangeErrorCode={setPhoneErrorCode}
+          onChangeNumber={updatePhone}
+          onChangeValidity={setPhoneIsValid}
+          value={data.telephone}
+        />
+        <ContactFieldFeedback error={phoneError} id="contact-phone-error" />
+      </label>
+
+      <label htmlFor="contact-referral">
+        <span>how did you find me?</span>
+        <input
+          id="contact-referral"
+          disabled={disabled}
+          maxLength={80}
+          onChange={(event) => updateField("referral", event.target.value)}
+          placeholder="Instagram, LinkedIn, X ..."
+          value={data.referral}
+        />
+        <div aria-hidden="true" className={styles.fieldFeedback} />
+      </label>
+    </>
+  );
+
+  const projectFields = (
+    <>
+      <label htmlFor="budget">
+        <span>what&rsquo;s your budget?</span>
+        <Select
+          disabled={disabled}
+          items={BUDGET_ITEMS}
+          name="budget"
+          onValueChange={(value) => {
+            updateField("budget", value ?? "");
+            markFieldTouched("budget");
+          }}
+          required
+          value={data.budget || null}
+        >
+          <SelectTrigger
+            id="budget"
+            aria-describedby={budgetError ? "contact-budget-error" : undefined}
+            aria-invalid={Boolean(budgetError)}
+            aria-label="What is your budget?"
+            data-contact-select
+            onBlur={() => markFieldTouched("budget")}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent
+            alignItemWithTrigger={false}
+            className={styles.contactSelectContent}
+          >
+            <SelectGroup>
+              {BUDGET_ITEMS.map((item) => (
+                <SelectItem
+                  className={styles.contactSelectItem}
+                  key={item.value ?? "budget-placeholder"}
+                  value={item.value}
+                >
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <ContactFieldFeedback error={budgetError} id="contact-budget-error" />
+      </label>
+
+      <label htmlFor="deadline-picker">
+        <span>project date range</span>
+        <Popover
+          onOpenChange={(open) => {
+            if (!open) markFieldTouched("deadline");
+          }}
+        >
+          <PopoverTrigger asChild>
+            <Button
+              id="deadline-picker"
+              aria-describedby={deadlineError ? "deadline-error" : undefined}
+              aria-invalid={Boolean(deadlineError)}
+              className={styles.dateRangePickerButton}
+              data-date-range-picker
+              data-empty={!deadlineRange?.from}
+              disabled={disabled}
+              type="button"
+              variant="outline"
+            >
+              <span>
+                {deadlineRange?.from
+                  ? formatContactDateRange(deadlineRange)
+                  : "Pick a date range"}
+              </span>
+              <CalendarIcon aria-hidden="true" data-icon="inline-end" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="end"
+            className={`w-auto ${styles.contactDatePopover}`}
+          >
+            <Calendar
+              className={styles.contactCalendar}
+              mode="range"
+              captionLayout="dropdown"
+              disabled={(date) => !isAvailableContactDate(date)}
+              min={1}
+              month={deadlineMonth}
+              numberOfMonths={compact ? 1 : 2}
+              onMonthChange={setDeadlineMonth}
+              onSelect={updateDeadlineRange}
+              selected={deadlineRange}
+            />
+          </PopoverContent>
+        </Popover>
+        <ContactFieldFeedback error={deadlineError} id="deadline-error" />
+      </label>
+    </>
+  );
+
   return (
     <div className={styles.formShell} id="contact-form">
       {showOverlay && (
@@ -160,44 +296,7 @@ export function ContactForm({
             <ContactFieldFeedback error={emailError} id="contact-email-error" />
           </label>
 
-          <label htmlFor="contact-phone">
-            <span>what&rsquo;s the best number to reach you?</span>
-            <IntlTelInput
-              containerClass={styles.phoneInput}
-              countryOrder={["de", "gb", "us"]}
-              disabled={disabled}
-              initialCountry="de"
-              inputProps={{
-                id: "contact-phone",
-                "aria-describedby": phoneError
-                  ? "contact-phone-error"
-                  : undefined,
-                "aria-invalid": Boolean(phoneError),
-                autoComplete: "tel",
-                onBlur: () => markFieldTouched("telephone"),
-                placeholder: "Phone number (optional)",
-              }}
-              loadUtils={loadPhoneUtils}
-              onChangeErrorCode={setPhoneErrorCode}
-              onChangeNumber={updatePhone}
-              onChangeValidity={setPhoneIsValid}
-              value={data.telephone}
-            />
-            <ContactFieldFeedback error={phoneError} id="contact-phone-error" />
-          </label>
-
-          <label htmlFor="contact-referral">
-            <span>how did you find me?</span>
-            <input
-              id="contact-referral"
-              disabled={disabled}
-              maxLength={80}
-              onChange={(event) => updateField("referral", event.target.value)}
-              placeholder="Instagram, LinkedIn, X ..."
-              value={data.referral}
-            />
-            <div aria-hidden="true" className={styles.fieldFeedback} />
-          </label>
+          {outreachFields}
 
           <label htmlFor="service">
             <span>what service do you need?</span>
@@ -247,103 +346,7 @@ export function ContactForm({
             />
           </label>
 
-          <label htmlFor="budget">
-            <span>what&rsquo;s your budget?</span>
-            <Select
-              disabled={disabled}
-              items={BUDGET_ITEMS}
-              name="budget"
-              onValueChange={(value) => {
-                updateField("budget", value ?? "");
-                markFieldTouched("budget");
-              }}
-              required
-              value={data.budget || null}
-            >
-              <SelectTrigger
-                id="budget"
-                aria-describedby={
-                  budgetError ? "contact-budget-error" : undefined
-                }
-                aria-invalid={Boolean(budgetError)}
-                aria-label="What is your budget?"
-                data-contact-select
-                onBlur={() => markFieldTouched("budget")}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent
-                alignItemWithTrigger={false}
-                className={styles.contactSelectContent}
-              >
-                <SelectGroup>
-                  {BUDGET_ITEMS.map((item) => (
-                    <SelectItem
-                      className={styles.contactSelectItem}
-                      key={item.value ?? "budget-placeholder"}
-                      value={item.value}
-                    >
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <ContactFieldFeedback
-              error={budgetError}
-              id="contact-budget-error"
-            />
-          </label>
-
-          <label htmlFor="deadline-picker">
-            <span>project date range</span>
-            <Popover
-              onOpenChange={(open) => {
-                if (!open) markFieldTouched("deadline");
-              }}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  id="deadline-picker"
-                  aria-describedby={
-                    deadlineError ? "deadline-error" : undefined
-                  }
-                  aria-invalid={Boolean(deadlineError)}
-                  className={styles.dateRangePickerButton}
-                  data-date-range-picker
-                  data-empty={!deadlineRange?.from}
-                  disabled={disabled}
-                  type="button"
-                  variant="outline"
-                >
-                  <span>
-                    {deadlineRange?.from
-                      ? formatContactDateRange(deadlineRange)
-                      : "Pick a date range"}
-                  </span>
-                  <CalendarIcon aria-hidden="true" data-icon="inline-end" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className={`w-auto ${styles.contactDatePopover}`}
-              >
-                <Calendar
-                  className={styles.contactCalendar}
-                  mode="range"
-                  captionLayout="dropdown"
-                  disabled={(date) => !isAvailableContactDate(date)}
-                  min={1}
-                  month={deadlineMonth}
-                  numberOfMonths={compact ? 1 : 2}
-                  onMonthChange={setDeadlineMonth}
-                  onSelect={updateDeadlineRange}
-                  selected={deadlineRange}
-                />
-              </PopoverContent>
-            </Popover>
-            <ContactFieldFeedback error={deadlineError} id="deadline-error" />
-          </label>
+          {projectFields}
 
           <label htmlFor="project-description">
             <span>what are you up to?</span>

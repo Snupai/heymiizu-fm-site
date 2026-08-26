@@ -89,7 +89,6 @@ export default function RootLayout({
 }) {
   return (
     <html className={rethinkSans.variable} lang="en">
-      <head></head>
       <body className="flex min-h-screen flex-col font-sans font-semibold">
         <AppShell>{children}</AppShell>
       </body>
