@@ -300,8 +300,8 @@ export async function POST(req: NextRequest) {
     telephone: inquiry.telephone ?? null,
     referral: inquiry.referral ?? null,
     service: inquiry.service,
-    budget: inquiry.budget || "",
-    deadline: inquiry.deadline || "",
+    budget: inquiry.budget ?? "",
+    deadline: inquiry.deadline ?? "",
     region: inquiry.region,
     description: inquiry.description,
   });

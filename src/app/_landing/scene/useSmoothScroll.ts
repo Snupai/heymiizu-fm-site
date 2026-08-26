@@ -40,7 +40,10 @@ export function useSmoothScroll(
   const previousTouchAction = useRef("");
   const onPauseStopRef = useRef(onPauseStop);
   const lenis = useLenis();
-  onPauseStopRef.current = onPauseStop;
+
+  useEffect(() => {
+    onPauseStopRef.current = onPauseStop;
+  });
 
   const releaseHoldLock = () => {
     if (!holdLocked.current) return;
