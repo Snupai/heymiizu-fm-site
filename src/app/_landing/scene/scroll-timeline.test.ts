@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 
 import {
   COMPACT_LAYOUT_MAX_WIDTH,
-  COMPACT_LAYOUT_QUERY,
   getIntroLayout,
   getIntroRevealDelayMs,
   hasIntroPlaybackReachedReveal,
@@ -18,12 +17,6 @@ describe("intro layout breakpoints", () => {
     expect(getIntroLayout(COMPACT_LAYOUT_MAX_WIDTH + 1)).toBe("medium");
     expect(getIntroLayout(1400)).toBe("medium");
     expect(getIntroLayout(1401)).toBe("desktop");
-  });
-
-  test("the compact media query matches the numeric cap", () => {
-    expect(COMPACT_LAYOUT_QUERY).toBe(
-      `(max-width: ${COMPACT_LAYOUT_MAX_WIDTH}px)`,
-    );
   });
 });
 

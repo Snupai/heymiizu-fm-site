@@ -29,7 +29,7 @@ export const DEFAULT_CONTACT_REGION: ContactRegion = "international";
 
 const UNKNOWN_COUNTRY_CODES = new Set(["", "XX", "T1", "ZZ"]);
 
-export function getContactRegionFromCountry(
+function getContactRegionFromCountry(
   country: string | null | undefined,
 ): ContactRegion | null {
   const code = country?.trim().toUpperCase() ?? "";

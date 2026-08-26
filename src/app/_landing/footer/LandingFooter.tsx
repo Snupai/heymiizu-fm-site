@@ -205,7 +205,8 @@ export function LandingFooter() {
     const resizeObserver = new ResizeObserver(scheduleFit);
     if (footer) resizeObserver.observe(footer);
     resizeObserver.observe(wordmark);
-    wordmark.parentElement && resizeObserver.observe(wordmark.parentElement);
+    const panel = wordmark.parentElement;
+    if (panel) resizeObserver.observe(panel);
     compactQuery.addEventListener("change", scheduleFit);
     window.addEventListener("resize", scheduleFit);
     window.visualViewport?.addEventListener("resize", scheduleFit);
@@ -444,28 +445,6 @@ export function LandingFooter() {
             >
               {"NVA"}
             </span>
-            <span
-              aria-hidden="true"
-              className={`${styles.nuviaWord} ${styles.nuviaWordLight}`}
-            >
-              {"NVA"}
-            </span>
-            <svg
-              aria-hidden="true"
-              className={styles.nuviaSvg}
-              preserveAspectRatio="none"
-              viewBox="0 0 1000 320"
-            >
-              <text
-                className={styles.nuviaSvgText}
-                lengthAdjust="spacingAndGlyphs"
-                textLength={1000}
-                x={0}
-                y={312}
-              >
-                NVA
-              </text>
-            </svg>
           </div>
           <motion.span
             className={styles.representedBy}

@@ -1230,34 +1230,6 @@
   position: relative;
 }
 
-.nuviaWordLight {
-  clip-path: none;
-  color: var(--miizu-bg);
-  display: none;
-}
-
-.nuviaSvg {
-  display: none;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-  width: 100%;
-}
-
-.nuviaSvgText {
-  fill: var(--miizu-primary);
-  font-family:
-    "SF Pro Display",
-    -apple-system,
-    BlinkMacSystemFont,
-    var(--font-rethink-sans),
-    system-ui,
-    sans-serif;
-  font-size: 320px;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
 .nuviaTooltip {
   background: #fbfbfe;
   border-radius: 999px;

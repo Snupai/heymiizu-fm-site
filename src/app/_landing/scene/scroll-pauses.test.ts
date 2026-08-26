@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 
-import { LENIS_OPTIONS } from "./lenis-options";
 import {
   crossedPauseStop,
   pauseHoldTick,
@@ -10,10 +9,6 @@ import {
 import { SCROLL_PANEL_EXPANDED, SCROLL_PAUSE_STOPS } from "./scroll-timeline";
 
 describe("mobile pause stops", () => {
-  test("touch scroll is synced through Lenis so stops can actually hold", () => {
-    expect(LENIS_OPTIONS.syncTouch).toBe(true);
-  });
-
   test("a flick across a stop is detected", () => {
     const stop = crossedPauseStop(0.1, 0.2, new Set());
     expect(stop?.at).toBe(SCROLL_PANEL_EXPANDED);

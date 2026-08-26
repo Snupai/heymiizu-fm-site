@@ -40,7 +40,7 @@ function formatDeadlineRange(deadline: string): string {
   return `${formatIsoDate(from)} – ${formatIsoDate(to)}`;
 }
 
-export function getContactLocationLabel(
+function getContactLocationLabel(
   region: ContactInquiry["region"],
 ): string {
   return region === "local" ? "Germany" : "International";
