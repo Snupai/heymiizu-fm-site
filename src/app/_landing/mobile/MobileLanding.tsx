@@ -5,6 +5,7 @@ import { Mail } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { BookCallSoon } from "../contact/BookCallSoon";
 import { ContactForm } from "../contact/ContactForm";
 import type { ContactRegion } from "../contact/contact-form-model";
 import { RegionToggle } from "../contact/RegionToggle";
@@ -52,10 +53,11 @@ export function MobileLanding({
         </motion.h1>
         <p>Tell me what you&rsquo;re launching.</p>
         <RegionToggle onChange={setRegion} region={region} />
+        <BookCallSoon />
       </section>
 
       <div className={styles.mobileContactForm}>
-        <ContactForm compact region={region} short />
+        <ContactForm compact region={region} />
         <a
           className={styles.mobileContactEmail}
           href="mailto:hey@miizumelon.com"

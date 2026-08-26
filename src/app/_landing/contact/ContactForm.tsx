@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import IntlTelInput from "@intl-tel-input/react";
-import { CalendarIcon, Plus, X } from "lucide-react";
+import { CalendarIcon, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,13 +36,10 @@ const loadPhoneUtils = () => import("intl-tel-input/utils");
 export function ContactForm({
   compact,
   region,
-  short = false,
 }: {
   compact: boolean;
   region: ContactRegion;
-  short?: boolean;
 }) {
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const {
     budgetError,
     data,
@@ -68,20 +64,10 @@ export function ContactForm({
     updateDeadlineRange,
     updateField,
     updatePhone,
-  } = useContactForm(region, { requireProjectDetails: !short });
+  } = useContactForm(region);
 
   const succeeded = result?.type === "success";
   const showOverlay = status.paused || succeeded;
-  const extraDetailError = Boolean(phoneError || budgetError || deadlineError);
-
-  useEffect(() => {
-    if (!short) return;
-    if (succeeded) {
-      setDetailsOpen(false);
-      return;
-    }
-    if (extraDetailError) setDetailsOpen(true);
-  }, [extraDetailError, short, succeeded]);
 
   const outreachFields = (
     <>
@@ -136,7 +122,7 @@ export function ContactForm({
             updateField("budget", value ?? "");
             markFieldTouched("budget");
           }}
-          required={!short}
+          required
           value={data.budget || null}
         >
           <SelectTrigger
@@ -310,7 +296,7 @@ export function ContactForm({
             <ContactFieldFeedback error={emailError} id="contact-email-error" />
           </label>
 
-          {short ? null : outreachFields}
+          {outreachFields}
 
           <label htmlFor="service">
             <span>what service do you need?</span>
@@ -360,7 +346,7 @@ export function ContactForm({
             />
           </label>
 
-          {short ? null : projectFields}
+          {projectFields}
 
           <label htmlFor="project-description">
             <span>what are you up to?</span>
@@ -386,31 +372,6 @@ export function ContactForm({
               id="project-description-error"
             />
           </label>
-
-          {short ? (
-            <div className={styles.projectDetails}>
-              <button
-                aria-controls="contact-project-details"
-                aria-expanded={detailsOpen}
-                className={styles.projectDetailsToggle}
-                onClick={() => setDetailsOpen((open) => !open)}
-                type="button"
-              >
-                <Plus
-                  aria-hidden="true"
-                  className={styles.projectDetailsIcon}
-                  data-open={detailsOpen ? "" : undefined}
-                />
-                {detailsOpen ? "Hide project details" : "Add project details"}
-              </button>
-              {detailsOpen ? (
-                <div id="contact-project-details">
-                  {outreachFields}
-                  {projectFields}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
 
           <button
             className={styles.submitButton}

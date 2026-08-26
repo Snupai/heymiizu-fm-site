@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { CONTACT_HEADLINES } from "./content";
 import { INTRO_SLIDE_EASE } from "../scene/scroll-timeline";
 import styles from "../../miizu-landing.module.css";
+import { BookCallSoon } from "./BookCallSoon";
 import { ContactForm } from "./ContactForm";
 import type { ContactRegion } from "./contact-form-model";
 import { RegionToggle } from "./RegionToggle";
@@ -98,7 +99,7 @@ export function ContactSection({
             viewport={{ amount: 0.4, once: true }}
             whileInView={compactMotion ? { opacity: 1, y: 0 } : undefined}
           >
-            {/* Restore book-a-call: uncomment the <a>, ArrowUpRight import, and bookingUrl. Comment out the coming-soon <div>. */}
+            {/* Restore book-a-call: uncomment the <a>, ArrowUpRight import, and bookingUrl. Comment out <BookCallSoon />. */}
             {/*
             <a
               className={styles.bookCall}
@@ -112,13 +113,7 @@ export function ContactSection({
               </span>
             </a>
             */}
-            <div
-              aria-label="Book a call, coming soon"
-              className={`${styles.bookCall} ${styles.bookCallSoon}`}
-            >
-              <span className={styles.bookCallText}>book a call</span>
-              <span className={styles.comingSoon}>coming soon</span>
-            </div>
+            <BookCallSoon />
             <p>or just say hello</p>
             <a className={styles.emailLink} href="mailto:hey@miizumelon.com">
               hey@<span className={styles.emailDomain}>miizumelon.com</span>

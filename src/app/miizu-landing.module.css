@@ -1489,6 +1489,11 @@
   padding: 0.7em 0.55em;
 }
 
+.mobileContactPage .bookCall {
+  font-size: clamp(1.35rem, 7.2vw, 1.9rem);
+  margin-top: 1.35rem;
+}
+
 .mobileContactForm {
   background: #000;
   border-radius: 1.8rem 1.8rem 0 0;
@@ -1540,35 +1545,6 @@
 .mobileContactLegal a:hover,
 .mobileContactLegal a:focus-visible {
   color: var(--miizu-bg);
-}
-
-.projectDetails {
-  margin-top: 0.35rem;
-}
-
-.projectDetailsToggle {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  color: #0189ff;
-  cursor: pointer;
-  display: inline-flex;
-  font-size: 0.95rem;
-  font-weight: 620;
-  gap: 0.4rem;
-  letter-spacing: 0.02em;
-  margin: 0.35rem 0 0.55rem;
-  padding: 0.35rem 0;
-}
-
-.projectDetailsIcon {
-  height: 1rem;
-  transition: transform 180ms ease;
-  width: 1rem;
-}
-
-.projectDetailsIcon[data-open] {
-  transform: rotate(45deg);
 }
 
 .clientsSection {
