@@ -4,6 +4,8 @@ import {
   COMPACT_LAYOUT_MAX_WIDTH,
   COMPACT_LAYOUT_QUERY,
   getIntroLayout,
+  getIntroRevealDelayMs,
+  hasIntroPlaybackReachedReveal,
 } from "./scroll-timeline";
 
 describe("intro layout breakpoints", () => {
@@ -22,5 +24,18 @@ describe("intro layout breakpoints", () => {
     expect(COMPACT_LAYOUT_QUERY).toBe(
       `(max-width: ${COMPACT_LAYOUT_MAX_WIDTH}px)`,
     );
+  });
+});
+
+describe("intro preload reveal", () => {
+  test("desktop waits a few seconds of actual playback before the card moves in", () => {
+    const delayMs = getIntroRevealDelayMs(false);
+    expect(delayMs).toBeGreaterThanOrEqual(1_500);
+    expect(delayMs).toBeLessThanOrEqual(2_500);
+    expect(hasIntroPlaybackReachedReveal(0, delayMs)).toBe(false);
+    expect(hasIntroPlaybackReachedReveal(delayMs / 1000 - 0.05, delayMs)).toBe(
+      false,
+    );
+    expect(hasIntroPlaybackReachedReveal(delayMs / 1000, delayMs)).toBe(true);
   });
 });

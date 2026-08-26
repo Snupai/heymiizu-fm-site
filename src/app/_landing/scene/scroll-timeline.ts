@@ -1,7 +1,7 @@
 import { WORK_LINES } from "./content";
 
 export const SHOWREEL_RADIUS_REM = 2.6;
-export const INTRO_REVEAL_DELAY_MS = 2_500;
+export const INTRO_REVEAL_DELAY_MS = 2_000;
 export const INTRO_MOBILE_REVEAL_DELAY_MS = 900;
 export const INTRO_SCROLL_UNLOCK_LEAD_MS = 7_000;
 export const INTRO_HEADER_SLIDE_DURATION_S = 4;
@@ -26,6 +26,13 @@ export const INTRO_MOBILE_CARD_SLIDE_TRANSITION = {
 
 export function getIntroRevealDelayMs(compact: boolean) {
   return compact ? INTRO_MOBILE_REVEAL_DELAY_MS : INTRO_REVEAL_DELAY_MS;
+}
+
+export function hasIntroPlaybackReachedReveal(
+  currentTimeS: number,
+  delayMs: number,
+) {
+  return currentTimeS * 1000 >= delayMs;
 }
 
 export function getIntroHeaderSlideDurationS(compact: boolean) {

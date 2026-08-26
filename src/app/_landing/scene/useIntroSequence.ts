@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   getIntroCardSlideDurationS,
   getIntroRevealDelayMs,
+  hasIntroPlaybackReachedReveal,
   INTRO_CARD_UNLOCK_LEAD_MS,
   INTRO_SCROLL_UNLOCK_LEAD_MS,
 } from "./scroll-timeline";
@@ -50,26 +51,27 @@ export function useIntroSequence(
     const video = introVideoRef.current;
     if (!video) return;
 
-    let timer: number | undefined;
+    const revealDelayMs = getIntroRevealDelayMs(false);
+    let revealed = false;
 
-    const startRevealTimer = () => {
-      if (timer !== undefined) return;
-
-      const remainingMs = Math.max(
-        0,
-        getIntroRevealDelayMs(false) - video.currentTime * 1000,
-      );
-      timer = window.setTimeout(() => {
-        setIntroPhase("revealing");
-      }, remainingMs);
+    const maybeReveal = () => {
+      if (revealed) return;
+      if (!hasIntroPlaybackReachedReveal(video.currentTime, revealDelayMs)) {
+        return;
+      }
+      revealed = true;
+      setIntroPhase("revealing");
     };
 
-    if (!video.paused) startRevealTimer();
-    video.addEventListener("playing", startRevealTimer);
+    video.addEventListener("playing", maybeReveal);
+    video.addEventListener("seeked", maybeReveal);
+    video.addEventListener("timeupdate", maybeReveal);
+    maybeReveal();
 
     return () => {
-      video.removeEventListener("playing", startRevealTimer);
-      if (timer !== undefined) window.clearTimeout(timer);
+      video.removeEventListener("playing", maybeReveal);
+      video.removeEventListener("seeked", maybeReveal);
+      video.removeEventListener("timeupdate", maybeReveal);
     };
   }, [compact, introPhase, reduceMotion, textIntro]);
 
@@ -174,12 +176,6 @@ export function useIntroSequence(
 
     const video = introVideoRef.current;
     if (!video) return;
-
-    if (video.networkState === video.NETWORK_NO_SOURCE) {
-      setIntroCanComplete(true);
-      setIntroPhase((phase) => (phase === "video" ? "revealing" : phase));
-      return;
-    }
 
     let timer: number | undefined;
 
