@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
@@ -22,10 +22,6 @@ function NavbarContent() {
       );
     }
   }, []);
-
-  const handleLinkClick = (_e: React.MouseEvent, _href: string) => {
-    // Intentionally left blank for future navigation logic
-  };
 
   if (isMobile) {
     return (
@@ -56,10 +52,7 @@ function NavbarContent() {
           </button>
         </div>
         {menuOpen && (
-          <div
-            className="animate-fade-in mt-2 flex w-full flex-col items-center border-t border-gray-200 bg-white"
-            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.07)" }}
-          >
+          <div className="mt-2 flex w-full flex-col items-center border-t border-gray-200 bg-white">
             <Link
               href="/"
               className="block w-full py-2 text-center text-lg"
@@ -115,7 +108,6 @@ function NavbarContent() {
     );
   }
 
-  // Desktop navbar
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -135,42 +127,6 @@ function NavbarContent() {
       variants={fadeIn}
       transition={{ duration: 0.5 }}
     >
-      <AnimatePresence>
-        {false && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
-          >
-            <motion.div
-              className="relative flex h-full w-full items-center justify-center"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.5, opacity: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-white"
-                initial={{ scale: 0, borderRadius: "50%" }}
-                animate={{ scale: 1, borderRadius: "0%" }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              />
-              <motion.h1
-                className="z-10 text-9xl font-bold text-black"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Loading...
-              </motion.h1>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <motion.nav
         className="fixed left-0 right-0 top-0 z-[2000]"
         variants={fadeInUp}
@@ -210,11 +166,7 @@ function NavbarContent() {
                   animate="initial"
                   className="group relative"
                 >
-                  <Link
-                    href="/"
-                    className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/")}
-                  >
+                  <Link href="/" className="group relative block">
                     <span
                       className={`relative z-10 transition-colors duration-200 ${pathname === "/" ? "text-brand" : ""}`}
                     >
@@ -237,11 +189,7 @@ function NavbarContent() {
                   animate="initial"
                   className="group relative"
                 >
-                  <Link
-                    href="/#work"
-                    className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/#work")}
-                  >
+                  <Link href="/#work" className="group relative block">
                     <span className="relative z-10 transition-colors duration-200">
                       Work
                       <motion.span
@@ -262,11 +210,7 @@ function NavbarContent() {
                   animate="initial"
                   className="group relative"
                 >
-                  <Link
-                    href="/#contact"
-                    className="group relative block"
-                    onClick={(e) => handleLinkClick(e, "/#contact")}
-                  >
+                  <Link href="/#contact" className="group relative block">
                     <span className="relative z-10 transition-colors duration-200">
                       Contact Me
                       <motion.span
@@ -288,11 +232,7 @@ function NavbarContent() {
                     animate="initial"
                     className="group relative"
                   >
-                    <Link
-                      href="/admin"
-                      className="group relative block"
-                      onClick={(e) => handleLinkClick(e, "/admin")}
-                    >
+                    <Link href="/admin" className="group relative block">
                       <span
                         className={`relative z-10 transition-colors duration-200 ${pathname === "/admin" ? "text-brand" : ""}`}
                       >

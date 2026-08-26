@@ -85,18 +85,12 @@
 }
 
 html {
-  overflow-y: overlay;
+  overflow-y: scroll;
   position: relative;
-  /* Standard properties keep overlay scrollbars (pill only).
-     ::-webkit-scrollbar width/track rules force the classic white channel. */
+  /* Slim pill, no white track. Custom ::-webkit-scrollbar width forces a
+     classic gutter, so keep that width stable when the intro lock toggles. */
   scrollbar-color: #888 transparent;
   scrollbar-width: thin;
-}
-
-@supports not (overflow-y: overlay) {
-  html {
-    overflow-y: scroll;
-  }
 }
 
 /* Keep this narrower than `thin` (~8px) without painting a track. */
@@ -116,17 +110,11 @@ html {
   border-radius: 999px;
 }
 
-/* Keep overflow while Lenis is stopped (intro lock, scene pauses). Overlay
-   scrollbars do not take layout width, so showing/hiding them does not jump. */
+/* Keep overflow while Lenis is stopped (intro lock, scene pauses). Always
+   keep the classic gutter so showing the pill does not shift the page. */
 html.lenis:not(.lenis-autoToggle).lenis-stopped {
   overflow-x: clip;
-  overflow-y: overlay;
-}
-
-@supports not (overflow-y: overlay) {
-  html.lenis:not(.lenis-autoToggle).lenis-stopped {
-    overflow-y: scroll;
-  }
+  overflow-y: scroll;
 }
 
 /* Radix overlays already hide overflow while open. Keep its scrollbar
@@ -135,17 +123,29 @@ html body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 
+/* Hide the bar visually without changing its width. Fully transparent
+   colors, collapsing the bar, or hiding it make some engines drop the
+   classic scrollbar and collapse the gutter, which is what caused the jump. */
 html[data-intro-lock],
 html:has([data-intro-lock]) {
-  scrollbar-color: transparent transparent;
-  scrollbar-width: none;
+  scrollbar-color: rgba(0, 0, 0, 0.001) transparent;
+  scrollbar-width: thin;
 }
 
 html[data-intro-lock]::-webkit-scrollbar,
 html:has([data-intro-lock])::-webkit-scrollbar {
-  display: none;
-  height: 0;
-  width: 0;
+  background: rgba(0, 0, 0, 0.001);
+  height: 5px;
+  width: 5px;
+}
+
+html[data-intro-lock]::-webkit-scrollbar-track,
+html[data-intro-lock]::-webkit-scrollbar-thumb,
+html[data-intro-lock]::-webkit-scrollbar-thumb:hover,
+html:has([data-intro-lock])::-webkit-scrollbar-track,
+html:has([data-intro-lock])::-webkit-scrollbar-thumb,
+html:has([data-intro-lock])::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.001);
 }
 
 html,

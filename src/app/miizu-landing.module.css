@@ -13,6 +13,7 @@
   background: var(--miizu-bg);
   color: var(--miizu-ink);
   font-weight: 600;
+  min-height: 100svh;
   min-width: 0;
   overflow: visible;
 }
@@ -1167,6 +1168,7 @@
   align-items: flex-end;
   cursor: default;
   display: flex;
+  isolation: isolate;
   min-width: 0;
   overflow: hidden;
   position: relative;
@@ -1174,18 +1176,19 @@
 
 .representedBy {
   color: var(--miizu-primary);
-  font-size: clamp(0.75rem, 1vw, 1rem);
+  font-size: clamp(0.55rem, calc(var(--nva-size) * 0.034), 1.25rem);
   font-weight: 650;
-  left: var(--n-x, 6%);
+  left: var(--n-x, 11.56%);
   letter-spacing: 0.01em;
   line-height: 1;
   pointer-events: none;
   position: absolute;
-  top: var(--n-y, 22%);
-  transform: translate(-50%, -50%) rotate(var(--n-angle, 58deg));
+  top: var(--n-y, 12.24%);
+  transform: translate(-50%, -50%) rotate(var(--n-angle, 55.83deg));
   transform-origin: center;
+  user-select: none;
   white-space: nowrap;
-  z-index: 4;
+  z-index: 2;
 }
 
 .nuviaWordmark {
@@ -1200,7 +1203,7 @@
   position: relative;
   top: auto;
   width: max-content;
-  z-index: 1;
+  z-index: 0;
 }
 
 .nuviaWord {
@@ -1215,7 +1218,7 @@
   text-box-edge: cap alphabetic;
   text-box-trim: trim-both;
   text-indent: 0;
-  transform: translateX(var(--nva-shift, 0px));
+  transform: scaleX(var(--nva-scale, 1)) translateX(var(--nva-shift, 0px));
   transform-origin: 0 100%;
   white-space: nowrap;
 }
@@ -1225,12 +1228,6 @@
   display: block;
   inset: auto;
   position: relative;
-}
-
-.nuviaWordLight {
-  clip-path: none;
-  color: var(--miizu-bg);
-  display: none;
 }
 
 .nuviaTooltip {
@@ -1275,6 +1272,26 @@
   padding: 0.75rem 1rem;
   text-align: center;
   white-space: normal;
+}
+
+@media (max-width: 760px) {
+  .nuviaPanel {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nuviaWordmark {
+    transition: filter 180ms ease;
+  }
+
+  .nuviaPanel:active .nuviaWordmark,
+  .nuviaPanel[data-nuvia-open] .nuviaWordmark {
+    filter: brightness(0.86);
+  }
+
+  .nuviaTooltip:not(.nuviaTooltipTouch) {
+    opacity: 0;
+  }
 }
 
 @media (hover: none) {
@@ -1363,6 +1380,191 @@
   }
 }
 
+.mobileContactPage {
+  background: var(--miizu-primary);
+  color: var(--miizu-bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow-x: clip;
+}
+
+.mobileContactHeader {
+  align-items: center;
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  background: color-mix(in srgb, var(--miizu-primary) 82%, transparent);
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1.15rem;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.mobileContactHeader span {
+  font-size: 0.95rem;
+  font-weight: 620;
+  letter-spacing: 0.02em;
+}
+
+.mobileContactMail {
+  align-items: center;
+  color: var(--miizu-bg);
+  display: flex;
+  height: 2.35rem;
+  justify-content: center;
+  width: 2.35rem;
+}
+
+.mobileContactMail svg {
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.mobileContactIntro {
+  padding: 0.35rem 1.15rem 1.5rem;
+}
+
+.mobileContactIntro h1 {
+  font-size: clamp(2.35rem, 12.2vw, 4.1rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.88;
+  margin: 0;
+}
+
+.mobileContactLead {
+  display: block;
+  white-space: nowrap;
+}
+
+.mobileContactIntro h1 span:last-child {
+  display: block;
+  font-size: 0.78em;
+}
+
+.mobileContactIntro p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0.9rem 0 1.4rem;
+  opacity: 0.9;
+}
+
+.mobileContactPage .regionToggle {
+  display: grid;
+  max-width: 100%;
+  width: 100%;
+}
+
+.mobileContactPage .regionToggle button {
+  font-size: clamp(0.82rem, 3.4vw, 1rem);
+  padding: 0.7em 0.55em;
+}
+
+.mobileContactPage .bookCall {
+  font-size: clamp(1.35rem, 7.2vw, 1.9rem);
+  margin-top: 1.35rem;
+}
+
+.mobileContactForm {
+  background: #000;
+  border-radius: 1.8rem 1.8rem 0 0;
+  flex: 1;
+  min-height: 0;
+  padding: 2.15rem 1.15rem 2.6rem;
+}
+
+.mobileContactPage .submitButton {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mobileContactForm .formShell {
+  margin: 0;
+  max-width: none;
+}
+
+.mobileContactEmail {
+  color: color-mix(in srgb, var(--miizu-bg) 72%, transparent);
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 620;
+  margin: 1.35rem 0 0;
+  text-align: center;
+  text-decoration: none;
+}
+
+.mobileContactEmail:hover,
+.mobileContactEmail:focus-visible {
+  color: var(--miizu-bg);
+}
+
+.mobileContactLegal {
+  display: flex;
+  gap: 0.45rem;
+  justify-content: center;
+  margin-top: 1.15rem;
+}
+
+.mobileContactLegal a,
+.mobileContactLegal span {
+  color: color-mix(in srgb, var(--miizu-bg) 58%, transparent);
+  font-size: 0.82rem;
+  font-weight: 620;
+  text-decoration: none;
+}
+
+.mobileContactLegal a:hover,
+.mobileContactLegal a:focus-visible {
+  color: var(--miizu-bg);
+}
+
+.clientsSection {
+  background: #000;
+  color: var(--miizu-bg);
+  overflow: hidden;
+  padding: 1.4rem 0 2.2rem;
+  position: relative;
+  width: 100%;
+}
+
+.clientsSection .clientsRail {
+  height: auto;
+  inset: auto;
+  padding: 0;
+  position: relative;
+}
+
+.clientsSection .clientMarquees {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.clientsSection .clientsLabel {
+  margin-bottom: 0.9rem;
+}
+
+.clientsSection .clientGroup span {
+  font-size: clamp(2rem, 11vw, 3.6rem);
+}
+
+.mobileContactWash {
+  background: linear-gradient(
+    90deg,
+    rgba(33, 23, 230, 0.4) 0%,
+    rgba(33, 23, 230, 0.1) 40%,
+    transparent 100%
+  );
+  inset: 0 auto 0 0;
+  pointer-events: none;
+  position: absolute;
+  width: 78%;
+  z-index: 0;
+}
+
 @media (max-width: 760px) {
   .heroIntroVideo,
   .heroIntroVideoOverlay,
@@ -1443,8 +1645,10 @@
   .contactWipe {
     height: auto;
     inset: auto;
+    margin-top: -1px;
     overflow: visible;
     position: relative;
+    scroll-margin-top: 3.4rem;
     width: 100%;
     z-index: 1;
   }
@@ -1466,10 +1670,18 @@
   }
 
   .contactPitch {
-    min-height: 100svh;
-    padding: 7.5rem 1.15rem 2.4rem;
+    min-height: 0;
+    overflow: hidden;
+    padding: 2.6rem 1.15rem 2.8rem;
     position: relative;
     top: auto;
+    z-index: 1;
+  }
+
+  .contactPitch h2,
+  .contactPitch .regionToggle,
+  .contactPitch .directContact {
+    position: relative;
     z-index: 1;
   }
 
@@ -1498,7 +1710,7 @@
   }
 
   .directContact {
-    margin-top: 5rem;
+    margin-top: 2.4rem;
   }
 
   .bookCall {
@@ -1510,17 +1722,36 @@
   }
 
   .contactWipe .formPanel {
-    margin-top: 0;
-    min-height: 100svh;
+    border-radius: 1.8rem 1.8rem 0 0;
+    margin-top: -1.35rem;
+    min-height: 0;
     min-width: 0;
-    padding: 3.8rem 1.15rem;
+    padding: 2.5rem 1.15rem 3.4rem;
     position: relative;
     top: auto;
     z-index: 2;
   }
 
+  .formShell {
+    scroll-margin-top: 4.2rem;
+  }
+
   .contactForm fieldset {
     gap: 0;
+  }
+
+  .contactForm input,
+  .contactForm select,
+  .contactForm textarea,
+  .contactForm [data-contact-select],
+  .contactForm [data-date-range-picker] {
+    font-size: 1rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .submitButton {
+    margin-top: 1.15rem;
+    padding: 0.78em 1.2em;
   }
 
   .phoneInput :global(.iti) {
@@ -1528,17 +1759,25 @@
   }
 
   .footer {
+    --nva-size: 38vw;
     height: auto;
+    margin-left: calc(50% - 50vw);
     min-height: 0;
+    overflow-x: clip;
+    width: 100vw;
   }
 
   .nuviaPanel {
-    --nva-crop: 0.888;
+    --nva-crop: 0.68;
     background: var(--miizu-bg);
-    height: 41.76vw;
+    height: calc(var(--nva-size, 38vw) * var(--nva-crop));
+    left: 0;
+    margin-left: 0;
+    max-width: none;
     min-height: 0;
     overflow: hidden;
     position: relative;
+    width: 100%;
   }
 
   .representedBy {
@@ -1547,31 +1786,26 @@
 
   .nuviaWordmark {
     bottom: 0;
-    font-size: 47vw;
+    font-size: var(--nva-size, 38vw);
     height: 100%;
+    left: 0;
+    max-width: none;
+    overflow: hidden;
     top: auto;
-  }
-
-  .nuviaWord {
-    letter-spacing: 0;
-    transform: translateX(var(--nva-shift, 0px));
-    transform-origin: 0 100%;
-  }
-
-  .nuviaWordLight {
-    clip-path: none;
-    display: none;
-  }
-
-  .nuviaWordDark {
-    display: block;
+    width: 100%;
   }
 
   .footerLinks {
     align-items: center;
     background: var(--miizu-bg);
-    min-height: 15rem;
-    padding: 2.5rem 1.4rem;
+    min-height: 0;
+    padding: 0.15rem 1.4rem 0.85rem;
+  }
+
+  .footerLinks a {
+    font-size: 1.05rem;
+    line-height: 1.05;
+    margin: 0.12em 0;
   }
 }
 
@@ -1591,11 +1825,17 @@
   }
 
   .contactPitch {
-    padding: 6.5rem 1rem 2rem;
+    padding: 2.2rem 1rem 2.4rem;
   }
 
   .contactWipe .formPanel {
-    padding: 3rem 1rem;
+    padding: 2.2rem 1rem 3rem;
+  }
+
+  .mobileContactHeader,
+  .mobileContactIntro,
+  .mobileContactForm {
+    padding-inline: 1rem;
   }
 }
 

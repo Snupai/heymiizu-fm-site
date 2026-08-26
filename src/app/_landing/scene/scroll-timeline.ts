@@ -1,7 +1,7 @@
 import { WORK_LINES } from "./content";
 
 export const SHOWREEL_RADIUS_REM = 2.6;
-export const INTRO_REVEAL_DELAY_MS = 2_500;
+export const INTRO_REVEAL_DELAY_MS = 2_000;
 export const INTRO_MOBILE_REVEAL_DELAY_MS = 900;
 export const INTRO_SCROLL_UNLOCK_LEAD_MS = 7_000;
 export const INTRO_HEADER_SLIDE_DURATION_S = 4;
@@ -26,6 +26,13 @@ export const INTRO_MOBILE_CARD_SLIDE_TRANSITION = {
 
 export function getIntroRevealDelayMs(compact: boolean) {
   return compact ? INTRO_MOBILE_REVEAL_DELAY_MS : INTRO_REVEAL_DELAY_MS;
+}
+
+export function hasIntroPlaybackReachedReveal(
+  currentTimeS: number,
+  delayMs: number,
+) {
+  return currentTimeS * 1000 >= delayMs;
 }
 
 export function getIntroHeaderSlideDurationS(compact: boolean) {
@@ -183,6 +190,9 @@ export function getClientsContactFadeScaleX(progress: number) {
 
 export type IntroLayout = "compact" | "medium" | "desktop";
 
+export const COMPACT_LAYOUT_MAX_WIDTH = 760;
+export const COMPACT_LAYOUT_QUERY = `(max-width: ${COMPACT_LAYOUT_MAX_WIDTH}px)`;
+
 const INTRO_PANEL_REST = {
   compact: {
     x: "-5vw",
@@ -209,7 +219,7 @@ export function getIntroPanelRest(layout: IntroLayout) {
 }
 
 export function getIntroLayout(width: number): IntroLayout {
-  if (width <= 760) return "compact";
+  if (width <= COMPACT_LAYOUT_MAX_WIDTH) return "compact";
   if (width <= 1400) return "medium";
   return "desktop";
 }
