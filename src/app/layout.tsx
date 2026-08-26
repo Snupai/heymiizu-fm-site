@@ -1,6 +1,6 @@
 import { Rethink_Sans } from "next/font/google";
 import "../styles/globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
 import React from "react";
 import Script from "next/script";
@@ -33,6 +33,13 @@ function randomTabTitle(): string {
   const eggIndex = 1 + Math.floor(Math.random() * (TAB_TITLES.length - 1));
   return TAB_TITLES[eggIndex] ?? defaultTitle;
 }
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(max-width: 760px)", color: "#000000" },
+    { media: "(min-width: 761px)", color: "#fbfbfe" },
+  ],
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   await connection();

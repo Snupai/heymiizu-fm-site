@@ -161,3 +161,16 @@ body {
     @apply bg-white text-black;
   }
 }
+
+/* Compact layout only: Android Chrome uses color-scheme + canvas for the
+   system nav bar. Desktop stays light. */
+@media (max-width: 760px) {
+  html {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background: #000;
+  }
+}
