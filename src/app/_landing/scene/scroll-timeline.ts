@@ -1,10 +1,13 @@
 import { WORK_LINES } from "./content";
 
 export const SHOWREEL_RADIUS_REM = 2.6;
-export const INTRO_REVEAL_DELAY_MS = 2_500;
+export const INTRO_REVEAL_DELAY_MS = 2_000;
+export const INTRO_MOBILE_REVEAL_DELAY_MS = 900;
 export const INTRO_SCROLL_UNLOCK_LEAD_MS = 7_000;
 export const INTRO_HEADER_SLIDE_DURATION_S = 4;
+export const INTRO_MOBILE_HEADER_SLIDE_DURATION_S = 2.4;
 export const INTRO_CARD_SLIDE_DURATION_S = 3;
+export const INTRO_MOBILE_CARD_SLIDE_DURATION_S = 2.2;
 export const INTRO_CARD_UNLOCK_LEAD_MS = 1_000;
 export const INTRO_SLIDE_EASE: [number, number, number, number] = [
   0.22, 1, 0.36, 1,
@@ -16,6 +19,39 @@ export const INTRO_CARD_SLIDE_TRANSITION = {
   duration: INTRO_CARD_SLIDE_DURATION_S,
   ease: INTRO_CARD_SLIDE_EASE,
 } as const;
+export const INTRO_MOBILE_CARD_SLIDE_TRANSITION = {
+  duration: INTRO_MOBILE_CARD_SLIDE_DURATION_S,
+  ease: INTRO_CARD_SLIDE_EASE,
+} as const;
+
+export function getIntroRevealDelayMs(compact: boolean) {
+  return compact ? INTRO_MOBILE_REVEAL_DELAY_MS : INTRO_REVEAL_DELAY_MS;
+}
+
+export function hasIntroPlaybackReachedReveal(
+  currentTimeS: number,
+  delayMs: number,
+) {
+  return currentTimeS * 1000 >= delayMs;
+}
+
+export function getIntroHeaderSlideDurationS(compact: boolean) {
+  return compact
+    ? INTRO_MOBILE_HEADER_SLIDE_DURATION_S
+    : INTRO_HEADER_SLIDE_DURATION_S;
+}
+
+export function getIntroCardSlideDurationS(compact: boolean) {
+  return compact
+    ? INTRO_MOBILE_CARD_SLIDE_DURATION_S
+    : INTRO_CARD_SLIDE_DURATION_S;
+}
+
+export function getIntroCardSlideTransition(compact: boolean) {
+  return compact
+    ? INTRO_MOBILE_CARD_SLIDE_TRANSITION
+    : INTRO_CARD_SLIDE_TRANSITION;
+}
 
 export const SCROLL_PANEL_HOLD = 0.02;
 export const SCROLL_PANEL_EXPANDED = 0.15;
@@ -152,18 +188,38 @@ export function getClientsContactFadeScaleX(progress: number) {
   );
 }
 
-export function getIntroPanelRest(compact: boolean) {
-  return compact
-    ? {
-        x: "-5vw",
-        y: "43svh",
-        scaleX: 0.9,
-        scaleY: 0.51,
-      }
-    : {
-        x: "-3vw",
-        y: "9svh",
-        scaleX: 0.31,
-        scaleY: 0.82,
-      };
+export type IntroLayout = "compact" | "medium" | "desktop";
+
+export const COMPACT_LAYOUT_MAX_WIDTH = 760;
+export const COMPACT_LAYOUT_QUERY = `(max-width: ${COMPACT_LAYOUT_MAX_WIDTH}px)`;
+
+const INTRO_PANEL_REST = {
+  compact: {
+    x: "-5vw",
+    y: "43svh",
+    scaleX: 0.9,
+    scaleY: 0.51,
+  },
+  medium: {
+    x: "-3vw",
+    y: "9svh",
+    scaleX: 0.5,
+    scaleY: 0.82,
+  },
+  desktop: {
+    x: "-3vw",
+    y: "9svh",
+    scaleX: 0.31,
+    scaleY: 0.82,
+  },
+} as const;
+
+export function getIntroPanelRest(layout: IntroLayout) {
+  return INTRO_PANEL_REST[layout];
+}
+
+export function getIntroLayout(width: number): IntroLayout {
+  if (width <= COMPACT_LAYOUT_MAX_WIDTH) return "compact";
+  if (width <= 1400) return "medium";
+  return "desktop";
 }

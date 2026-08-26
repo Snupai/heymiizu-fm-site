@@ -11,7 +11,9 @@ import type { ContactFormStatus } from "@/lib/contact-settings";
 
 import {
   ALL_CONTACT_FIELDS_TOUCHED,
+  getBudgetValidationMessage,
   getContactDateKey,
+  getDeadlineValidationMessage,
   getEmailValidationMessage,
   getPhoneValidationMessage,
   INITIAL_CONTACT_DATA,
@@ -24,7 +26,10 @@ import type {
   ValidatedContactField,
 } from "./contact-form-model";
 
-export function useContactForm(region: ContactRegion) {
+export function useContactForm(
+  region: ContactRegion,
+  { requireProjectDetails = true }: { requireProjectDetails?: boolean } = {},
+) {
   const [data, setData] = useState<ContactData>(INITIAL_CONTACT_DATA);
   const [status, setStatus] = useState<ContactFormStatus>({
     paused: false,
@@ -132,14 +137,15 @@ export function useContactForm(region: ContactRegion) {
   const serviceValidationMessage = data.service
     ? null
     : "Please choose a service.";
-  const budgetValidationMessage = data.budget
-    ? null
-    : "Please choose a budget range.";
-  const deadlineValidationMessage = !deadlineRange?.from
-    ? "Please select a project date range."
-    : !deadlineRange.to || !data.deadline
-      ? "Please select an end date."
-      : null;
+  const budgetValidationMessage = getBudgetValidationMessage(
+    data.budget,
+    requireProjectDetails,
+  );
+  const deadlineValidationMessage = getDeadlineValidationMessage(
+    deadlineRange,
+    data.deadline,
+    requireProjectDetails,
+  );
   const descriptionValidationMessage = data.description.trim()
     ? null
     : "Please tell me a little about your project.";
@@ -160,7 +166,11 @@ export function useContactForm(region: ContactRegion) {
     event.preventDefault();
     if (submitting || status.paused || statusLoading) return;
 
-    setTouchedFields(ALL_CONTACT_FIELDS_TOUCHED);
+    setTouchedFields({
+      ...ALL_CONTACT_FIELDS_TOUCHED,
+      budget: requireProjectDetails || Boolean(data.budget),
+      deadline: requireProjectDetails || Boolean(deadlineRange?.from),
+    });
 
     if (
       nameValidationMessage ||

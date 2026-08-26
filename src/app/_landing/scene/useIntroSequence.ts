@@ -3,15 +3,19 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
-  INTRO_CARD_SLIDE_DURATION_S,
+  getIntroCardSlideDurationS,
+  getIntroRevealDelayMs,
+  hasIntroPlaybackReachedReveal,
   INTRO_CARD_UNLOCK_LEAD_MS,
-  INTRO_REVEAL_DELAY_MS,
   INTRO_SCROLL_UNLOCK_LEAD_MS,
 } from "./scroll-timeline";
 
 export type IntroPhase = "video" | "revealing" | "complete";
 
-export function useIntroSequence(reduceMotion: boolean | null) {
+export function useIntroSequence(
+  reduceMotion: boolean | null,
+  compact: boolean | null,
+) {
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const showreelVideoRef = useRef<HTMLVideoElement>(null);
   const [introPhase, setIntroPhase] = useState<IntroPhase>(
@@ -24,6 +28,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
 
   const introActive = introPhase !== "complete";
   const introScrollLocked = introActive && !(introCardIn && introCanComplete);
+  const textIntro = compact === true;
 
   useEffect(() => {
     if (reduceMotion) {
@@ -32,33 +37,43 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [reduceMotion]);
 
   useEffect(() => {
-    if (introPhase !== "video" || reduceMotion) return;
+    if (introPhase !== "video" || reduceMotion || compact === null) return;
+
+    if (textIntro) {
+      const timer = window.setTimeout(() => {
+        setIntroCanComplete(true);
+        setIntroPhase("revealing");
+      }, getIntroRevealDelayMs(true));
+
+      return () => window.clearTimeout(timer);
+    }
 
     const video = introVideoRef.current;
     if (!video) return;
 
-    let timer: number | undefined;
+    const revealDelayMs = getIntroRevealDelayMs(false);
+    let revealed = false;
 
-    const startRevealTimer = () => {
-      if (timer !== undefined) return;
-
-      const remainingMs = Math.max(
-        0,
-        INTRO_REVEAL_DELAY_MS - video.currentTime * 1000,
-      );
-      timer = window.setTimeout(() => {
-        setIntroPhase("revealing");
-      }, remainingMs);
+    const maybeReveal = () => {
+      if (revealed) return;
+      if (!hasIntroPlaybackReachedReveal(video.currentTime, revealDelayMs)) {
+        return;
+      }
+      revealed = true;
+      setIntroPhase("revealing");
     };
 
-    if (!video.paused) startRevealTimer();
-    video.addEventListener("playing", startRevealTimer);
+    video.addEventListener("playing", maybeReveal);
+    video.addEventListener("seeked", maybeReveal);
+    video.addEventListener("timeupdate", maybeReveal);
+    maybeReveal();
 
     return () => {
-      video.removeEventListener("playing", startRevealTimer);
-      if (timer !== undefined) window.clearTimeout(timer);
+      video.removeEventListener("playing", maybeReveal);
+      video.removeEventListener("seeked", maybeReveal);
+      video.removeEventListener("timeupdate", maybeReveal);
     };
-  }, [introPhase, reduceMotion]);
+  }, [compact, introPhase, reduceMotion, textIntro]);
 
   useEffect(() => {
     if (introPhase !== "revealing") return;
@@ -66,7 +81,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
     setIntroCardIn(false);
     setIntroCardSettled(false);
 
-    const slideMs = INTRO_CARD_SLIDE_DURATION_S * 1_000;
+    const slideMs = getIntroCardSlideDurationS(textIntro) * 1_000;
     revealStartedAtRef.current = performance.now();
     const unlockTimer = window.setTimeout(
       () => setIntroCardIn(true),
@@ -81,7 +96,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       window.clearTimeout(unlockTimer);
       window.clearTimeout(settleTimer);
     };
-  }, [introPhase]);
+  }, [introPhase, textIntro]);
 
   useEffect(() => {
     if (introPhase !== "revealing" || !introCardSettled || !introCanComplete) {
@@ -91,9 +106,9 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [introPhase, introCardSettled, introCanComplete]);
 
   useEffect(() => {
-    if (introPhase === "complete" || reduceMotion) return;
+    if (introPhase === "complete" || reduceMotion || compact !== false) return;
     void introVideoRef.current?.play().catch(() => undefined);
-  }, [introPhase, reduceMotion]);
+  }, [compact, introPhase, reduceMotion]);
 
   useEffect(() => {
     if (introPhase === "video") return;
@@ -157,16 +172,10 @@ export function useIntroSequence(reduceMotion: boolean | null) {
   }, [introScrollLocked]);
 
   useEffect(() => {
-    if (introPhase === "complete" || reduceMotion) return;
+    if (introPhase === "complete" || reduceMotion || compact !== false) return;
 
     const video = introVideoRef.current;
     if (!video) return;
-
-    if (video.networkState === video.NETWORK_NO_SOURCE) {
-      setIntroCanComplete(true);
-      setIntroPhase((phase) => (phase === "video" ? "revealing" : phase));
-      return;
-    }
 
     let timer: number | undefined;
 
@@ -192,7 +201,7 @@ export function useIntroSequence(reduceMotion: boolean | null) {
       video.removeEventListener("ended", markReady);
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [introPhase, reduceMotion]);
+  }, [compact, introPhase, reduceMotion]);
 
   const handleIntroCardSlideComplete = () => {
     if (introPhase !== "revealing") return;

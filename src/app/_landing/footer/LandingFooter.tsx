@@ -1,13 +1,27 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { PointerEvent } from "react";
 
 import styles from "../../miizu-landing.module.css";
-import { anchorRepresentedBy, measureNvaInk } from "./nva-measurement";
+import { COMPACT_LAYOUT_QUERY } from "../scene/scroll-timeline";
+import { useIntroLayout } from "../scene/useIntroLayout";
+import {
+  fitMobileNvaInk,
+  measureNvaInk,
+  mobileNvaViewportWidth,
+  representedByWordmarkPin,
+} from "./nva-measurement";
 
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
 const NUVIA_POST_TOUCH_SUPPRESSION_MS = 900;
@@ -17,6 +31,9 @@ function supportsFineHover() {
 }
 
 export function LandingFooter() {
+  const layout = useIntroLayout();
+  const reduceMotion = useReducedMotion();
+  const footerRef = useRef<HTMLElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
   const representedByRef = useRef<HTMLSpanElement>(null);
   const nuviaTooltipReady = useRef(false);
@@ -24,6 +41,22 @@ export function LandingFooter() {
   const lastNuviaTouchAt = useRef(-Infinity);
   const nuviaTooltipX = useMotionValue(0);
   const nuviaTooltipY = useMotionValue(0);
+  const { scrollYProgress } = useScroll({
+    offset: ["start end", "start 0.62"],
+    target: footerRef,
+  });
+  const compact = layout === "compact";
+  const compactMotion = compact && reduceMotion !== true;
+  const linksOpacity = useTransform(
+    scrollYProgress,
+    [0.12, 1],
+    compactMotion ? [0, 1] : [1, 1],
+  );
+  const representedOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.72],
+    compactMotion ? [0, 1] : [1, 1],
+  );
   const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
     stiffness: 420,
     damping: 32,
@@ -54,7 +87,22 @@ export function LandingFooter() {
     if (!wordmark) return;
 
     const footer = wordmark.closest("footer");
-    const compactQuery = window.matchMedia("(max-width: 760px)");
+    const compactQuery = window.matchMedia(COMPACT_LAYOUT_QUERY);
+
+    const pinRepresentedBy = () => {
+      const label = representedByRef.current;
+      const panel = wordmark.parentElement;
+      if (!label || !panel) return;
+
+      const pin = representedByWordmarkPin(
+        wordmark.getBoundingClientRect(),
+        panel.getBoundingClientRect(),
+      );
+      if (!pin) return;
+
+      label.style.setProperty("--n-x", `${pin.xPct}%`);
+      label.style.setProperty("--n-y", `${pin.yPct}%`);
+    };
 
     const fitWordmark = () => {
       const words = [
@@ -67,56 +115,101 @@ export function LandingFooter() {
       if (!word) return;
 
       if (compactQuery.matches) {
-        footer?.style.removeProperty("--nva-size");
-      } else if (footer && footer.clientWidth > 0) {
-        const current = window.getComputedStyle(word);
-        const currentSize = Number.parseFloat(current.fontSize);
+          const target = mobileNvaViewportWidth(
+            window.innerWidth,
+            window.visualViewport?.width,
+          );
+          if (!footer || target <= 0) return;
 
-        if (Number.isFinite(currentSize) && currentSize > 0) {
-          const currentInk = measureNvaInk(current, currentSize);
+          const computed = window.getComputedStyle(word);
+          const fontSize = Number.parseFloat(computed.fontSize);
+          if (!Number.isFinite(fontSize) || fontSize <= 0) return;
 
-          if (currentInk) {
-            const linksReserve = Math.min(
-              Math.max(footer.clientWidth * 0.2, 240),
-              480,
-            );
-            const nextSize = Math.round(
-              currentSize *
-                ((footer.clientWidth - linksReserve) / currentInk.inkWidth),
-            );
+          const ink = measureNvaInk(computed, fontSize);
+          if (!ink) return;
 
-            if (
-              Number.isFinite(nextSize) &&
-              nextSize > 0 &&
-              Math.abs(nextSize - currentSize) > 1
-            ) {
-              footer.style.setProperty("--nva-size", `${nextSize}px`);
+          const fit = fitMobileNvaInk(ink, target);
+          if (!fit) return;
+
+          const nextSize = Math.round(fontSize * fit.scale);
+          if (
+            Number.isFinite(nextSize) &&
+            nextSize > 0 &&
+            Math.abs(nextSize - fontSize) > 1
+          ) {
+            footer.style.setProperty("--nva-size", `${nextSize}px`);
+          }
+
+          wordmark.style.width = `${fit.width}px`;
+          wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
+          wordmark.style.setProperty("--nva-scale", "1");
+          pinRepresentedBy();
+          return;
+        }
+
+        footer?.style.removeProperty("--nva-scale");
+
+        if (footer && footer.clientWidth > 0) {
+          const current = window.getComputedStyle(word);
+          const currentSize = Number.parseFloat(current.fontSize);
+
+          if (Number.isFinite(currentSize) && currentSize > 0) {
+            const currentInk = measureNvaInk(current, currentSize);
+
+            if (currentInk) {
+              const linksReserve = Math.min(
+                Math.max(footer.clientWidth * 0.2, 240),
+                480,
+              );
+              const nextSize = Math.round(
+                currentSize *
+                  ((footer.clientWidth - linksReserve) / currentInk.inkWidth),
+              );
+
+              if (
+                Number.isFinite(nextSize) &&
+                nextSize > 0 &&
+                Math.abs(nextSize - currentSize) > 1
+              ) {
+                footer.style.setProperty("--nva-size", `${nextSize}px`);
+              }
             }
           }
         }
-      }
 
-      const computed = window.getComputedStyle(word);
-      const fontSize = Number.parseFloat(computed.fontSize);
+        const computed = window.getComputedStyle(word);
+        const fontSize = Number.parseFloat(computed.fontSize);
 
-      if (!Number.isFinite(fontSize) || fontSize <= 0) return;
+        if (!Number.isFinite(fontSize) || fontSize <= 0) return;
 
-      const ink = measureNvaInk(computed, fontSize);
-      if (!ink) return;
+        const ink = measureNvaInk(computed, fontSize);
+        if (!ink) return;
 
-      const bleed = 1;
-      const shift = -ink.inkLeft - bleed;
-      wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
-      wordmark.style.setProperty("--nva-shift", `${shift}px`);
-
-      const label = representedByRef.current;
-      if (label) anchorRepresentedBy(word, label);
+        const bleed = 1;
+        const shift = -ink.inkLeft - bleed;
+        wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
+        wordmark.style.setProperty("--nva-shift", `${shift}px`);
+        wordmark.style.setProperty("--nva-scale", "1");
+        pinRepresentedBy();
     };
 
-    const resizeObserver = new ResizeObserver(fitWordmark);
+    let fitFrame = 0;
+    const scheduleFit = () => {
+      if (fitFrame !== 0) return;
+      fitFrame = window.requestAnimationFrame(() => {
+        fitFrame = 0;
+        fitWordmark();
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(scheduleFit);
     if (footer) resizeObserver.observe(footer);
-    compactQuery.addEventListener("change", fitWordmark);
-    window.addEventListener("resize", fitWordmark);
+    resizeObserver.observe(wordmark);
+    const panel = wordmark.parentElement;
+    if (panel) resizeObserver.observe(panel);
+    compactQuery.addEventListener("change", scheduleFit);
+    window.addEventListener("resize", scheduleFit);
+    window.visualViewport?.addEventListener("resize", scheduleFit);
     void document.fonts.ready.then(fitWordmark);
     fitWordmark();
     let layoutFrame = window.requestAnimationFrame(() => {
@@ -124,10 +217,12 @@ export function LandingFooter() {
     });
 
     return () => {
+      window.cancelAnimationFrame(fitFrame);
       window.cancelAnimationFrame(layoutFrame);
       resizeObserver.disconnect();
-      compactQuery.removeEventListener("change", fitWordmark);
-      window.removeEventListener("resize", fitWordmark);
+      compactQuery.removeEventListener("change", scheduleFit);
+      window.removeEventListener("resize", scheduleFit);
+      window.visualViewport?.removeEventListener("resize", scheduleFit);
     };
   }, []);
 
@@ -151,6 +246,7 @@ export function LandingFooter() {
 
   const showNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
     if (
+      compact ||
       event.pointerType === "touch" ||
       !supportsFineHover() ||
       window.performance.now() - lastNuviaTouchAt.current <
@@ -183,6 +279,7 @@ export function LandingFooter() {
 
   const moveNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
     if (
+      !compact &&
       event.pointerType !== "touch" &&
       supportsFineHover() &&
       window.performance.now() - lastNuviaTouchAt.current >=
@@ -193,6 +290,7 @@ export function LandingFooter() {
 
   const leaveNuviaTooltip = (event: PointerEvent<HTMLElement>) => {
     if (
+      !compact &&
       event.pointerType !== "touch" &&
       supportsFineHover() &&
       window.performance.now() - lastNuviaTouchAt.current >=
@@ -201,7 +299,36 @@ export function LandingFooter() {
       hideNuviaTooltip();
   };
 
+  const showCompactNuviaTooltip = (panel: HTMLElement) => {
+    const rect = panel.getBoundingClientRect();
+
+    lastNuviaTouchAt.current = window.performance.now();
+    nuviaTooltipX.jump(rect.left + rect.width / 2);
+    nuviaTooltipY.jump(rect.top + rect.height / 2);
+    nuviaTooltipReady.current = true;
+    setNuviaTooltipTouch(true);
+    setNuviaTooltipVisible(true);
+  };
+
+  const toggleCompactNuviaTooltip = () => {
+    const panel = nuviaWordmarkRef.current?.parentElement;
+    if (!panel) return;
+
+    if (nuviaTooltipTouch && nuviaTooltipVisible) {
+      hideNuviaTooltip();
+      return;
+    }
+
+    showCompactNuviaTooltip(panel);
+  };
+
   const toggleNuviaTouchTooltip = (event: PointerEvent<HTMLElement>) => {
+    if (compact) {
+      event.preventDefault();
+      toggleCompactNuviaTooltip();
+      return;
+    }
+
     if (event.pointerType !== "touch") return;
 
     if (nuviaTooltipHoverTimer.current !== null) {
@@ -246,31 +373,48 @@ export function LandingFooter() {
 
     document.addEventListener("pointerdown", dismissOutside);
     window.addEventListener("scroll", dismissTouchTooltip, { passive: true });
+    const autoHide = window.setTimeout(dismissTouchTooltip, 3_200);
 
     return () => {
       document.removeEventListener("pointerdown", dismissOutside);
       window.removeEventListener("scroll", dismissTouchTooltip);
+      window.clearTimeout(autoHide);
     };
   }, [nuviaTooltipTouch, nuviaTooltipVisible]);
 
   return (
     <>
-      <footer className={styles.footer} id="footer">
+      <footer className={styles.footer} id="footer" ref={footerRef}>
         <div
+          aria-expanded={compact ? nuviaTooltipVisible && nuviaTooltipTouch : undefined}
+          aria-label={compact ? "NVA, represented by Nuvia" : undefined}
           className={styles.nuviaPanel}
+          data-nuvia-open={
+            compact && nuviaTooltipVisible && nuviaTooltipTouch ? "" : undefined
+          }
+          onKeyDown={
+            compact
+              ? (event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  toggleCompactNuviaTooltip();
+                }
+              : undefined
+          }
           onPointerDown={toggleNuviaTouchTooltip}
-          onPointerEnter={showNuviaTooltip}
-          onPointerLeave={leaveNuviaTooltip}
-          onPointerMove={moveNuviaTooltip}
+          onPointerEnter={compact ? undefined : showNuviaTooltip}
+          onPointerLeave={compact ? undefined : leaveNuviaTooltip}
+          onPointerMove={compact ? undefined : moveNuviaTooltip}
+          role={compact ? "button" : undefined}
+          tabIndex={compact ? 0 : undefined}
         >
-          <span className={styles.representedBy} ref={representedByRef}>
-            represented by
-          </span>
           <div
             aria-label="NVA, represented by Nuvia"
             className={styles.nuviaWordmark}
-            onBlur={hideNuviaTooltip}
+            onBlur={compact ? undefined : hideNuviaTooltip}
             onFocus={() => {
+              if (compact) return;
+
               if (
                 window.performance.now() - lastNuviaTouchAt.current <
                 NUVIA_POST_TOUCH_SUPPRESSION_MS
@@ -293,7 +437,7 @@ export function LandingFooter() {
               setNuviaTooltipVisible(true);
             }}
             ref={nuviaWordmarkRef}
-            tabIndex={0}
+            tabIndex={compact ? -1 : 0}
           >
             <span
               aria-hidden="true"
@@ -301,31 +445,40 @@ export function LandingFooter() {
             >
               {"NVA"}
             </span>
-            <span
-              aria-hidden="true"
-              className={`${styles.nuviaWord} ${styles.nuviaWordLight}`}
-            >
-              {"NVA"}
-            </span>
           </div>
+          <motion.span
+            className={styles.representedBy}
+            ref={representedByRef}
+            style={
+              compactMotion
+                ? { opacity: representedOpacity, position: "absolute", zIndex: 2 }
+                : { position: "absolute", zIndex: 2 }
+            }
+          >
+            represented by
+          </motion.span>
         </div>
-        <nav className={styles.footerLinks} aria-label="Legal and about links">
+        <motion.nav
+          className={styles.footerLinks}
+          aria-label="Legal and about links"
+          style={compactMotion ? { opacity: linksOpacity } : undefined}
+        >
           <Link href="/imprint">Imprint</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="#hero">who is miizu?</Link>
-        </nav>
+        </motion.nav>
       </footer>
       {nuviaTooltipMounted
         ? createPortal(
             <motion.span
               aria-hidden="true"
-              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}${nuviaTooltipTouch ? ` ${styles.nuviaTooltipTouch}` : ""}`}
+              className={`${styles.nuviaTooltip}${nuviaTooltipVisible ? ` ${styles.nuviaTooltipVisible}` : ""}${nuviaTooltipTouch || compact ? ` ${styles.nuviaTooltipTouch}` : ""}`}
               style={{
-                x: nuviaTooltipTouch ? nuviaTooltipX : nuviaTooltipFollowX,
-                y: nuviaTooltipTouch ? nuviaTooltipY : nuviaTooltipFollowY,
+                x: nuviaTooltipTouch || compact ? nuviaTooltipX : nuviaTooltipFollowX,
+                y: nuviaTooltipTouch || compact ? nuviaTooltipY : nuviaTooltipFollowY,
               }}
               transformTemplate={({ x, y }) =>
-                nuviaTooltipTouch
+                nuviaTooltipTouch || compact
                   ? `translate(${x}, ${y}) translate(-50%, -50%)`
                   : `translate(${x}, ${y}) translate(14px, -50%)`
               }

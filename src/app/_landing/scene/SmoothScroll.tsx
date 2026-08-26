@@ -1,19 +1,12 @@
 "use client";
 
 import { cancelFrame, frame } from "framer-motion";
-import type { LenisOptions } from "lenis";
 import { ReactLenis, type LenisRef } from "lenis/react";
 import { useEffect, useRef, type ReactNode } from "react";
 
-import "lenis/dist/lenis.css";
+import { LENIS_OPTIONS } from "./lenis-options";
 
-const LENIS_OPTIONS: LenisOptions = {
-  allowNestedScroll: true,
-  anchors: true,
-  autoRaf: false,
-  stopInertiaOnNavigate: true,
-  virtualScroll: () => document.documentElement.dataset.introLock === undefined,
-};
+import "lenis/dist/lenis.css";
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const lenisRef = useRef<LenisRef>(null);

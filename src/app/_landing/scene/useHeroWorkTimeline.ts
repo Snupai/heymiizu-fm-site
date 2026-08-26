@@ -8,6 +8,7 @@ import { sceneProgress } from "./scene-scroll";
 import {
   getClientsContactFadeOpacity,
   getClientsContactFadeScaleX,
+  getIntroPanelRest,
   getMarqueeHandoffProgress,
   SCROLL_CONTACT_SET,
   SCROLL_CONTACT_START,
@@ -20,13 +21,15 @@ import {
   SCROLL_WORK_RESET,
   SCROLL_WORK_REVEAL,
   SHOWREEL_RADIUS_REM,
+  type IntroLayout,
   type ScrollPauseStop,
 } from "./scroll-timeline";
 
 type WorkSequencePhase = "idle" | "in" | "out";
 type ScrollDir = "up" | "down";
 
-export function useHeroWorkTimeline(compact: boolean) {
+export function useHeroWorkTimeline(layout: IntroLayout) {
+  const rest = getIntroPanelRest(layout);
   const sceneRef = useRef<HTMLDivElement>(null);
   const workSequencePhase = useRef<WorkSequencePhase>("idle");
   const lastWorkProgress = useRef(0);
@@ -106,24 +109,22 @@ export function useHeroWorkTimeline(compact: boolean) {
   const panelX = useTransform(
     scrollYProgress,
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
-    compact ? ["-5vw", "-5vw", "0vw", "0vw"] : ["-3vw", "-3vw", "0vw", "0vw"],
+    [rest.x, rest.x, "0vw", "0vw"],
   );
   const panelY = useTransform(
     scrollYProgress,
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
-    compact
-      ? ["43svh", "43svh", "0svh", "0svh"]
-      : ["9svh", "9svh", "0svh", "0svh"],
+    [rest.y, rest.y, "0svh", "0svh"],
   );
   const panelScaleX = useTransform(
     scrollYProgress,
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
-    compact ? [0.9, 0.9, 1, 1] : [0.31, 0.31, 1, 1],
+    [rest.scaleX, rest.scaleX, 1, 1],
   );
   const panelScaleY = useTransform(
     scrollYProgress,
     [0, SCROLL_PANEL_HOLD, SCROLL_PANEL_EXPANDED, 1],
-    compact ? [0.51, 0.51, 1, 1] : [0.82, 0.82, 1, 1],
+    [rest.scaleY, rest.scaleY, 1, 1],
   );
   const cardScaleX = useTransform(panelScaleX, (value) => 1 / value);
   const cardScaleY = useTransform(panelScaleY, (value) => 1 / value);
@@ -192,6 +193,16 @@ export function useHeroWorkTimeline(compact: boolean) {
   };
 
   const openContact = () => {
+    if (layout === "compact") {
+      const contact = document.getElementById("contact");
+      if (contact && lenis) {
+        lenis.scrollTo(contact, { userData: { skipPauses: true } });
+        return;
+      }
+      contact?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
     scrollToProgress(SCROLL_CONTACT_SET);
   };
 

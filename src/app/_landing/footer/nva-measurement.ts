@@ -97,37 +97,62 @@ export function measureNvaInk(computed: CSSStyleDeclaration, fontSize: number) {
   return { inkLeft, inkWidth };
 }
 
-export function anchorRepresentedBy(word: HTMLElement, label: HTMLElement) {
-  const panel = word.parentElement?.parentElement;
-  const textNode = word.firstChild;
+export function mobileNvaViewportWidth(
+  innerWidth: number,
+  visualWidth?: number,
+) {
+  const raw = visualWidth && visualWidth > 0 ? visualWidth : innerWidth;
+  if (!(raw > 0)) return 0;
+  return Math.round(raw);
+}
 
-  if (!panel || textNode?.nodeType !== Node.TEXT_NODE) return;
+export function fitMobileNvaInk(
+  ink: { inkLeft: number; inkWidth: number },
+  targetWidth: number,
+) {
+  if (!(ink.inkWidth > 0) || !(targetWidth > 0)) return null;
 
-  const range = document.createRange();
-  range.setStart(textNode, 0);
-  range.setEnd(textNode, 1);
-  const nRect = range.getBoundingClientRect();
-  const panelRect = panel.getBoundingClientRect();
-  range.detach();
+  return {
+    scale: targetWidth / ink.inkWidth,
+    shift: -ink.inkLeft,
+    width: targetWidth,
+  };
+}
 
-  if (nRect.width < 2 || nRect.height < 2 || panelRect.height < 2) return;
+export const NVA_REPRESENTED_PIN = {
+  small: { height: 297, xFrac: 0.1435, yFrac: 0.2182 },
+  large: { height: 766.25, xFrac: 0.1156, yFrac: 0.1224 },
+} as const;
 
-  const computed = window.getComputedStyle(word);
-  const letterSpacing = Number.parseFloat(computed.letterSpacing);
-  const scaleX = new DOMMatrix(computed.transform).a || 1;
-  const visualTracking = Number.isFinite(letterSpacing)
-    ? Math.abs(letterSpacing * scaleX)
-    : 0;
-  const inkWidth = Math.max(1, nRect.width - visualTracking);
-  const yAbs = panelRect.top + panelRect.height * 0.28;
-  const alongGlyph = (yAbs - nRect.top) / nRect.height;
-  const xAbs = nRect.left + inkWidth * alongGlyph;
+type NvaBox = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
 
-  label.style.setProperty("--n-x", `${xAbs - panelRect.left}px`);
-  label.style.setProperty("--n-y", `${yAbs - panelRect.top}px`);
-  label.style.setProperty(
-    "--n-angle",
-    `${(Math.atan2(nRect.height, inkWidth) * 180) / Math.PI}deg`,
-  );
-  label.style.fontSize = `${Math.min(16, Math.max(11, panelRect.height * 0.048))}px`;
+export function representedByMarkFractions(markHeight: number) {
+  const { small, large } = NVA_REPRESENTED_PIN;
+  const span = large.height - small.height;
+  const t =
+    span > 0
+      ? Math.min(1, Math.max(0, (markHeight - small.height) / span))
+      : 1;
+
+  return {
+    xFrac: small.xFrac + (large.xFrac - small.xFrac) * t,
+    yFrac: small.yFrac + (large.yFrac - small.yFrac) * t,
+  };
+}
+
+export function representedByWordmarkPin(mark: NvaBox, panel: NvaBox) {
+  if (!(panel.width > 0) || !(panel.height > 0)) return null;
+
+  const { xFrac, yFrac } = representedByMarkFractions(mark.height);
+  const x = mark.left - panel.left + mark.width * xFrac;
+  const y = mark.top - panel.top + mark.height * yFrac;
+  return {
+    xPct: (x / panel.width) * 100,
+    yPct: (y / panel.height) * 100,
+  };
 }
