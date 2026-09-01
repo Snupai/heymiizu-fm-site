@@ -20,7 +20,6 @@ import {
   fitMobileNvaInk,
   measureNvaInk,
   mobileNvaViewportWidth,
-  representedByWordmarkPin,
 } from "./nva-measurement";
 
 const NUVIA_TOOLTIP_HOVER_DELAY_MS = 2_000;
@@ -35,7 +34,6 @@ export function LandingFooter() {
   const reduceMotion = useReducedMotion();
   const footerRef = useRef<HTMLElement>(null);
   const nuviaWordmarkRef = useRef<HTMLDivElement>(null);
-  const representedByRef = useRef<HTMLSpanElement>(null);
   const nuviaTooltipReady = useRef(false);
   const nuviaTooltipHoverTimer = useRef<number | null>(null);
   const lastNuviaTouchAt = useRef(-Infinity);
@@ -50,11 +48,6 @@ export function LandingFooter() {
   const linksOpacity = useTransform(
     scrollYProgress,
     [0.12, 1],
-    compactMotion ? [0, 1] : [1, 1],
-  );
-  const representedOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.72],
     compactMotion ? [0, 1] : [1, 1],
   );
   const nuviaTooltipFollowX = useSpring(nuviaTooltipX, {
@@ -88,21 +81,6 @@ export function LandingFooter() {
 
     const footer = wordmark.closest("footer");
     const compactQuery = window.matchMedia(COMPACT_LAYOUT_QUERY);
-
-    const pinRepresentedBy = () => {
-      const label = representedByRef.current;
-      const panel = wordmark.parentElement;
-      if (!label || !panel) return;
-
-      const pin = representedByWordmarkPin(
-        wordmark.getBoundingClientRect(),
-        panel.getBoundingClientRect(),
-      );
-      if (!pin) return;
-
-      label.style.setProperty("--n-x", `${pin.xPct}%`);
-      label.style.setProperty("--n-y", `${pin.yPct}%`);
-    };
 
     const fitWordmark = () => {
       const words = [
@@ -143,7 +121,6 @@ export function LandingFooter() {
           wordmark.style.width = `${fit.width}px`;
           wordmark.style.setProperty("--nva-shift", `${fit.shift}px`);
           wordmark.style.setProperty("--nva-scale", "1");
-          pinRepresentedBy();
           return;
         }
 
@@ -190,7 +167,6 @@ export function LandingFooter() {
         wordmark.style.width = `${Math.ceil(ink.inkWidth)}px`;
         wordmark.style.setProperty("--nva-shift", `${shift}px`);
         wordmark.style.setProperty("--nva-scale", "1");
-        pinRepresentedBy();
     };
 
     let fitFrame = 0;
@@ -387,7 +363,7 @@ export function LandingFooter() {
       <footer className={styles.footer} id="footer" ref={footerRef}>
         <div
           aria-expanded={compact ? nuviaTooltipVisible && nuviaTooltipTouch : undefined}
-          aria-label={compact ? "NVA, represented by Nuvia" : undefined}
+          aria-label={compact ? "NVA" : undefined}
           className={styles.nuviaPanel}
           data-nuvia-open={
             compact && nuviaTooltipVisible && nuviaTooltipTouch ? "" : undefined
@@ -409,7 +385,7 @@ export function LandingFooter() {
           tabIndex={compact ? 0 : undefined}
         >
           <div
-            aria-label="NVA, represented by Nuvia"
+            aria-label="NVA"
             className={styles.nuviaWordmark}
             onBlur={compact ? undefined : hideNuviaTooltip}
             onFocus={() => {
@@ -446,17 +422,6 @@ export function LandingFooter() {
               {"NVA"}
             </span>
           </div>
-          <motion.span
-            className={styles.representedBy}
-            ref={representedByRef}
-            style={
-              compactMotion
-                ? { opacity: representedOpacity, position: "absolute", zIndex: 2 }
-                : { position: "absolute", zIndex: 2 }
-            }
-          >
-            represented by
-          </motion.span>
         </div>
         <motion.nav
           className={styles.footerLinks}
