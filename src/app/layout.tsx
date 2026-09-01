@@ -24,10 +24,10 @@ const SITE_DESCRIPTION =
   "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.";
 
 const OG_IMAGE = {
-  url: "/og.png",
-  width: 2048,
-  height: 2728,
-  alt: "Miizu motion design",
+  url: "/og.jpg",
+  width: 1200,
+  height: 1598,
+  alt: "Visit miizumelon.com",
 } as const;
 
 const EASTER_EGG_CHANCE = 0.25;
