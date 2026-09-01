@@ -13,14 +13,22 @@ const rethinkSans = Rethink_Sans({
   variable: "--font-rethink-sans",
 });
 
-const CANONICAL_TITLE = "Miizu - Motion Direction";
-
 const TAB_TITLES = [
   "miizumelon.com",
   "miiiiiiiiizu",
   "Miizu - Motion Design",
   "Your new motion designer ;)",
 ] as const;
+
+const SITE_DESCRIPTION =
+  "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.";
+
+const OG_IMAGE = {
+  url: "/og.jpg",
+  width: 1200,
+  height: 1598,
+  alt: "Visit miizumelon.com",
+} as const;
 
 const EASTER_EGG_CHANCE = 0.25;
 
@@ -50,8 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "https://heymiizu-fm-site-git-main-snupai.vercel.app",
     ),
     title,
-    description:
-      "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.",
+    description: SITE_DESCRIPTION,
     icons: {
       icon: [
         {
@@ -67,24 +74,13 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
     },
     openGraph: {
-      title: CANONICAL_TITLE,
-      description:
-        "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.",
-      images: [
-        {
-          url: "/dd8ushtKAafNiPreGQQfuOm10U.jpg",
-          width: 1200,
-          height: 630,
-          alt: "Miizu motion direction portfolio",
-        },
-      ],
+      description: SITE_DESCRIPTION,
+      images: [OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
-      title: CANONICAL_TITLE,
-      description:
-        "Launches, trailers, keynotes and placements directed by Miizu for brands and creators.",
-      images: ["/dd8ushtKAafNiPreGQQfuOm10U.jpg"],
+      description: SITE_DESCRIPTION,
+      images: [OG_IMAGE.url],
     },
   };
 }
