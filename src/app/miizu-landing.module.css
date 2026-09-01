@@ -1174,23 +1174,6 @@
   position: relative;
 }
 
-.representedBy {
-  color: var(--miizu-primary);
-  font-size: clamp(0.55rem, calc(var(--nva-size) * 0.034), 1.25rem);
-  font-weight: 650;
-  left: var(--n-x, 11.56%);
-  letter-spacing: 0.01em;
-  line-height: 1;
-  pointer-events: none;
-  position: absolute;
-  top: var(--n-y, 12.24%);
-  transform: translate(-50%, -50%) rotate(var(--n-angle, 55.83deg));
-  transform-origin: center;
-  user-select: none;
-  white-space: nowrap;
-  z-index: 2;
-}
-
 .nuviaWordmark {
   bottom: 0;
   cursor: default;
@@ -1778,10 +1761,6 @@
     overflow: hidden;
     position: relative;
     width: 100%;
-  }
-
-  .representedBy {
-    color: var(--miizu-primary);
   }
 
   .nuviaWordmark {
