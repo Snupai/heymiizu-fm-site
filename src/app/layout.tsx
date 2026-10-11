@@ -6,6 +6,7 @@ import React from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import AppShell from "../components/AppShell";
+import PlausibleAnalytics from "../components/PlausibleAnalytics";
 
 const rethinkSans = Rethink_Sans({
   subsets: ["latin"],
@@ -94,6 +95,7 @@ export default function RootLayout({
     <html className={rethinkSans.variable} lang="en">
       <body className="flex min-h-screen flex-col font-sans font-semibold">
         <AppShell>{children}</AppShell>
+        <PlausibleAnalytics />
       </body>
       <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
       <Analytics />

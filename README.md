@@ -42,7 +42,7 @@ Miizu is a motion director’s portfolio and commission interface. Instead of pr
 | Forms            | React Day Picker, `@intl-tel-input/react`, Zod              |
 | Backend          | Supabase Auth, PostgreSQL, RPC, and Storage                 |
 | Contact delivery | Next.js route handler and Nodemailer over SMTP              |
-| Analytics        | Simple Analytics and Vercel Analytics                       |
+| Analytics        | Self-hosted Plausible, Simple Analytics, Vercel Analytics    |
 
 ## Getting started
 
@@ -91,6 +91,14 @@ Variables prefixed with `NEXT_PUBLIC_` are included in browser code and must nev
 The browser client has local placeholders so the visual site can render without Supabase. The contact API has no equivalent fallback and requires real values for availability checks and submissions.
 
 These variables are currently read directly by application code rather than validated in `src/env.js`.
+
+### Plausible Analytics
+
+`@plausible-analytics/tracker` initializes in `src/components/PlausibleAnalytics.tsx`, mounted once in the root layout. It automatically tracks the initial pageview and client-side page navigation, sending events to `https://visits.snupai.dev/api/event` under the existing `miizumelon.com` site.
+
+Tracking runs only in production builds on `miizumelon.com`, `miizumelon.de`, and their `www` hosts. Local development and preview hosts are excluded. Hash changes between landing sections do not count as new pageviews. No API key or additional environment variables are required. Existing Simple Analytics and Vercel Analytics integrations remain enabled.
+
+After deploying, open the public site and use the installation verification for `miizumelon.com` at [your Plausible instance](https://visits.snupai.dev/sites). The tracker exposes `window.plausible` for Plausible's NPM installation detection. Local checks do not verify the deployed installation or live event ingestion.
 
 ### Email delivery
 
